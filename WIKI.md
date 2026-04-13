@@ -33,11 +33,12 @@ It separates:
 | `questions/` | Unresolved uncertainties and research gaps |
 | `decisions/` | Recorded judgments, resolutions, and schema choices |
 | `reports/` | Generated maintenance views and dashboards |
-| `_attachments/` | Attachments referenced by source or other pages |
-| `_views/` | Reusable view templates or layout helpers |
+| `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
+| `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
+| `_views/` | Reusable view templates or layout helpers (created on init, may be empty) |
+| `_docs/` | Repository and structural documentation not part of the ontology |
 | `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
-| `_archive/` | Archived content no longer actively maintained |
 
 ---
 
@@ -56,6 +57,7 @@ Every authored page has a `pageType` in its frontmatter.
 | `question`  | `questions/`  | Open question or research gap         |
 | `decision`  | `decisions/`  | Recorded judgment or choice           |
 | `report`    | `reports/`    | Generated view or dashboard           |
+| `index`     | `index.md`    | Vault landing page (not a report)     |
 
 ---
 

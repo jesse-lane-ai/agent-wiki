@@ -201,13 +201,17 @@ A v1-compliant vault MUST use the following top-level structure.
   reports/
 
   _attachments/
+  _archive/
   _views/
+  _docs/
 
   _wiki/
     cache/
     indexes/
     logs/
 ```
+
+The folders `_attachments/`, `_archive/`, `_views/`, and `_docs/` do not need to contain content at vault creation time. They SHOULD be created as empty directories (with a `.gitkeep` if using git) during initial vault setup so the structure is in place.
 
 ### 6.1 Required top-level files
 
@@ -269,10 +273,16 @@ Stores recorded decision pages.
 Stores generated dashboard pages and maintenance views.
 
 #### `_attachments/`
-Stores attachments referenced by source pages or other pages.
+Stores binary assets and attachments referenced by source pages or other pages (PDFs, images, raw files). Created on vault initialization; MAY be empty.
+
+#### `_archive/`
+Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
 
 #### `_views/`
-Optional place for reusable view templates or layout helpers.
+Optional. Stores reusable view templates or layout helpers. Created on vault initialization; MAY be empty.
+
+#### `_docs/`
+Optional. Stores structural or repository-level documentation that does not belong in the primary ontology (e.g., directory guides, onboarding notes). Pages in `_docs/` are not required to conform to the standard page type schema.
 
 #### `_wiki/`
 Stores machine-generated runtime and compile artifacts.
@@ -369,6 +379,14 @@ A `claim` page represents a standalone atomic proposition that tracks its own ev
 
 A page in `claims/` MUST have `pageType: claim`.
 
+### 7.10 `index.md`
+
+`index.md` is the human-facing landing page for the vault.
+
+It SHOULD have `pageType: index`. It MUST NOT be typed as `report` — it is not a generated view.
+
+The `index` page type is reserved for vault-level navigation and orientation pages. There is typically only one `index` page per vault.
+
 ---
 
 ## 8. Page Identity and Naming
@@ -454,6 +472,7 @@ Allowed values:
 - `question`
 - `decision`
 - `report`
+- `index`
 
 #### `title`
 Type: string  

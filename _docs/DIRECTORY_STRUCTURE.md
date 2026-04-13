@@ -20,11 +20,10 @@ These folders start with an underscore (`_`) to separate them from the primary o
 
 - **`_wiki/`**: The compiler core. Contains `compile.py` and the generated `cache/` and `indexes/` directories where the machine-facing artifacts (`pages.json`, `claims.jsonl`, etc.) are written. *Do not hand-edit files inside the cache.*
 - **`_inbox/`**: The raw item intake queue. Unstructured or newly added data items land here as minimal pointer files before they are processed, triaged, and codified into official `sources/`.
-- **`_attachments/`**: A storage folder for binary assets like PDFs, images, code snippets, or raw files referenced by other wiki pages.
-- **`_archive/`**: A dead-letter storage area for deprecated, discarded, or obsolete pages that are no longer actively maintained.
-- **`_procedures/`**: System-level procedures tracking meta-workflows specific to managing the vault infrastructure itself.
-- **`_views/`**: Designed to hold reusable layout helpers and templates.
-- **`_docs/`**: Houses general structural and repository documentation (including this very file).
+- **`_attachments/`**: A storage folder for binary assets like PDFs, images, code snippets, or raw files referenced by other wiki pages. Created on vault initialization; may be empty.
+- **`_archive/`**: A dead-letter storage area for deprecated, discarded, or obsolete pages that are no longer actively maintained. Created on vault initialization; may be empty.
+- **`_views/`**: Holds reusable layout helpers and templates. Created on vault initialization; may be empty.
+- **`_docs/`**: Houses general structural and repository documentation (including this very file). Pages here are not required to conform to the standard page type schema.
 
 ## Root Configuration & Specifications
 The root directory holds the schema definitions, behavior contracts, and entry points for navigating the setup.

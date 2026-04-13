@@ -153,6 +153,7 @@ Example: `entities/my-project.md`
 | `questions/` | `question` |
 | `decisions/` | `decision` |
 | `reports/` | `report` (if frontmatter present) |
+| `index.md` | `index` |
 
 Agents MUST place pages in the folder that matches their `pageType`.  
 Agents MUST NOT place entity pages in `concepts/`, etc.

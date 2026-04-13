@@ -1,6 +1,6 @@
 ---
 id: meta.index
-pageType: report
+pageType: index
 title: Agentics Wiki Index
 status: active
 createdAt: 2026-04-12
@@ -37,7 +37,7 @@ Welcome to the Agentics vault — a structured knowledge base designed for both 
 
 New material lands in [`_inbox/`](_inbox/) as pointer files before being processed into canonical `source` pages.
 
-See [INBOX.md](INBOX.md) for the pointer schema and intake lifecycle.
+See [[INBOX]] for the pointer schema and intake lifecycle.
 
 ---
 
@@ -45,10 +45,10 @@ See [INBOX.md](INBOX.md) for the pointer schema and intake lifecycle.
 
 | File | Purpose |
 |---|---|
-| [WIKI.md](WIKI.md) | Schema, page types, folder meanings, and editorial rules |
-| [AGENTS.md](AGENTS.md) | Agent behavior contract |
-| [INBOX.md](INBOX.md) | Inbox pointer schema and intake workflow |
-| [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) | Full v1 specification |
+| [[WIKI]] | Schema, page types, folder meanings, and editorial rules |
+| [[AGENTS]] | Agent behavior contract |
+| [[INBOX]] | Inbox pointer schema and intake workflow |
+| [[AGENT-WIKI-SPEC-v1]] | Full v1 specification |
 
 ---
 
