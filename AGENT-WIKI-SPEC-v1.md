@@ -604,9 +604,9 @@ Allowed values:
 Recommended shape:
 
 ```yaml
-id: procedure.compile-wiki
+id: procedure.create-video
 pageType: procedure
-title: Compile the Wiki Cache
+title: Create Video
 procedureType: workflow
 status: active
 createdAt: 2026-04-12
