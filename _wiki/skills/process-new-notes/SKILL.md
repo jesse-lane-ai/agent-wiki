@@ -11,9 +11,8 @@ This skill captures the workflow for processing the Agentics vault inbox: readin
  
 Before touching anything, read the vault's agent contract in this order:
  
-1. `CLAUDE.md` — may point to other files
-2. `AGENTS.md` — the behavioral contract (managed blocks, ID rules, what agents may/must not do)
-3. `agentic-wiki-v1-spec.md` — the full v1 schema
+1. `AGENTS.md` — the behavioral contract (managed blocks, ID rules, what agents may/must not do)
+2. `agentic-wiki-v1-spec.md` — the full v1 schema
  
 You need to understand the contract before editing anything. The key things from AGENTS.md that apply here:
 - Never rewrite human content outside managed blocks
