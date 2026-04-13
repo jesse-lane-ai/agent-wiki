@@ -65,7 +65,7 @@ REPORTS_DIR = "reports"
 STALE_DAYS = 90  # pages not updated in this many days are flagged
 LOW_CONFIDENCE_THRESHOLD = 0.50
 
-VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report"}
+VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report", "claim"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
 VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
@@ -163,6 +163,13 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> list[dict]:
             record["decisionType"] = meta.get("decisionType", "")
             record["decidedAt"] = str(meta.get("decidedAt", ""))
             record["summary"] = meta.get("summary", "")
+        elif page_type == "claim":
+            record["claimType"] = meta.get("claimType", "")
+            record["claimStatus"] = meta.get("claimStatus", meta.get("status", ""))
+            record["confidence"] = meta.get("confidence", None)
+            record["text"] = meta.get("text", "")
+            record["subjectPageId"] = meta.get("subjectPageId", "")
+            record["sourceIds"] = meta.get("sourceIds") or []
 
         # Counts
         claims = meta.get("claims") or []
@@ -185,9 +192,26 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def extract_claims(pages: list[dict]) -> list[dict]:
-    """Extract all claims from page metadata."""
+    """Extract all claims from page metadata (embedded and standalone)."""
     all_claims = []
     for page in pages:
+        # Standalone claim pages
+        if page["pageType"] == "claim":
+            record = {
+                "id": page["id"],
+                "text": page["meta"].get("text", page["title"]),
+                "status": page["meta"].get("claimStatus", page["meta"].get("status", "")),
+                "confidence": page["meta"].get("confidence"),
+                "claimType": page["meta"].get("claimType", ""),
+                "evidence": page["meta"].get("evidence") or [],
+                "_owningPageId": page["meta"].get("subjectPageId", ""),
+                "_owningPagePath": page["path"],
+                "_owningPageType": "claim",
+                "_standaloneClaimPage": True,
+            }
+            all_claims.append(record)
+            continue
+        # Embedded claims in frontmatter
         raw_claims = page["meta"].get("claims") or []
         for claim in raw_claims:
             if not isinstance(claim, dict):
@@ -196,6 +220,7 @@ def extract_claims(pages: list[dict]) -> list[dict]:
             record["_owningPageId"] = page["id"]
             record["_owningPagePath"] = page["path"]
             record["_owningPageType"] = page["pageType"]
+            record["_standaloneClaimPage"] = False
             all_claims.append(record)
     return all_claims
 
@@ -808,6 +833,28 @@ def main():
         encoding="utf-8"
     )
     print(f"  Wrote source-index.json ({len(source_index)} sources)")
+
+    # claims-index.json — standalone claim pages only
+    claims_index = [
+        {
+            "id": p["id"],
+            "title": p["title"],
+            "path": p["path"],
+            "claimStatus": p.get("claimStatus", p["status"]),
+            "claimType": p.get("claimType", ""),
+            "confidence": p.get("confidence"),
+            "text": p.get("text", ""),
+            "subjectPageId": p.get("subjectPageId", ""),
+            "sourceIds": p.get("sourceIds") or [],
+            "updatedAt": p["updatedAt"],
+        }
+        for p in pages if p["pageType"] == "claim"
+    ]
+    (cache_dir / "claims-index.json").write_text(
+        json.dumps({"compiledAt": compiled_at, "claims": claims_index}, indent=2, default=str),
+        encoding="utf-8"
+    )
+    print(f"  Wrote claims-index.json ({len(claims_index)} standalone claims)")
 
     # --- Write indexes ---
     print("\nWriting indexes...")

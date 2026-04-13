@@ -24,6 +24,7 @@ Welcome to the Agentics vault — a structured knowledge base designed for both 
 | [`sources/`](sources/) | Raw material and source-backed pages |
 | [`entities/`](entities/) | Durable things: people, orgs, projects, products |
 | [`concepts/`](concepts/) | Definitions, methods, frameworks, principles |
+| [`claims/`](claims/) | Standalone atomic claim pages with evidence |
 | [`syntheses/`](syntheses/) | Cross-source analyses and overviews |
 | [`procedures/`](procedures/) | Runbooks, checklists, workflows |
 | [`questions/`](questions/) | Open questions and research gaps |

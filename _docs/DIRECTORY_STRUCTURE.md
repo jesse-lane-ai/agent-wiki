@@ -8,6 +8,7 @@ These folders contain the actual data, relationships, and nodes that make up the
 - **`sources/`**: Holds `source` pages. Represents information origins (e.g., webpages, PDFs, datasets, transcripts, meeting notes). This is the canonical home for verified facts.
 - **`entities/`**: Holds `entity` pages. Represents durable things (e.g., people, organizations, products, projects, systems).
 - **`concepts/`**: Holds `concept` pages. Stores abstract ideas such as definitions, frameworks, policies, and principles.
+- **`claims/`**: Holds `claim` pages. Stores standalone, atomic propositions with dedicated frontmatter for tracking individual evidence and status.
 - **`syntheses/`**: Holds `synthesis` pages. Contains cross-source rollups, overview documents, and analyses that aggregate ideas from multiple raw sources.
 - **`procedures/`**: Holds `procedure` pages. Action-oriented workflows, playbooks, runbooks, and checklists.
 - **`decisions/`**: Holds `decision` pages. Keeps a historical log of schema definitions, resolutions, or architectural choices made over time.

@@ -27,6 +27,7 @@ It separates:
 | `sources/` | Raw material and source-backed pages: webpages, PDFs, articles, transcripts, meeting notes, datasets |
 | `entities/` | Durable things: people, orgs, projects, products, systems, places, events, artifacts |
 | `concepts/` | Abstract ideas: definitions, principles, methods, frameworks, policies, standards |
+| `claims/` | Standalone claim pages: individual atomic propositions with their own evidence and provenance |
 | `syntheses/` | Maintained cross-source interpretations: overviews, analyses, comparisons, briefs, timelines |
 | `procedures/` | Action-oriented instructions: runbooks, checklists, workflows, playbooks |
 | `questions/` | Unresolved uncertainties and research gaps |
@@ -50,6 +51,7 @@ Every authored page has a `pageType` in its frontmatter.
 | `source`    | `sources/`    | Information origin                    |
 | `entity`    | `entities/`   | Durable thing                         |
 | `concept`   | `concepts/`   | Abstract idea or definition           |
+| `claim`     | `claims/`     | Standalone atomic proposition         |
 | `synthesis` | `syntheses/`  | Cross-source rollup or interpretation |
 | `procedure` | `procedures/` | Workflow or instructions              |
 | `question`  | `questions/`  | Open question or research gap         |

@@ -147,6 +147,7 @@ Example: `entities/my-project.md`
 | `sources/` | `source` |
 | `entities/` | `entity` |
 | `concepts/` | `concept` |
+| `claims/` | `claim` |
 | `syntheses/` | `synthesis` |
 | `procedures/` | `procedure` |
 | `questions/` | `question` |
