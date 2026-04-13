@@ -38,7 +38,6 @@ It separates:
 | `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `_archive/` | Archived content no longer actively maintained |
-| `_procedures/` | Internal system-level procedure pages |
 
 ---
 
