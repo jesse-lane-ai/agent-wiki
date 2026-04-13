@@ -1,20 +1,3 @@
----
-id: procedure.compile-wiki
-pageType: procedure
-title: Compile the Wiki Cache
-procedureType: workflow
-status: active
-createdAt: 2026-04-12
-updatedAt: 2026-04-12
-aliases:
-  - compile
-  - run compile
-tags:
-  - meta
-  - compile
-  - agents
----
-
 # Compile the Wiki Cache
 
 Run the compile pipeline to regenerate all machine-facing cache artifacts and maintenance reports from vault page frontmatter.
