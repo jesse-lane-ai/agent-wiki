@@ -1,15 +1,21 @@
 ## `_inbox/` Pointer Schema
 
 Inbox pointer files are simple tracking records for raw items that landed in `_inbox/` and still need to be processed into canonical `source` pages.
+
+**Use the process-new-notes skill to process the inbox.**
+`_wiki/skills/process-new-notes/SKILL.md`
+
 ### Folder meaning
 
 - `_inbox/` = active queue
 - `_inbox/trash/` = discarded or inactive inbox items
+
 ### Required fields
 
 - `id`: unique inbox item ID
 - `source`: pointer to the raw item
 - `status`: processing state
+
 ### Allowed `status` values
 
 - `unprocessed`
@@ -18,6 +24,7 @@ Inbox pointer files are simple tracking records for raw items that landed in `_i
 - `failed`
 - `ignored`
 - `trashed`
+
 ### Minimal example
 
 ```yaml
@@ -37,6 +44,7 @@ Items moved to `_inbox/trash/` SHOULD use one of these statuses:
 - `processed`
 
 `trashed` is the clearest status when the file is physically moved into `_inbox/trash/`.
+
 ### Notes
 
 - `_inbox` pointer files are not canonical `source` pages.
