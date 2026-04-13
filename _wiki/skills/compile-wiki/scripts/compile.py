@@ -56,7 +56,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "_views"}
-SKIP_FILES = {"AGENTS.md", "WIKI.md", "inbox.md", "initialize.md", "agentic-wiki-v1-spec.md"}
+SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
 CACHE_DIR = "_wiki/cache"
 INDEX_DIR = "_wiki/indexes"
 LOG_DIR = "_wiki/logs"
