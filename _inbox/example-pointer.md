@@ -1,5 +1,5 @@
 ---
-pointer: https://example.com
+pointer: "[[example-source]]"
 status: UNPROCESSED
 title: Example Link
 ---
