@@ -10,7 +10,7 @@ Last updated: 2026-04-12
 
 This file is the authoritative description of how agents are expected to behave when reading, writing, or compiling this vault. It is not a style guide — it is a contract.
 
-Agents MUST read this file before making any edits to the vault. See also [WIKI.md](./WIKI.md) for schema and editorial rules, and [INBOX.md](./INBOX.md) for the intake pointer schema.
+Agents MUST read this file before making any edits to the vault. See also [[WIKI]] for schema and editorial rules, and [[INBOX]] for the intake pointer schema.
 
 ---
 
@@ -80,7 +80,7 @@ Agents MUST NOT manually patch cache files except by running the compile pipelin
 
 Agents MUST NOT read `_inbox/` pointer files as primary data sources or treat them as evidence for claims.
 
-Agents SHOULD process inbox items by converting retained items into canonical `source` pages under `sources/`. See [INBOX.md](./INBOX.md) for the pointer schema and lifecycle rules.
+Agents SHOULD process inbox items by converting retained items into canonical `source` pages under `sources/`. See [[INBOX]] for the pointer schema and lifecycle rules.
 
 ---
 
@@ -238,7 +238,31 @@ Standard block names agents should use:
 - Create duplicate IDs
 - Place pages in the wrong folder for their `pageType`
 - Invent unsupported certainty in claims
+- Use standard markdown links for internal vault references (use wikilinks instead)
 
-## 12. Full Specification
+---
 
-[[agentic-wiki-v1-spec]]
+## 12. Internal linking convention
+
+All internal links within the vault MUST use Obsidian-style wikilinks.
+
+| Use case | Format |
+|---|---|
+| Link to a page | `[[page-slug]]` |
+| Link with display text | `[[page-slug\|Display Text]]` |
+| Link to a section | `[[page-slug#section-heading]]` |
+
+Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs only.
+
+This convention applies to:
+- page body content
+- managed block content
+- `relatedPages` values in frontmatter (use wikilink strings)
+- skill instruction files
+- all root-level docs (AGENTS.md, WIKI.md, INBOX.md, CLAUDE.md, etc.)
+
+---
+
+## 13. Full Specification
+
+[[AGENT-WIKI-SPEC-v1]]

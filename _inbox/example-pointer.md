@@ -1,7 +1,5 @@
 ---
-pointer: "[[example-source]]"
+id: inbox.example.001
+pointer: "[[sources/example-source]]"
 status: UNPROCESSED
-title: Source Title
 ---
-
-

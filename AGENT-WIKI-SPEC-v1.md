@@ -395,6 +395,26 @@ Filenames MAY change. IDs SHOULD remain stable.
 ### 8.3 Canonical names
 Entities and concepts SHOULD include `canonicalName`.
 
+### 8.4 Internal linking convention
+
+All internal references within the vault MUST use Obsidian-style wikilinks.
+
+```md
+[[page-slug]]
+[[page-slug|Display Text]]
+[[page-slug#section-heading]]
+```
+
+Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs only.
+
+This convention applies to:
+- page body content and managed block content
+- skill instruction files
+- root-level docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `CLAUDE.md`, etc.)
+- `relatedPages`, `relatedClaims`, and similar string reference fields in frontmatter
+
+Rationale: wikilinks decouple references from file system paths, survive renames, and are resolved natively by Obsidian and compatible tooling.
+
 ---
 
 ## 9. Required Universal Frontmatter

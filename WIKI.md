@@ -291,15 +291,15 @@ The `_inbox/` folder is the raw item intake queue. New unprocessed material shou
 
 Each item in `_inbox/` is tracked by a **pointer file** — a minimal YAML record that references the raw item and tracks its processing state.
 
-See [INBOX.md](./INBOX.md) for the full pointer schema.
+See [[INBOX]] for the full pointer schema.
 
 ### Intake lifecycle
 
 1. Raw item arrives in `_inbox/`
-2. A pointer file is created with `status: unprocessed`
+2. A pointer file is created with `status: UNPROCESSED`
 3. The item is reviewed and triaged
-4. If retained: item becomes a canonical `source` page under `sources/`; pointer moves to `_inbox/trash/` with `status: processed`
-5. If discarded: pointer moves to `_inbox/trash/` with `status: ignored` or `trashed`
+4. If retained: item becomes a canonical `source` page under `sources/`; pointer moves to `_inbox/trash/` with `status: PROCESSED`
+5. If discarded: pointer moves to `_inbox/trash/` with `status: IGNORED` or `TRASHED`
 
 ### `_inbox/` is not canonical
 
@@ -309,7 +309,21 @@ See [INBOX.md](./INBOX.md) for the full pointer schema.
 
 ---
 
-## 14. Editorial principles
+## 14. Internal linking convention
+
+All internal links within the vault use Obsidian-style wikilinks.
+
+| Format | Use |
+|---|---|
+| `[[page-slug]]` | Link to a page |
+| `[[page-slug\|Display Text]]` | Link with custom display text |
+| `[[page-slug#section]]` | Link to a section |
+
+Standard markdown links are only used for external URLs.
+
+---
+
+## 15. Editorial principles
 
 - Claims should be atomic — one proposition per claim.
 - Important assertions should be in frontmatter, not buried in prose, if they matter for agents.

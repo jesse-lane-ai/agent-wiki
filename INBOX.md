@@ -13,41 +13,42 @@ Inbox pointer files are simple tracking records for raw items that landed in `_i
 ### Required fields
 
 - `id`: unique inbox item ID
-- `source`: pointer to the raw item
+- `pointer`: path or reference to the raw item
 - `status`: processing state
 
 ### Allowed `status` values
 
-- `unprocessed`
-- `processing`
-- `processed`
-- `failed`
-- `ignored`
-- `trashed`
+- `UNPROCESSED`
+- `PROCESSING`
+- `PROCESSED`
+- `FAILED`
+- `IGNORED`
+- `TRASHED`
 
 ### Minimal example
 
 ```yaml
 id: 2026-04-12-inbox-2042925773300908103
-source: source/2042925773300908103
-status: unprocessed
+pointer: "[[sources/2042925773300908103]]"
+status: UNPROCESSED
 ```
+
 ### Trash rule
 
-When an item is confirmed as processed change it's status to `processed` and move it to the trash.
+When an item is confirmed as processed change its status to `PROCESSED` and move it to the trash.
 
 Items moved to `_inbox/trash/` SHOULD use one of these statuses:
 
-- `ignored`
-- `failed`
-- `trashed`
-- `processed`
+- `IGNORED`
+- `FAILED`
+- `TRASHED`
+- `PROCESSED`
 
-`trashed` is the clearest status when the file is physically moved into `_inbox/trash/`.
+`TRASHED` is the clearest status when the file is physically moved into `_inbox/trash/`.
 
 ### Notes
 
 - `_inbox` pointer files are not canonical `source` pages.
-- The `source` field replaces the old `evidence` field.
+- The `pointer` field references the raw item using an Obsidian wikilink.
 - When processing is complete, the item should be turned into a canonical page under `sources/`.
 - Items in `_inbox/trash/` are no longer part of the active processing queue.

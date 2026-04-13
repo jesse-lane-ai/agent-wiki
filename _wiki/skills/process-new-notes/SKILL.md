@@ -11,8 +11,8 @@ This skill captures the workflow for processing the Agentics vault inbox: readin
  
 Before touching anything, read the vault's agent contract in this order:
  
-1. `AGENTS.md` — the behavioral contract (managed blocks, ID rules, what agents may/must not do)
-2. `agentic-wiki-v1-spec.md` — the full v1 schema
+1. [[AGENTS]] — the behavioral contract (managed blocks, ID rules, what agents may/must not do)
+2. [[AGENT-WIKI-SPEC-v1]] — the full v1 schema
  
 You need to understand the contract before editing anything. The key things from AGENTS.md that apply here:
 - Never rewrite human content outside managed blocks
@@ -22,12 +22,12 @@ You need to understand the contract before editing anything. The key things from
  
 ## Step 2: Check the Inbox
  
-Read all files in `_inbox/` (excluding `_inbox/trash/`). Look for pointer files with `status: unprocessed`. Each pointer has:
+Read all files in `_inbox/` (excluding `_inbox/trash/`). Look for pointer files with `status: UNPROCESSED`. Each pointer has:
  
 ```yaml
 id: <inbox-item-id>
-source: sources/<filename>   # path to the raw source file (no .md extension)
-status: unprocessed
+pointer: "[[sources/<filename>]]"
+status: UNPROCESSED
 ```
  
 If the inbox is empty or all items are already processed, tell the user and stop.
@@ -38,7 +38,7 @@ For each unprocessed pointer, work through them one at a time:
  
 ### 3a. Read the source file
  
-The `source:` field gives you the path. The file will be at `source/<filename>.md` relative to the vault root. Read it fully — the content is what you use to fill the frontmatter.
+The `pointer:` field is a wikilink to the raw source file. Resolve it to the file path and read it fully — the content is what you use to fill the frontmatter.
  
 ### 3b. Infer frontmatter fields from content
  
@@ -91,10 +91,10 @@ Prepend the frontmatter block to the top of the file. Do not remove, rewrite, or
  
 For each pointer you've finished:
  
-1. **Create a copy in `_inbox/trash/`** with `status: processed`
-2. **Update the original pointer** in `_inbox/` to `status: processed`
+1. **Create a copy in `_inbox/trash/`** with `status: PROCESSED`
+2. **Update the original pointer** in `_inbox/` to `status: PROCESSED`
  
-If physical deletion of the original isn't possible (permission denied), updating the status in place is acceptable — the active queue is defined by `status: unprocessed`, so a `processed` item is effectively out of queue.
+If physical deletion of the original isn't possible (permission denied), updating the status in place is acceptable — the active queue is defined by `status: UNPROCESSED`, so a `PROCESSED` item is effectively out of queue.
  
 ## Step 5: Report to the User
  
