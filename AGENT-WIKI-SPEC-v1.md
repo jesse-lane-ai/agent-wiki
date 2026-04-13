@@ -193,6 +193,7 @@ A v1-compliant vault MUST use the following top-level structure.
   sources/
   entities/
   concepts/
+  claims/
   syntheses/
   procedures/
   questions/
@@ -248,6 +249,9 @@ Stores durable thing pages.
 
 #### `concepts/`
 Stores concept pages.
+
+#### `claims/`
+Stores standalone claim pages representing atomic propositions with dedicated evidence tracking.
 
 #### `syntheses/`
 Stores maintained rollups, analyses, comparisons, summaries, and timeline-style syntheses.
@@ -359,6 +363,12 @@ A page in `reports/` MUST have `pageType: report` if it includes frontmatter.
 
 Reports are views over compiled or source page data.
 
+### 7.9 `claims/`
+
+A `claim` page represents a standalone atomic proposition that tracks its own evidence independent of any one source.
+
+A page in `claims/` MUST have `pageType: claim`.
+
 ---
 
 ## 8. Page Identity and Naming
@@ -418,6 +428,7 @@ Allowed values:
 - `source`
 - `entity`
 - `concept`
+- `claim`
 - `synthesis`
 - `procedure`
 - `question`
@@ -680,13 +691,34 @@ Allowed values for decision pages:
 - `superseded`
 - `rejected`
 
+### 10.8 Claim pages
+
+Recommended shape for standalone claims:
+
+```yaml
+id: claim.auto.some-fact
+pageType: claim
+title: Some Fact
+claimType: descriptive
+claimStatus: supported
+confidence: 0.90
+text: This is the actual claim text.
+subjectPageId: entity.person.john-doe
+sourceIds: []
+evidence: []
+createdAt: 2026-04-12
+updatedAt: 2026-04-12
+aliases: []
+tags: []
+```
+
 ---
 
 ## 11. Structured Claims
 
-Claims are first-class records embedded in pages and extracted during compile.
+Claims are first-class records that can either be embedded in the frontmatter of other pages or authored as top-level standalone files in `claims/`.
 
-A page MAY contain zero or more claims.
+A page MAY contain zero or more embedded claims.
 
 Claims MUST live in frontmatter under `claims:` or in a managed structured block that compile can normalize into the same format.
 
