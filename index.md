@@ -1,0 +1,73 @@
+---
+id: meta.index
+pageType: report
+title: Agentics Wiki Index
+status: active
+createdAt: 2026-04-12
+updatedAt: 2026-04-13
+aliases: []
+tags:
+  - meta
+  - index
+---
+
+# Agentics Wiki
+
+Welcome to the Agentics vault — a structured knowledge base designed for both human reading and agent consumption.
+
+---
+
+## Navigation
+
+| Section | Purpose |
+|---|---|
+| [`sources/`](sources/) | Raw material and source-backed pages |
+| [`entities/`](entities/) | Durable things: people, orgs, projects, products |
+| [`concepts/`](concepts/) | Definitions, methods, frameworks, principles |
+| [`syntheses/`](syntheses/) | Cross-source analyses and overviews |
+| [`procedures/`](procedures/) | Runbooks, checklists, workflows |
+| [`questions/`](questions/) | Open questions and research gaps |
+| [`decisions/`](decisions/) | Recorded schema and interpretation choices |
+| [`reports/`](reports/) | Generated maintenance views |
+
+---
+
+## Intake
+
+New material lands in [`_inbox/`](_inbox/) as pointer files before being processed into canonical `source` pages.
+
+See [INBOX.md](INBOX.md) for the pointer schema and intake lifecycle.
+
+---
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| [WIKI.md](WIKI.md) | Schema, page types, folder meanings, and editorial rules |
+| [AGENTS.md](AGENTS.md) | Agent behavior contract |
+| [INBOX.md](INBOX.md) | Inbox pointer schema and intake workflow |
+| [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) | Full v1 specification |
+
+---
+
+## Compile pipeline
+
+To regenerate the machine-facing cache files and reports:
+
+```bash
+python _wiki/compile.py
+```
+
+Cache outputs live in `_wiki/cache/`. Required outputs:
+
+- `pages.json` — normalized page index
+- `claims.jsonl` — all extracted claims
+- `relations.jsonl` — all extracted relations
+- `agent-digest.json` — high-signal agent context
+
+---
+
+<!-- AI:GENERATED START name=summary -->
+This vault is initialized with the v1 schema. Folders, compile pipeline, and root docs are in place. Begin adding source, entity, and concept pages to populate the knowledge graph.
+<!-- AI:GENERATED END name=summary -->

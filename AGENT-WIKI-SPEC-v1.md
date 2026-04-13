@@ -188,7 +188,7 @@ A v1-compliant vault MUST use the following top-level structure.
   AGENTS.md
   WIKI.md
   index.md
-  inbox.md
+  INBOX.md
 
   sources/
   entities/
@@ -235,8 +235,8 @@ Typical contents:
 #### `index.md`
 SHOULD be the human-facing landing page.
 
-#### `inbox.md`
-MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material.
+#### `INBOX.md`
+MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` folder pointer schema — the intake queue for raw items that have not yet been processed into canonical `source` pages.
 
 ### 6.2 Required directories
 

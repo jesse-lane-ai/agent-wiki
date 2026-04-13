@@ -10,7 +10,7 @@ Last updated: 2026-04-12
 
 This file is the authoritative description of how agents are expected to behave when reading, writing, or compiling this vault. It is not a style guide — it is a contract.
 
-Agents MUST read this file before making any edits to the vault.
+Agents MUST read this file before making any edits to the vault. See also [WIKI.md](./WIKI.md) for schema and editorial rules, and [INBOX.md](./INBOX.md) for the intake pointer schema.
 
 ---
 
@@ -73,6 +73,14 @@ Agents MUST NOT read reports as primary data sources when page frontmatter or ca
 Files in `_wiki/cache/` and `_wiki/indexes/` are compile artifacts.
 
 Agents MUST NOT manually patch cache files except by running the compile pipeline.
+
+### 2.8 Respect the inbox boundary
+
+`_inbox/` is a raw item intake queue — NOT a source of canonical knowledge.
+
+Agents MUST NOT read `_inbox/` pointer files as primary data sources or treat them as evidence for claims.
+
+Agents SHOULD process inbox items by converting retained items into canonical `source` pages under `sources/`. See [INBOX.md](./INBOX.md) for the pointer schema and lifecycle rules.
 
 ---
 

@@ -37,6 +37,7 @@ It separates:
 | `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `_archive/` | Archived content no longer actively maintained |
+| `_procedures/` | Internal system-level procedure pages |
 
 ---
 
@@ -283,7 +284,31 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 
 ---
 
-## 13. Editorial principles
+## 13. Inbox intake strategy
+
+The `_inbox/` folder is the raw item intake queue. New unprocessed material should land here first.
+
+Each item in `_inbox/` is tracked by a **pointer file** — a minimal YAML record that references the raw item and tracks its processing state.
+
+See [INBOX.md](./INBOX.md) for the full pointer schema.
+
+### Intake lifecycle
+
+1. Raw item arrives in `_inbox/`
+2. A pointer file is created with `status: unprocessed`
+3. The item is reviewed and triaged
+4. If retained: item becomes a canonical `source` page under `sources/`; pointer moves to `_inbox/trash/` with `status: processed`
+5. If discarded: pointer moves to `_inbox/trash/` with `status: ignored` or `trashed`
+
+### `_inbox/` is not canonical
+
+- Inbox pointer files are NOT `source` pages.
+- Agents MUST NOT treat `_inbox/` items as authoritative source records.
+- Agents SHOULD process inbox items by converting them into proper `source` pages.
+
+---
+
+## 14. Editorial principles
 
 - Claims should be atomic — one proposition per claim.
 - Important assertions should be in frontmatter, not buried in prose, if they matter for agents.
@@ -291,3 +316,4 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 - Decisions should be recorded when schema or interpretation choices are made.
 - Human notes outside managed blocks will always be preserved.
 - Reports are views, not truth sources.
+- Inbox items MUST be processed into canonical source pages before being treated as evidence.
