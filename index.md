@@ -57,7 +57,7 @@ See [INBOX.md](INBOX.md) for the pointer schema and intake lifecycle.
 To regenerate the machine-facing cache files and reports:
 
 ```bash
-python _wiki/compile.py
+python _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 Cache outputs live in `_wiki/cache/`. Required outputs:

@@ -176,7 +176,7 @@ The compile pipeline reads the vault and emits:
 To run the compile pipeline:
 
 ```bash
-python _wiki/compile.py
+python _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 The compile pipeline MUST be run after meaningful vault changes to keep caches fresh.

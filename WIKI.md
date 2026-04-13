@@ -237,7 +237,7 @@ The compile pipeline reads the vault and emits machine-readable caches to `_wiki
 Run with:
 
 ```bash
-python _wiki/compile.py
+python _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 Required outputs:
