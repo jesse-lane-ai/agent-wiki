@@ -1,3 +1,7 @@
+---
+name: compile-wiki
+description: "Run the compile pipeline whenever the underlying vault data changes. Trigger this skill whenever the user says \"compile the wiki\", \"regenerate the cache\", \"compile\", \"run compile\", or similar phrases indicating they want to update the machine-facing artifacts."
+---
 # Compile the Wiki Cache
 
 Run the compile pipeline to regenerate all machine-facing cache artifacts and maintenance reports from vault page frontmatter.
