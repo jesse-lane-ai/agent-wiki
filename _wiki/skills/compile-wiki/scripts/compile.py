@@ -5,7 +5,7 @@ Agentics Wiki v1 Compile Pipeline
 Reads the vault, extracts structured data, and emits machine-facing cache artifacts.
 
 Usage:
-    python _wiki/compile.py [--vault-root <path>] [--verbose]
+    python3 _wiki/skills/compile-wiki/scripts/compile.py [--vault-root <path>] [--verbose]
 
 Outputs (under _wiki/cache/):
     pages.json            - normalized page index
@@ -55,7 +55,7 @@ except ImportError:
 # Config
 # ---------------------------------------------------------------------------
 
-SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "_views"}
+SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "_views", "reports"}
 SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
 CACHE_DIR = "_wiki/cache"
 INDEX_DIR = "_wiki/indexes"
@@ -73,7 +73,7 @@ MAX_DIGEST_DECISIONS = 20        # max recent decision pages included in agent d
 MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent digest
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
-VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report", "claim"}
+VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report", "claim", "index"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
 VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
@@ -86,29 +86,114 @@ VALID_DECISION_STATUSES = {"proposed", "accepted", "superseded", "rejected"}
 # Frontmatter parsing
 # ---------------------------------------------------------------------------
 
-def parse_frontmatter(text: str) -> tuple[dict, str]:
-    """Extract YAML frontmatter from a markdown file. Returns (meta, body)."""
+def parse_frontmatter(text: str) -> tuple[dict, str, str | None]:
+    """Extract YAML frontmatter from a markdown file. Returns (meta, body, error)."""
     if not text.startswith("---"):
-        return {}, text
+        return {}, text, None
     end = text.find("\n---", 3)
     if end == -1:
-        return {}, text
+        return {}, text, "unterminated_frontmatter"
     fm_text = text[3:end].strip()
     body = text[end + 4:].strip()
     try:
         meta = yaml.safe_load(fm_text) or {}
-    except yaml.YAMLError:
-        meta = {}
-    return meta, body
+    except yaml.YAMLError as exc:
+        return {}, body, f"invalid_frontmatter: {exc}"
+    if not isinstance(meta, dict):
+        return {}, body, f"invalid_frontmatter: frontmatter must be a mapping, got {type(meta).__name__}"
+    return meta, body, None
+
+
+def coerce_float(value: Any) -> float | None:
+    """Convert a value to float when possible, otherwise return None."""
+    if value is None or value == "":
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def add_validation_issue(issues: list[dict], issue_type: str, path: str, message: str, **details) -> None:
+    """Record a validation problem and surface it during compile."""
+    issue = {
+        "type": issue_type,
+        "path": path,
+        "message": message,
+        "details": details or {},
+    }
+    issues.append(issue)
+    print(f"  WARNING: [{issue_type}] {path}: {message}")
+
+
+def summarize_validation_issues(issues: list[dict]) -> dict[str, int]:
+    """Return a simple count by validation issue type."""
+    summary = {}
+    for issue in issues:
+        issue_type = issue.get("type", "unknown")
+        summary[issue_type] = summary.get(issue_type, 0) + 1
+    return summary
+
+
+def normalize_claim_record(record: dict, owner_id: str, owner_path: str, issues: list[dict]) -> dict:
+    """Normalize a claim record and emit validation warnings for bad fields."""
+    normalized = dict(record)
+
+    claim_id = str(normalized.get("id", "")).strip()
+    if not claim_id:
+        add_validation_issue(
+            issues,
+            "missing_claim_id",
+            owner_path,
+            "Claim is missing a stable id.",
+            ownerId=owner_id,
+        )
+
+    confidence_raw = normalized.get("confidence")
+    confidence = coerce_float(confidence_raw)
+    if confidence_raw not in (None, ""):
+        if confidence is None:
+            add_validation_issue(
+                issues,
+                "invalid_claim_confidence",
+                owner_path,
+                f"Claim {claim_id or '(missing id)'} has non-numeric confidence {confidence_raw!r}.",
+                ownerId=owner_id,
+                claimId=claim_id,
+                field="confidence",
+                value=confidence_raw,
+            )
+            normalized["confidenceRaw"] = confidence_raw
+            normalized["confidence"] = None
+        else:
+            normalized["confidence"] = confidence
+
+    return normalized
+
+
+def normalize_page_record(record: dict, issues: list[dict]) -> dict:
+    """Normalize page-level fields that the compiler depends on."""
+    normalized = dict(record)
+
+    if normalized.get("pageType") == "claim":
+        normalized = normalize_claim_record(
+            normalized,
+            owner_id=normalized.get("id", ""),
+            owner_path=normalized.get("path", ""),
+            issues=issues,
+        )
+
+    return normalized
 
 
 # ---------------------------------------------------------------------------
 # Vault walker
 # ---------------------------------------------------------------------------
 
-def walk_vault(vault_root: Path, verbose: bool = False) -> list[dict]:
+def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], list[dict]]:
     """Walk vault, parse all markdown pages, return list of page records."""
     pages = []
+    validation_issues = []
     for md_file in sorted(vault_root.rglob("*.md")):
         rel = md_file.relative_to(vault_root)
         parts = rel.parts
@@ -121,19 +206,44 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> list[dict]:
             continue
 
         text = md_file.read_text(encoding="utf-8", errors="replace")
-        meta, body = parse_frontmatter(text)
+        meta, body, parse_error = parse_frontmatter(text)
+
+        if parse_error:
+            add_validation_issue(
+                validation_issues,
+                "invalid_frontmatter",
+                str(rel).replace("\\", "/"),
+                "Frontmatter could not be parsed.",
+                error=parse_error,
+            )
+            continue
 
         if not meta:
             if verbose:
                 print(f"  [SKIP] No frontmatter: {rel}")
             continue
 
-        page_id = meta.get("id", "")
-        page_type = meta.get("pageType", "")
+        page_id = str(meta.get("id", "")).strip()
+        page_type = str(meta.get("pageType", "")).strip()
 
         if not page_id or not page_type:
-            if verbose:
-                print(f"  [SKIP] Missing id or pageType: {rel}")
+            add_validation_issue(
+                validation_issues,
+                "missing_required_metadata",
+                str(rel).replace("\\", "/"),
+                "Frontmatter is missing required `id` or `pageType`.",
+            )
+            continue
+
+        if page_type not in VALID_PAGE_TYPES:
+            add_validation_issue(
+                validation_issues,
+                "invalid_page_type",
+                str(rel).replace("\\", "/"),
+                f"Unsupported pageType {page_type!r}.",
+                pageId=page_id,
+                pageType=page_type,
+            )
             continue
 
         record = {
@@ -187,36 +297,41 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> list[dict]:
         record["relationCount"] = len(relations)
         record["timelineCount"] = len(timeline)
 
-        pages.append(record)
+        pages.append(normalize_page_record(record, validation_issues))
 
         if verbose:
             print(f"  [PAGE] {page_id} ({page_type}) — {rel}")
 
-    return pages
+    return pages, validation_issues
 
 
 # ---------------------------------------------------------------------------
 # Claim extraction
 # ---------------------------------------------------------------------------
 
-def extract_claims(pages: list[dict]) -> list[dict]:
+def extract_claims(pages: list[dict], validation_issues: list[dict]) -> list[dict]:
     """Extract all claims from page metadata (embedded and standalone)."""
     all_claims = []
     for page in pages:
         # Standalone claim pages
         if page["pageType"] == "claim":
-            record = {
-                "id": page["id"],
-                "text": page["meta"].get("text", page["title"]),
-                "status": page["meta"].get("claimStatus", page["meta"].get("status", "")),
-                "confidence": page["meta"].get("confidence"),
-                "claimType": page["meta"].get("claimType", ""),
-                "evidence": page["meta"].get("evidence") or [],
-                "_owningPageId": page["meta"].get("subjectPageId", ""),
-                "_owningPagePath": page["path"],
-                "_owningPageType": "claim",
-                "_standaloneClaimPage": True,
-            }
+            record = normalize_claim_record(
+                {
+                    "id": page["id"],
+                    "text": page["meta"].get("text", page["title"]),
+                    "status": page["meta"].get("claimStatus", page["meta"].get("status", "")),
+                    "confidence": page.get("confidence"),
+                    "claimType": page["meta"].get("claimType", ""),
+                    "evidence": page["meta"].get("evidence") or [],
+                    "_owningPageId": page["meta"].get("subjectPageId", ""),
+                    "_owningPagePath": page["path"],
+                    "_owningPageType": "claim",
+                    "_standaloneClaimPage": True,
+                },
+                owner_id=page["id"],
+                owner_path=page["path"],
+                issues=validation_issues,
+            )
             all_claims.append(record)
             continue
         # Embedded claims in frontmatter
@@ -224,11 +339,18 @@ def extract_claims(pages: list[dict]) -> list[dict]:
         for claim in raw_claims:
             if not isinstance(claim, dict):
                 continue
-            record = dict(claim)
-            record["_owningPageId"] = page["id"]
-            record["_owningPagePath"] = page["path"]
-            record["_owningPageType"] = page["pageType"]
-            record["_standaloneClaimPage"] = False
+            record = normalize_claim_record(
+                {
+                    **claim,
+                    "_owningPageId": page["id"],
+                    "_owningPagePath": page["path"],
+                    "_owningPageType": page["pageType"],
+                    "_standaloneClaimPage": False,
+                },
+                owner_id=page["id"],
+                owner_path=page["path"],
+                issues=validation_issues,
+            )
             all_claims.append(record)
     return all_claims
 
@@ -444,11 +566,9 @@ def analyze_health(pages: list[dict], claims: list[dict]) -> dict:
 
         # Low confidence
         if conf is not None:
-            try:
-                if float(conf) < LOW_CONFIDENCE_THRESHOLD:
-                    low_confidence_claims.append(claim)
-            except (ValueError, TypeError):
-                pass
+            numeric_conf = coerce_float(conf)
+            if numeric_conf is not None and numeric_conf < LOW_CONFIDENCE_THRESHOLD:
+                low_confidence_claims.append(claim)
         if status in ("weakly_supported", "unverified", "contested"):
             if claim not in low_confidence_claims:
                 low_confidence_claims.append(claim)
@@ -485,7 +605,8 @@ def analyze_health(pages: list[dict], claims: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 
 def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[dict],
-                       contradictions: list[dict], health: dict, compiled_at: str) -> dict:
+                       contradictions: list[dict], health: dict, validation_issues: list[dict],
+                       compiled_at: str) -> dict:
     """Build the high-signal agent context digest."""
 
     def summarize_page(p: dict) -> dict:
@@ -516,7 +637,7 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
     # Top supported claims
     top_claims = sorted(
         [c for c in claims if c.get("status") == "supported" and c.get("confidence") is not None],
-        key=lambda c: float(c.get("confidence", 0)),
+        key=lambda c: coerce_float(c.get("confidence")) or 0,
         reverse=True,
     )[:MAX_DIGEST_CLAIMS]
     top_claims_summary = [
@@ -540,6 +661,7 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
             "lowConfidenceClaims": len(health["low_confidence_claims"]),
             "evidenceGapClaims": len(health["evidence_gap_claims"]),
             "stalePages": len(health["stale_pages"]),
+            "validationIssues": len(validation_issues),
         },
         "keyPages": key_pages_summary,
         "recentDecisions": decisions_summary,
@@ -603,6 +725,16 @@ compiledAt: {compiled_at}
 """
 
 
+def format_wikilink(path: str, title: str | None = None) -> str:
+    """Convert a vault-relative markdown path into an Obsidian wikilink."""
+    target = path.replace("\\", "/")
+    if target.endswith(".md"):
+        target = target[:-3]
+    if title:
+        return f"[[{target}|{title}]]"
+    return f"[[{target}]]"
+
+
 def generate_open_questions_report(pages: list[dict], compiled_at: str) -> str:
     questions = [p for p in pages if p["pageType"] == "question"]
     active = [q for q in questions if q["status"] in ("open", "researching", "blocked")]
@@ -619,13 +751,13 @@ def generate_open_questions_report(pages: list[dict], compiled_at: str) -> str:
         active_sorted = sorted(active, key=lambda q: priority_order.get(q.get("meta", {}).get("priority", ""), 4))
         for q in active_sorted:
             priority = q.get("meta", {}).get("priority", "—")
-            out += f"- **[{q['status'].upper()}]** [{q['title']}]({q['path']}) — priority: `{priority}`\n"
+            out += f"- **[{q['status'].upper()}]** {format_wikilink(q['path'], q['title'])} — priority: `{priority}`\n"
         out += "\n"
 
     if resolved:
         out += "## Resolved\n\n"
         for q in resolved:
-            out += f"- [{q['title']}]({q['path']})\n"
+            out += f"- {format_wikilink(q['path'], q['title'])}\n"
         out += "\n"
 
     if not active and not resolved:
@@ -663,7 +795,7 @@ def generate_low_confidence_report(health: dict, compiled_at: str) -> str:
 
     if low:
         out += "## Claims\n\n"
-        sorted_low = sorted(low, key=lambda c: float(c.get("confidence", 0) or 0))
+        sorted_low = sorted(low, key=lambda c: coerce_float(c.get("confidence")) or 0)
         for c in sorted_low:
             conf = c.get("confidence", "—")
             status = c.get("status", "—")
@@ -706,7 +838,7 @@ def generate_stale_pages_report(health: dict, compiled_at: str) -> str:
         out += "## Stale Pages\n\n"
         sorted_stale = sorted(stale, key=lambda p: p.get("updatedAt", ""))
         for p in sorted_stale:
-            out += f"- [{p['title']}]({p['path']}) — last updated: `{p['updatedAt']}`\n"
+            out += f"- {format_wikilink(p['path'], p['title'])} — last updated: `{p['updatedAt']}`\n"
         out += "\n"
     else:
         out += "_No stale pages detected._\n"
@@ -778,8 +910,10 @@ def main():
 
     # --- Walk vault ---
     print("Reading vault pages...")
-    pages = walk_vault(vault_root, verbose=args.verbose)
+    pages, validation_issues = walk_vault(vault_root, verbose=args.verbose)
     print(f"  Found {len(pages)} pages with frontmatter")
+    if validation_issues:
+        print(f"  Validation issues detected: {len(validation_issues)}")
 
     # Validate unique IDs
     id_counts = {}
@@ -791,7 +925,7 @@ def main():
 
     # --- Extract structured data ---
     print("Extracting claims...")
-    claims = extract_claims(pages)
+    claims = extract_claims(pages, validation_issues)
     print(f"  Found {len(claims)} claims")
 
     print("Extracting relations...")
@@ -813,6 +947,12 @@ def main():
     print(f"  Low-confidence claims: {len(health['low_confidence_claims'])}")
     print(f"  Evidence gap claims: {len(health['evidence_gap_claims'])}")
     print(f"  Stale pages: {len(health['stale_pages'])}")
+    if validation_issues:
+        validation_summary = summarize_validation_issues(validation_issues)
+        summary_text = ", ".join(f"{k}={v}" for k, v in sorted(validation_summary.items()))
+        print(f"  Validation issues: {summary_text}")
+    else:
+        validation_summary = {}
 
     # --- Build registries ---
     questions_registry = [
@@ -863,7 +1003,7 @@ def main():
 
     # --- Build agent digest ---
     print("Building agent digest...")
-    agent_digest = build_agent_digest(pages, claims, relations, contradictions, health, compiled_at)
+    agent_digest = build_agent_digest(pages, claims, relations, contradictions, health, validation_issues, compiled_at)
 
     # --- Build indexes ---
     print("Building indexes...")
@@ -937,6 +1077,21 @@ def main():
     )
     print(f"  Wrote source-index.json ({len(source_index)} sources)")
 
+    # validation-issues.json
+    (cache_dir / "validation-issues.json").write_text(
+        json.dumps(
+            {
+                "compiledAt": compiled_at,
+                "issues": validation_issues,
+                "summary": validation_summary,
+            },
+            indent=2,
+            default=str,
+        ),
+        encoding="utf-8"
+    )
+    print(f"  Wrote validation-issues.json ({len(validation_issues)} issues)")
+
     # claims-index.json — standalone claim pages only
     claims_index = [
         {
@@ -1009,6 +1164,7 @@ def main():
         "compiledAt": compiled_at,
         "vaultRoot": str(vault_root),
         "stats": agent_digest["vaultStats"],
+        "validationIssues": validation_summary,
         "duplicateIds": duplicate_ids,
     }
     log_path = log_dir / f"compile-{compiled_date}.jsonl"
@@ -1020,6 +1176,7 @@ def main():
     print(f"  Pages: {len(pages)} | Claims: {len(claims)} | Relations: {len(relations)} | Contradictions: {len(contradictions)}")
     print(f"  Open questions: {len([p for p in pages if p['pageType']=='question' and p['status'] in ('open','researching','blocked')])}")
     print(f"  Evidence gaps: {len(health['evidence_gap_claims'])} | Low confidence: {len(health['low_confidence_claims'])}")
+    print(f"  Validation issues: {len(validation_issues)}")
 
 
 if __name__ == "__main__":

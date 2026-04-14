@@ -2,7 +2,7 @@
 
 Agent behavior contract for the Agentics vault.  
 Version: v1  
-Last updated: 2026-04-12
+Last updated: 2026-04-13
 
 ---
 
@@ -177,7 +177,7 @@ The compile pipeline reads the vault and emits:
 To run the compile pipeline:
 
 ```bash
-python _wiki/skills/compile-wiki/scripts/compile.py
+python3 _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 The compile pipeline MUST be run after meaningful vault changes to keep caches fresh.

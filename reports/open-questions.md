@@ -12,5 +12,5 @@ compiledAt: 2026-04-13
 
 ## Active
 
-- **[OPEN]** [When was Acme Corp founded?](questions/example-question.md) — priority: `low`
+- **[OPEN]** [[questions/example-question|When was Acme Corp founded?]] — priority: `low`
 

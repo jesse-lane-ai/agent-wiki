@@ -26,19 +26,19 @@ The compile pipeline is **safe to run at any time**. It is fully regenerative an
 From the vault root:
 
 ```bash
-python _wiki/skills/compile-wiki/scripts/compile.py
+python3 _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 With verbose output:
 
 ```bash
-python _wiki/skills/compile-wiki/scripts/compile.py --verbose
+python3 _wiki/skills/compile-wiki/scripts/compile.py --verbose
 ```
 
 From a different working directory:
 
 ```bash
-python _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
+python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 ```
 
 ---

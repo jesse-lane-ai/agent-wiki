@@ -43,6 +43,7 @@ The `pointer:` field is a wikilink to the raw source file. Resolve it to the fil
 ### 3b. Infer frontmatter fields from content
  
 Generate a complete source frontmatter block. Use the schema below.
+Source pages use the normal page status vocabulary from [[WIKI]]; after intake, they should usually be `active`, not `processed`.
  
 **ID format:** `source.<namespace>.<slug>`
 - `namespace`: author handle, platform name, or topic area (e.g., `nav-toor`, `timothy-carbat`, `youtube`)
@@ -65,7 +66,7 @@ Generate a complete source frontmatter block. Use the schema below.
 id: source.<namespace>.<slug>
 pageType: source
 title: "<title from content>"
-status: processed
+status: active
 sourceType: <inferred>
 originUrl: <url if present in content>
 author: <author if present>

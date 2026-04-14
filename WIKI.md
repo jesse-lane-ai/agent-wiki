@@ -2,7 +2,7 @@
 
 Human-readable schema and editorial guide for the Agentics vault.  
 Spec version: v1  
-Last updated: 2026-04-12
+Last updated: 2026-04-13
 
 ---
 
@@ -238,7 +238,7 @@ The compile pipeline reads the vault and emits machine-readable caches to `_wiki
 Run with:
 
 ```bash
-python _wiki/skills/compile-wiki/scripts/compile.py
+python3 _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
 Required outputs:
@@ -266,7 +266,6 @@ Reports in `reports/` are generated views. They are NOT authoritative.
 | `stale-pages.md` | Pages not updated recently |
 
 Do not treat reports as primary data — they derive from page frontmatter and caches.
-
 ---
 
 ## 12. Source types
@@ -322,7 +321,6 @@ All internal links within the vault use Obsidian-style wikilinks.
 | `[[page-slug#section]]` | Link to a section |
 
 Standard markdown links are only used for external URLs.
-
 ---
 
 ## 15. Editorial principles
