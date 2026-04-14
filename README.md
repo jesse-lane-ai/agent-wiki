@@ -25,6 +25,8 @@ Read INITIALIZE.md and AGENTS.md first. Then read index.md and WIKI.md.
 Follow the vault contract before making any changes.
 ```
 
+Have your agent verify the wiki is initialized.
+
 ## What Exists Today
 
 This repo currently gives you:
@@ -51,13 +53,6 @@ Typical scheduled jobs look like this:
 - inbox triage on a frequent schedule, pointed at `_wiki/skills/process-new-notes/`
 - compile/regeneration on a frequent or post-ingest schedule, pointed at `_wiki/skills/compile-wiki/`
 - future extraction or cleanup passes, each pointed at a dedicated skill once those skills exist
-
-Examples of acceptable schedulers:
-
-- `cron` on Linux
-- `launchd` on macOS
-- Task Scheduler on Windows
-- CI scheduled workflows if this vault is maintained in a remote repo
 
 The important part is the pattern:
 
