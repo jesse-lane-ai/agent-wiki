@@ -209,6 +209,7 @@ A v1-compliant vault MUST use the following top-level structure.
     cache/
     indexes/
     logs/
+    skills/
 ```
 
 The folders `_attachments/`, `_archive/`, `_views/`, and `_docs/` do not need to contain content at vault creation time. They SHOULD be created as empty directories (with a `.gitkeep` if using git) during initial vault setup so the structure is in place.
@@ -285,7 +286,27 @@ Optional. Stores reusable view templates or layout helpers. Created on vault ini
 Optional. Stores structural or repository-level documentation that does not belong in the primary ontology (e.g., directory guides, onboarding notes). Pages in `_docs/` are not required to conform to the standard page type schema.
 
 #### `_wiki/`
-Stores machine-generated runtime and compile artifacts.
+Stores machine-generated runtime and compile artifacts, and the `skills/` directory for agent skill definitions.
+
+Sub-directories:
+- `cache/` — compiled artifact outputs (do not hand-edit)
+- `indexes/` — generated index files (do not hand-edit)
+- `logs/` — compile run logs (do not hand-edit)
+- `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
+
+The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
+
+Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
+
+```text
+_wiki/skills/
+  compile-wiki/
+    instructions.md
+    scripts/
+      compile.py
+  process-new-notes/
+    instructions.md
+```
 
 ---
 
@@ -1068,6 +1089,21 @@ updatedAt: 2026-04-12
 - `resolved`
 - `dismissed`
 
+### 14.5 Detection strategy
+
+**Explicit detection (compiled from flags):**
+- Claims with `status: contradicted`
+- Evidence entries with `relation: contradicts`
+
+**Semantic conflict detection (cross-claim analysis):**
+
+The compiler SHOULD also detect implicit conflicts by comparing claims that share the same `subjectPageId`.
+
+- **Date conflict** (`type: date_conflict`): Two or more `claimType: historical` claims on the same subject that have different `date` field values and are both in an active (non-deprecated, non-contradicted) status.
+- **Scope conflict** (`type: scope_conflict`): Claims with `status: contested` coexisting with claims of `status: supported` or `weakly_supported` on the same subject, indicating active unresolved disagreement.
+
+Semantic contradiction detection operates on structured fields only. It does not perform natural-language text comparison.
+
 ---
 
 ## 15. Questions
@@ -1397,6 +1433,20 @@ Chronological event index.
 
 #### `source-index.json`
 Source metadata registry.
+
+### 21.5 Agent digest limits
+
+The `agent-digest.json` output truncates content to keep the file compact for use as a prompt supplement. Implementations SHOULD define these as named constants so they can be tuned as vault size grows.
+
+| Constant | Default | Description |
+|---|---|---|
+| `MAX_DIGEST_KEY_PAGES` | `50` | Max entity/concept pages included |
+| `MAX_DIGEST_CLAIMS` | `30` | Max top supported claims included |
+| `MAX_DIGEST_DECISIONS` | `20` | Max recent decision pages included |
+| `MAX_DIGEST_QUESTIONS` | `20` | Max open question pages included |
+| `MAX_DIGEST_CONTRADICTIONS` | `10` | Max open contradictions included |
+
+Implementations MUST NOT silently discard high-value pages due to truncation without surfacing the total counts in `vaultStats`. Operators SHOULD increase limits if `vaultStats` shows totals significantly exceeding the defaults.
 
 ---
 

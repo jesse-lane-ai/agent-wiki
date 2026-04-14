@@ -65,6 +65,14 @@ REPORTS_DIR = "reports"
 STALE_DAYS = 90  # pages not updated in this many days are flagged
 LOW_CONFIDENCE_THRESHOLD = 0.50
 
+# Agent digest limits — named constants so they are easy to tune as the vault grows.
+# Increase if high-value pages are being silently truncated.
+MAX_DIGEST_KEY_PAGES = 50        # max entity/concept pages included in agent digest
+MAX_DIGEST_CLAIMS = 30           # max top supported claims included in agent digest
+MAX_DIGEST_DECISIONS = 20        # max recent decision pages included in agent digest
+MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent digest
+MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
+
 VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report", "claim"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
@@ -322,6 +330,99 @@ def detect_contradictions(claims: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Semantic contradiction detection
+# ---------------------------------------------------------------------------
+
+def detect_semantic_contradictions(claims: list[dict]) -> list[dict]:
+    """Detect cross-claim semantic conflicts between claims sharing a subject.
+
+    Operates on structured fields only — no natural-language text comparison.
+
+    Detects:
+    - date_conflict: two+ historical claims on the same subject with different
+      'date' values, both in an active (non-deprecated) status.
+    - scope_conflict: contested claims coexisting with supported claims on the
+      same subject, indicating active disagreement.
+    """
+    contradictions = []
+    ctr = 1
+
+    # Group claims by subjectPageId, falling back to owning page id
+    by_subject: dict[str, list[dict]] = {}
+    for claim in claims:
+        subject = claim.get("subjectPageId") or claim.get("_owningPageId", "")
+        if not subject:
+            continue
+        by_subject.setdefault(subject, []).append(claim)
+
+    for subject_id, group in by_subject.items():
+        # Exclude already-flagged or inactive claims from semantic analysis
+        active = [
+            c for c in group
+            if c.get("status") not in ("deprecated", "contradicted")
+        ]
+        if len(active) < 2:
+            continue
+
+        # --- Date conflict ---
+        # Historical claims on the same subject that have a 'date' field and
+        # whose dates differ.
+        dated_historical = [
+            c for c in active
+            if c.get("claimType") == "historical" and c.get("date")
+        ]
+        if len(dated_historical) >= 2:
+            dates_seen: dict[str, list[dict]] = {}
+            for c in dated_historical:
+                d = str(c["date"])
+                dates_seen.setdefault(d, []).append(c)
+            if len(dates_seen) > 1:
+                all_ids = [c.get("id", "") for c in dated_historical]
+                cid = f"contradiction.semantic.date.{ctr:03d}"
+                ctr += 1
+                contradictions.append({
+                    "id": cid,
+                    "type": "date_conflict",
+                    "status": "open",
+                    "summary": (
+                        f"Subject '{subject_id}' has {len(dates_seen)} conflicting historical "
+                        f"dates: {sorted(dates_seen.keys())}."
+                    ),
+                    "claimIds": all_ids,
+                    "sourceIds": [],
+                    "resolution": None,
+                    "updatedAt": datetime.now().strftime("%Y-%m-%d"),
+                })
+
+        # --- Scope conflict ---
+        # Contested claims coexisting with supported claims on the same subject.
+        contested = [c for c in active if c.get("status") == "contested"]
+        supported = [
+            c for c in active
+            if c.get("status") in ("supported", "weakly_supported")
+        ]
+        if contested and supported:
+            conflict_ids = [c.get("id", "") for c in contested + supported]
+            cid = f"contradiction.semantic.scope.{ctr:03d}"
+            ctr += 1
+            contradictions.append({
+                "id": cid,
+                "type": "scope_conflict",
+                "status": "open",
+                "summary": (
+                    f"Subject '{subject_id}' has {len(contested)} contested and "
+                    f"{len(supported)} supported claim(s) in potential conflict."
+                ),
+                "claimIds": conflict_ids,
+                "sourceIds": [],
+                "resolution": None,
+                "updatedAt": datetime.now().strftime("%Y-%m-%d"),
+            })
+
+    return contradictions
+
+
+# ---------------------------------------------------------------------------
 # Health analysis
 # ---------------------------------------------------------------------------
 
@@ -402,22 +503,22 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
 
     # Entities and concepts — high-value pages for grounding
     key_pages = [p for p in pages if p["pageType"] in ("entity", "concept")]
-    key_pages_summary = [summarize_page(p) for p in key_pages[:50]]
+    key_pages_summary = [summarize_page(p) for p in key_pages[:MAX_DIGEST_KEY_PAGES]]
 
     # Recent decisions
     decisions = [p for p in pages if p["pageType"] == "decision"]
-    decisions_summary = [summarize_page(p) for p in decisions[:20]]
+    decisions_summary = [summarize_page(p) for p in decisions[:MAX_DIGEST_DECISIONS]]
 
     # Open questions
     open_questions = [p for p in pages if p["pageType"] == "question" and p["status"] in ("open", "researching", "blocked")]
-    questions_summary = [summarize_page(p) for p in open_questions[:20]]
+    questions_summary = [summarize_page(p) for p in open_questions[:MAX_DIGEST_QUESTIONS]]
 
     # Top supported claims
     top_claims = sorted(
         [c for c in claims if c.get("status") == "supported" and c.get("confidence") is not None],
         key=lambda c: float(c.get("confidence", 0)),
         reverse=True,
-    )[:30]
+    )[:MAX_DIGEST_CLAIMS]
     top_claims_summary = [
         {"id": c.get("id"), "text": c.get("text"), "confidence": c.get("confidence"),
          "owningPage": c.get("_owningPageId")}
@@ -425,7 +526,7 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
     ]
 
     # Notable contradictions
-    open_contradictions = [c for c in contradictions if c.get("status") == "open"][:10]
+    open_contradictions = [c for c in contradictions if c.get("status") == "open"][:MAX_DIGEST_CONTRADICTIONS]
 
     return {
         "compiledAt": compiled_at,
@@ -703,7 +804,9 @@ def main():
 
     print("Detecting contradictions...")
     contradictions = detect_contradictions(claims)
-    print(f"  Found {len(contradictions)} contradictions")
+    semantic_contradictions = detect_semantic_contradictions(claims)
+    contradictions.extend(semantic_contradictions)
+    print(f"  Found {len(contradictions)} contradictions ({len(semantic_contradictions)} semantic)")
 
     print("Analyzing health...")
     health = analyze_health(pages, claims)
