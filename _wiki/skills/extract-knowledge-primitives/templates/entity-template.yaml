@@ -1,0 +1,33 @@
+---
+id: entity.<category>.<slug>
+pageType: entity
+title: <Official Name>
+entityType: <person|org|project|product|system|place|event|artifact|other>
+canonicalName: <Preferred Name>
+status: active
+createdAt: 2026-04-16
+updatedAt: 2026-04-16
+aliases:
+  - <Alternate Name 1>
+  - <Alternate Name 2>
+tags:
+  - extracted
+  - <topical-tag>
+relatedPages:
+  - entity.<category>.<slug>  # Related entities
+  - concept.<slug>             # Related concepts
+relations:
+  - subject: entity.<category>.<slug>
+    predicate: <is_a|part_of|depends_on|uses|produces|owned_by|located_in|related_to|supports|contradicts|mentions|applies_to|derived_from>
+    object: entity.<category>.<slug>
+    confidence: 0.70
+    sourceClaimIds: []
+---
+
+# <Official Name>
+
+[Human-written context about this entity, or leave for managed block generation]
+
+<!-- AI:GENERATED START name=summary -->
+Auto-generated summary of this entity extracted from sources.
+<!-- AI:GENERATED END name=summary -->

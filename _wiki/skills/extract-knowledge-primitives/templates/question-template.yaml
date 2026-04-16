@@ -1,0 +1,37 @@
+---
+id: question.<domain>.<slug>
+pageType: question
+title: <Question Title>
+priority: <low|medium|high|critical>
+status: <open|researching|blocked|resolved|dropped>
+openedAt: 2026-04-16
+createdAt: 2026-04-16
+updatedAt: 2026-04-16
+relatedClaims: []
+relatedPages: []
+aliases: []
+tags:
+  - extracted
+---
+
+# <Question Title>
+
+## The Question
+
+[Clear statement of what is unknown or unresolved]
+
+## Context
+
+[Why this question matters, what prompted it, what problem does answering it solve?]
+
+## Possible Answers
+
+[If mentioned in source: alternative approaches or hypotheses being considered]
+
+## Related Work
+
+[Links to claims, decisions, or procedures that might help answer this question]
+
+<!-- AI:GENERATED START name=summary -->
+Auto-generated summary of this open question and its significance.
+<!-- AI:GENERATED END name=summary -->

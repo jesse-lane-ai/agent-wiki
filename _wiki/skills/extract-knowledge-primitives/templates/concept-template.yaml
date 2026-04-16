@@ -1,0 +1,31 @@
+---
+id: concept.<slug>
+pageType: concept
+title: <Concept Name>
+conceptType: <definition|principle|framework|method|policy|standard|pattern|theory|taxonomy|other>
+status: active
+createdAt: 2026-04-16
+updatedAt: 2026-04-16
+aliases:
+  - <Alternate Name>
+tags:
+  - extracted
+  - <topical-tag>
+relatedPages:
+  - concept.<slug>              # Related concepts
+  - entity.<category>.<slug>    # Related entities
+relations:
+  - subject: concept.<slug>
+    predicate: <is_a|part_of|depends_on|uses|produces|owned_by|related_to|supports|contradicts|mentions|applies_to|derived_from>
+    object: concept.<slug>
+    confidence: 0.70
+    sourceClaimIds: []
+---
+
+# <Concept Name>
+
+[Human-written explanation of this concept, or leave for managed block generation]
+
+<!-- AI:GENERATED START name=summary -->
+Auto-generated definition or explanation of this concept extracted from sources.
+<!-- AI:GENERATED END name=summary -->

@@ -1,0 +1,40 @@
+---
+id: decision.<domain>.<slug>
+pageType: decision
+title: <Decision Title>
+decisionType: <schema|taxonomy|interpretation|resolution|workflow>
+status: <proposed|accepted|superseded|rejected>
+summary: <Brief summary of what was decided>
+rationale:
+  - <Why this decision was made>
+  - <Problem it solves>
+decidedAt: 2026-04-16
+createdAt: 2026-04-16
+updatedAt: 2026-04-16
+relatedPages: []
+aliases: []
+tags:
+  - extracted
+---
+
+# <Decision Title>
+
+## Decision
+
+[The actual decision — what was chosen and why]
+
+## Rationale
+
+[Why this decision was made, what problem it addresses, what alternatives were considered]
+
+## Implications
+
+[What this decision means for the vault, project, or system]
+
+## Supersedes
+
+[Any previous decisions this replaces, if applicable]
+
+<!-- AI:GENERATED START name=summary -->
+Auto-generated summary of this decision and its impact.
+<!-- AI:GENERATED END name=summary -->

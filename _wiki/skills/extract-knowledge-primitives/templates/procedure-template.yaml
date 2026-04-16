@@ -1,0 +1,31 @@
+---
+id: procedure.<domain>.<slug>
+pageType: procedure
+title: <Procedure Name>
+procedureType: <runbook|workflow|checklist|playbook>
+status: active
+createdAt: 2026-04-16
+updatedAt: 2026-04-16
+aliases: []
+tags:
+  - extracted
+relatedPages: []
+---
+
+# <Procedure Name>
+
+[Brief description of what this procedure accomplishes]
+
+## Steps
+
+1. [Step one]
+2. [Step two]
+3. [Step three]
+
+## Notes
+
+[Any important notes, warnings, or context]
+
+<!-- AI:GENERATED START name=summary -->
+Auto-generated summary of this procedure.
+<!-- AI:GENERATED END name=summary -->
