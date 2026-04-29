@@ -1164,14 +1164,24 @@ Relationships MAY be authored in page frontmatter under `relations:`.
 
 ### 13.1 Relationship shape
 
+**Schema:**
 ```yaml
 relations:
-  - subject: entity.project.<topic-slug>
+  - subject: <subject-id>
+    predicate: <predicate>
+    object: <object-id>
+    confidence: <float>
+    sourceClaimIds: []
+```
+
+**Example:**
+```yaml
+relations:
+  - subject: entity.project.ai-harness
     predicate: uses
     object: concept.structured-claims
     confidence: 0.88
-    sourceClaimIds:
-      - claim.<topic-slug>.compile.outputs
+    sourceClaimIds: ["[[claim.descriptive.compile-outputs]]"]
 ```
 
 ### 13.2 Required relationship fields
