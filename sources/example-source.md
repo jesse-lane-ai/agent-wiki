@@ -2,7 +2,7 @@
 id: source.example.acme-homepage
 pageType: source
 title: Acme Corp Homepage
-status: active
+status: UNPROCESSED
 sourceType: webpage
 originUrl: https://example.com
 retrievedAt: 2026-04-13
