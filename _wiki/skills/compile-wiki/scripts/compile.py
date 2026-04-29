@@ -923,12 +923,14 @@ def main():
         print(f"  Validation issues detected: {len(validation_issues)}")
 
     # Validate unique IDs
-    id_counts = {}
+    id_paths = {}
     for p in pages:
-        id_counts[p["id"]] = id_counts.get(p["id"], 0) + 1
-    duplicate_ids = {k: v for k, v in id_counts.items() if v > 1}
+        id_paths.setdefault(p["id"], []).append(p["path"])
+    duplicate_ids = {k: v for k, v in id_paths.items() if len(v) > 1}
     if duplicate_ids:
-        print(f"  WARNING: Duplicate page IDs found: {list(duplicate_ids.keys())}")
+        print(f"  WARNING: Duplicate page IDs found:")
+        for dup_id, paths in duplicate_ids.items():
+            print(f"    - {dup_id} in files: {', '.join(paths)}")
 
     # --- Extract structured data ---
     print("Extracting claims...")

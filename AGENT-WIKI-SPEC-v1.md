@@ -1,9 +1,8 @@
 
 # Agentic Wiki v1 Specification
 
-Version: 1.0  
-Status: Draft  
-Last Updated: 2026-04-13
+Version: 1.1
+Last Updated: 2026-04-28
 
 ---
 
@@ -427,6 +426,13 @@ Examples:
 - `synthesis.market-overview.automation`
 - `question.claim-ownership.multi-page`
 - `decision.claim-status-enum-v1`
+
+#### Rationale: Dotted Namespaces vs. UUIDs
+
+While UUIDs guarantee mathematical uniqueness without central coordination, the dotted lowercase namespace format prioritizes **semantic density** and **agent ergonomics**:
+- **Context at a Glance:** Humans and agents can immediately infer what an ID points to without needing to resolve the node.
+- **Token Efficiency:** Descriptive IDs like `source.ai-harness.docs` provide rich metadata at a low token cost.
+- **Collision Prevention:** Scoping IDs by `<pageType>.<namespace>.<slug>` prevents common naming collisions in a flat namespace.
 
 ### 8.2 Filenames
 Filenames MAY change. IDs SHOULD remain stable.
