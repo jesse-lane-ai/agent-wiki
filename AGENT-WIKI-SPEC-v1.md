@@ -414,7 +414,8 @@ The `index` page type is reserved for vault-level navigation and orientation pag
 Each page MUST have a stable `id`.
 
 ### 8.1 Requirements
-- `id` MUST be globally unique within the vault
+- `id` MUST be globally unique within the vault.
+  - *Note: Duplicate IDs will not self-repair. The compiler flags collisions in the console and logs the offending file paths in `_wiki/logs/`. In the compiled indexes, the last processed file with the duplicate ID will overwrite previous entries.*
 - `id` SHOULD be stable over time
 - `id` SHOULD NOT depend on the page filename alone
 - `id` SHOULD use dotted lowercase namespace-style format
