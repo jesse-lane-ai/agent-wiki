@@ -556,23 +556,41 @@ These are optional in v1, but strongly recommended where applicable.
 
 ## 10. Page-Type Specific Frontmatter
 
+This section defines the pure schema templates for each page type, followed by a concrete example.
+
 ### 10.1 Source pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
 id: source.<yyyy-mm-dd>.<source-slug>
 pageType: source
 title: <title>
-status: processed
-sourceType: webpage
-originUrl:
-publishedAt:
-retrievedAt: 2026-04-12
-updatedAt: 2026-04-12
-createdAt: 2026-04-12
+status: <status>
+sourceType: <sourceType>
+originUrl: <url>
+publishedAt: <yyyy-mm-dd>
+retrievedAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+createdAt: <yyyy-mm-dd>
 aliases: []
 tags: []
+attachments: []
+```
+
+**Example:**
+```yaml
+id: source.2026-04-28.ai-agents-future
+pageType: source
+title: The Future of AI Agents
+status: processed
+sourceType: article
+originUrl: https://example.com/ai-agents
+publishedAt: 2026-04-25
+retrievedAt: 2026-04-28
+updatedAt: 2026-04-28
+createdAt: 2026-04-28
+aliases: []
+tags: [ai, agents]
 attachments: []
 ```
 
@@ -600,19 +618,32 @@ Allowed values:
 
 ### 10.2 Entity pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: entity.project.<topic-slug>
+id: entity.<entityType>.<entity-slug>
 pageType: entity
 title: <title>
-entityType: project
+entityType: <entityType>
 canonicalName: <canonical name>
+status: active
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: entity.project.agent-wiki
+pageType: entity
+title: Agent Wiki
+entityType: project
+canonicalName: Agentic Wiki Project
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
-aliases: []
-tags: []
+aliases: [wiki-project]
+tags: [documentation]
 ```
 
 #### `entityType`
@@ -630,18 +661,30 @@ Allowed values:
 
 ### 10.3 Concept pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: concept.structured-claims
+id: concept.<conceptType>.<concept-slug>
+pageType: concept
+title: Structured Claims
+conceptType: <conceptType>
+status: active
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: concept.method.structured-claims
 pageType: concept
 title: Structured Claims
 conceptType: method
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
-aliases: []
-tags: []
+aliases: [claims-ontology]
+tags: [ontology]
 ```
 
 #### `conceptType`
@@ -659,21 +702,36 @@ Allowed values:
 
 ### 10.4 Synthesis pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: synthesis.market-overview.automation
+id: synthesis.<synthesisType>.<synthesis-slug>
+pageType: synthesis
+title: <title>
+synthesisType: <synthesisType>
+scope: <scope>
+status: active
+sourcePages: []
+derivedClaims: []
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: synthesis.overview.automation-market
 pageType: synthesis
 title: Automation Market Overview
 synthesisType: overview
 scope: automation market
 status: active
-sourcePages: []
-derivedClaims: []
+sourcePages: ["[[source.2026-04-12.market-report]]"]
+derivedClaims: ["[[claim.market.size.2026]]"]
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: []
+tags: [market-analysis]
 ```
 
 #### `synthesisType`
@@ -687,10 +745,22 @@ Allowed values:
 
 ### 10.5 Procedure pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: procedure.create-video
+id: procedure.<procedureType>.<procedure-slug>
+pageType: procedure
+title: <title>
+procedureType: <procedureType>
+status: active
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: procedure.workflow.create-video
 pageType: procedure
 title: Create Video
 procedureType: workflow
@@ -698,7 +768,7 @@ status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: []
+tags: [video-production]
 ```
 
 #### `procedureType`
@@ -710,10 +780,25 @@ Allowed values:
 
 ### 10.6 Question pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: question.claim-ownership.multi-page
+id: question.<question-slug>
+pageType: question
+title: <title>
+priority: <priority>
+status: open
+relatedClaims: []
+relatedPages: []
+openedAt: <yyyy-mm-dd>
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: question.multi-page-claim-ownership
 pageType: question
 title: How should claim ownership be handled across multiple synthesis pages?
 priority: high
@@ -724,7 +809,7 @@ openedAt: 2026-04-12
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: []
+tags: [governance]
 ```
 
 #### `priority`
@@ -744,22 +829,38 @@ Allowed values for question pages:
 
 ### 10.7 Decision pages
 
-Recommended shape:
-
+**Schema:**
 ```yaml
-id: decision.claim-status-enum-v1
+id: decision.<decisionType>.<decision-slug>
+pageType: decision
+title: <title>
+decisionType: <decisionType>
+status: accepted
+summary: <summary>
+rationale: []
+relatedPages: []
+decidedAt: <yyyy-mm-dd>
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: decision.schema.claim-status-vocabulary
 pageType: decision
 title: Standardize Claim Status Vocabulary
 decisionType: schema
 status: accepted
 summary: Claim status will use a fixed enum for compile consistency.
-rationale: []
+rationale: ["Consistent enums prevent compile errors."]
 relatedPages: []
 decidedAt: 2026-04-12
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: []
+tags: [schema-update]
 ```
 
 #### `decisionType`
@@ -779,10 +880,27 @@ Allowed values for decision pages:
 
 ### 10.8 Claim pages
 
-Recommended shape for standalone claims:
-
+**Schema:**
 ```yaml
-id: claim.auto.some-fact
+id: claim.<claimType>.<claim-slug>
+pageType: claim
+title: <title>
+claimType: <claimType>
+claimStatus: supported
+confidence: <float>
+text: <text>
+subjectPageId: <page-id>
+sourceIds: []
+evidence: []
+createdAt: <yyyy-mm-dd>
+updatedAt: <yyyy-mm-dd>
+aliases: []
+tags: []
+```
+
+**Example:**
+```yaml
+id: claim.descriptive.some-fact
 pageType: claim
 title: Some Fact
 claimType: descriptive
