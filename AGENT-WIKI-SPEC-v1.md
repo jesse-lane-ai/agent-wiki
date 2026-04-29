@@ -780,6 +780,16 @@ Allowed values:
 
 ### 10.6 Question pages
 
+Questions are first-class authored pages in v1.
+
+They represent known unknowns, unresolved research tasks, or ambiguity the system should not erase.
+
+#### Question rules
+
+- Questions MUST have stable IDs.
+- Questions MUST link related pages or claims.
+- Resolved questions MUST remain in the vault with updated status, not be deleted.
+
 **Schema:**
 ```yaml
 id: question.<question-slug>
@@ -828,6 +838,20 @@ Allowed values for question pages:
 - `dropped`
 
 ### 10.7 Decision pages
+Decisions are first-class authored pages in v1.
+
+They capture:
+- schema choices
+- taxonomy choices
+- interpretation judgments
+- contradiction resolutions
+- workflow decisions
+
+#### Decision rules
+
+- Important schema or interpretation changes SHOULD be recorded as decisions.
+- Superseded decisions SHOULD remain present with updated status.
+- Decision pages SHOULD link affected pages or schemas.
 
 **Schema:**
 ```yaml
@@ -1313,45 +1337,12 @@ Semantic contradiction detection operates on structured fields only. It does not
 
 ---
 
-## 15. Questions
-
-Questions are first-class authored pages in v1.
-
-They represent known unknowns, unresolved research tasks, or ambiguity the system should not erase.
-
-### 15.1 Question rules
-
-- Questions MUST have stable IDs.
-- Questions SHOULD link related pages or claims.
-- Resolved questions SHOULD remain in the vault with updated status, not be deleted.
-
----
-
-## 16. Decisions
-
-Decisions are first-class authored pages in v1.
-
-They capture:
-- schema choices
-- taxonomy choices
-- interpretation judgments
-- contradiction resolutions
-- workflow decisions
-
-### 16.1 Decision rules
-
-- Important schema or interpretation changes SHOULD be recorded as decisions.
-- Superseded decisions SHOULD remain present with updated status.
-- Decision pages SHOULD link affected pages or schemas.
-
----
-
-## ## 17. Timelines
+## 15. Timelines
 
 Timelines represent dated events and temporal changes tied to pages in the wiki. They exist to support chronology, historical tracking, date-based retrieval, and temporal conflict detection.
 
 Timeline data does not require a top-level `timelines/` folder in v1. It is represented through page-level `timeline:` records, synthesis pages with `synthesisType: timeline`, and compiled timeline cache output.
-### 17.1 Structure
+### 15.1 Structure
 
 Timeline entries MUST be represented under a `timeline:` field.
 
@@ -1398,7 +1389,8 @@ Optional fields:
 - `note`
 - `createdAt`
 - `updatedAt`
-### 17.2 Placement and Semantics
+
+#### 15.2 Placement and Semantics
 
 Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, question, and decision pages.
 
@@ -1412,7 +1404,7 @@ A synthesis page that acts as a dedicated chronology MUST use:
 pageType: synthesis
 synthesisType: timeline
 ```
-### 17.3 Compile and Validation
+#### 15.3 Compile and Validation
 
 The compile pipeline SHOULD extract timeline entries into:
 
@@ -1434,7 +1426,7 @@ The compiler SHOULD flag timeline conflicts when multiple entries appear to desc
 
 ---
 
-## 18. Aliases
+## 16. Aliases
 
 Entities and concepts SHOULD include aliases when relevant.
 
@@ -1454,52 +1446,6 @@ Alias support exists to improve:
 - matching
 - claim linking
 - prompt grounding
-
----
-
-## 19. Managed Blocks
-
-Managed blocks separate generated content from human content.
-
-This is a core v1 rule.
-
-### 19.1 Rule
-
-**Managed content MUST stay inside generated blocks.**  
-**Human-authored note content outside those blocks MUST be preserved.**
-
-### 19.2 Goals
-- safe recompilation
-- editable human notes
-- stable agent updates
-- reduced clobber risk
-
-### 19.3 Recommended managed block format
-
-v1 RECOMMENDS HTML comment delimiters:
-
-```md
-<!-- AI:GENERATED START name=summary -->
-Generated content here.
-<!-- AI:GENERATED END name=summary -->
-```
-
-### 19.4 Rules
-- Agents MUST only rewrite content inside matching generated block boundaries unless explicitly instructed otherwise.
-- Agents MUST preserve unknown human-authored content outside generated blocks.
-- Managed blocks SHOULD use stable `name=` values for targeted rewrites.
-- Nested generated blocks SHOULD NOT be used in v1.
-
-### 19.5 Recommended block names
-
-Common block names:
-- `summary`
-- `claims`
-- `evidence`
-- `relations`
-- `timeline`
-- `source-metadata`
-- `report-body`
 
 ---
 
