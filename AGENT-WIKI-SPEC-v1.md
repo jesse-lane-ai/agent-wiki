@@ -963,7 +963,7 @@ claims:
     claimType: descriptive
     relatedClaimIds: []
     evidence:
-      - id: ev.compile.docs.01
+      - id: evidence.quote.supports.a1b2c3d4
         sourceId: source.2026-04-12.ai-harness
         path: sources/2026-04-12-ai-harness.md
         lines: 55-79
@@ -1061,7 +1061,7 @@ Evidence entries attach provenance and support semantics to a claim.
 **Schema:**
 ```yaml
 evidence:
-  - id: <evidence-id>
+  - id: evidence.<kind>.<relation>.<uuid>
     sourceId: <source-id>
     path: <source-path>
     lines: <line-range>
@@ -1077,9 +1077,9 @@ evidence:
 **Example:**
 ```yaml
 evidence:
-  - id: ev.001
-    sourceId: source.2026-04-12.sample
-    path: sources/2026-04-12-sample.md
+  - id: evidence.quote.supports.a1b2c3d4
+    sourceId: source.2026-04-28.ai-agents-future
+    path: sources/source.2026-04-28.ai-agents-future.md
     lines: 10-18
     kind: quote
     relation: supports
@@ -1828,7 +1828,7 @@ claims:
     claimType: descriptive
     relatedClaimIds: []
     evidence:
-      - id: ev.compile.docs.01
+      - id: evidence.quote.supports.a1b2c3d4
         sourceId: source.<yyyy-mm-dd>.<source-slug>
         path: sources/yyyy-mm-dd-<source-slug>.md
         lines: 55-79
