@@ -1449,11 +1449,11 @@ Alias support exists to improve:
 
 ---
 
-## 20. Authoritative Sources of Truth
+## 17. Authoritative Sources of Truth
 
 The system has multiple layers. Their authority is different.
 
-### 20.1 Authoritative layers
+### 17.1 Authoritative layers
 
 Primary truth sources:
 1. page frontmatter
@@ -1461,7 +1461,7 @@ Primary truth sources:
 3. authored page content where structured references exist
 4. compiled caches derived from the above
 
-### 20.2 Non-authoritative layers
+#### 17.2 Non-authoritative layers
 
 These are views, not truth sources:
 - `reports/`
@@ -1469,18 +1469,18 @@ These are views, not truth sources:
 - search indexes
 - prompt supplements that do not round-trip back to pages
 
-### 20.3 Rule
+#### 17.3 Rule
 Compiled outputs MUST reflect page truth.  
 Reports MUST reflect compiled or page truth.  
 Reports MUST NOT silently become the canonical data layer.
 
 ---
 
-## 21. Compile Pipeline
+## 18. Compile Pipeline
 
 The compile step reads the authored wiki and emits stable machine-facing artifacts.
 
-### 21.1 Compile goals
+### 18.1 Compile goals
 
 The compile pipeline exists so agents and runtime code do not need to scrape arbitrary markdown.
 
@@ -1493,7 +1493,7 @@ It MUST:
 - emit stable cache files
 - generate reports
 
-### 21.2 Minimum v1 compile outputs
+#### 18.2 Minimum v1 compile outputs
 
 The following files MUST be emitted under `_wiki/cache/`:
 
@@ -1510,9 +1510,9 @@ The following files SHOULD also be emitted:
 - `timeline-events.json`
 - `source-index.json`
 
-### 21.3 Required cache files
+#### 18.3 Required cache files
 
-#### `agent-digest.json`
+##### `agent-digest.json`
 Purpose:
 - compact high-signal prompt supplement
 - runtime context pack
@@ -1570,12 +1570,12 @@ Each line SHOULD contain:
 - source claim IDs if present
 - confidence
 
-### 21.4 Recommended cache files
+#### 18.4 Recommended cache files
 
-#### `contradictions.json`
+##### `contradictions.json`
 Conflict registry.
 
-#### `questions.json`
+##### `questions.json`
 Open question registry.
 
 #### `decisions.json`
@@ -1587,7 +1587,7 @@ Chronological event index.
 #### `source-index.json`
 Source metadata registry.
 
-### 21.5 Agent digest limits
+#### 18.5 Agent digest limits
 
 The `agent-digest.json` output truncates content to keep the file compact for use as a prompt supplement. Implementations SHOULD define these as named constants so they can be tuned as vault size grows.
 
@@ -1603,7 +1603,7 @@ Implementations MUST NOT silently discard high-value pages due to truncation wit
 
 ---
 
-## 22. Search and Indexes
+## 19. Search and Indexes
 
 The compiler MAY emit additional indexes under `_wiki/indexes/`.
 
@@ -1619,11 +1619,11 @@ These indexes are implementation details and not normative v1 authored data.
 
 ---
 
-## 23. Reports
+## 20. Reports
 
 Reports are generated maintenance views.
 
-### 23.1 Required reports
+### 20.1 Required reports
 
 When dashboard generation is enabled, the system SHOULD generate:
 
@@ -1633,7 +1633,7 @@ When dashboard generation is enabled, the system SHOULD generate:
 - `reports/claim-health.md`
 - `reports/stale-pages.md`
 
-### 23.2 Recommended additional reports
+### 20.2 Recommended additional reports
 
 - `reports/orphaned-claims.md`
 - `reports/evidence-gaps.md`
@@ -1641,7 +1641,7 @@ When dashboard generation is enabled, the system SHOULD generate:
 - `reports/relationship-gaps.md`
 - `reports/timeline-conflicts.md`
 
-### 23.3 Report rules
+#### 20.3 Report rules
 
 - Reports SHOULD be fully regenerable.
 - Reports SHOULD NOT be treated as primary truth.
@@ -1650,11 +1650,11 @@ When dashboard generation is enabled, the system SHOULD generate:
 
 ---
 
-## 24. Health Rules
+## 21. Health Rules
 
 The system SHOULD compute health signals at compile time.
 
-### 24.1 Low confidence
+### 21.1 Low confidence
 
 A claim SHOULD be considered low confidence when:
 - `confidence < 0.50`
@@ -1662,13 +1662,13 @@ A claim SHOULD be considered low confidence when:
 
 Exact threshold MAY be configurable, but SHOULD be stable.
 
-### 24.2 Evidence gaps
+#### 21.2 Evidence gaps
 
 A claim SHOULD appear in evidence-gap reporting when:
 - it has zero evidence entries
 - or only `context_only` evidence exists
 
-### 24.3 Staleness
+### 21.3 Staleness
 
 A page or claim MAY be considered stale when:
 - `updatedAt` exceeds configured freshness expectations
@@ -1677,7 +1677,7 @@ A page or claim MAY be considered stale when:
 
 v1 does not prescribe one universal stale threshold because domains vary.
 
-### 24.4 Contradictions
+#### 21.4 Contradictions
 
 A contradiction SHOULD be surfaced when:
 - two claims with overlapping scope conflict materially
@@ -1687,28 +1687,28 @@ A contradiction SHOULD be surfaced when:
 
 ---
 
-## 25. Freshness Model
+## 22. Freshness Model
 
 Freshness SHOULD be tracked at multiple levels when possible.
 
-### 25.1 Recommended fields
+### 22.1 Recommended fields
 - page `updatedAt`
 - claim `updatedAt`
 - evidence `updatedAt`
 - source `publishedAt`
 - source `retrievedAt`
 
-### 25.2 Rule
+#### 22.2 Rule
 A recently edited page is not automatically a fresh page.  
 Compile SHOULD distinguish between recent edits and recent underlying evidence.
 
 ---
 
-## 26. Validation Rules
+## 23. Validation Rules
 
 A v1 validator SHOULD check the following.
 
-### 26.1 Required validation
+### 23.1 Required validation
 - every page has a valid `pageType`
 - every page has a unique `id`
 - required frontmatter fields are present
@@ -1720,7 +1720,7 @@ A v1 validator SHOULD check the following.
 - question and decision pages use allowed status enums
 - pages are stored in folders consistent with `pageType`
 
-### 26.2 Recommended validation
+#### 23.2 Recommended validation
 - source IDs referenced by evidence exist
 - related page references exist
 - claim IDs referenced by relationships exist when provided
@@ -1730,7 +1730,7 @@ A v1 validator SHOULD check the following.
 
 ---
 
-## 27. Human Editing Expectations
+## 24. Human Editing Expectations
 
 Humans MAY:
 - add prose outside managed blocks
@@ -1748,14 +1748,14 @@ Humans SHOULD NOT:
 
 ---
 
-## 28. Agent Editing Expectations
+## 25. Agent Editing Expectations
 
 Agents MUST:
-- preserve human-authored content outside managed blocks unless explicitly directed otherwise
+- preserve human-authored content unless explicitly directed otherwise
 - use stable IDs when generating claims or pages
-- keep generated content inside managed block boundaries
 - update `updatedAt` when meaningfully changing structured content
 - avoid inventing unsupported certainty
+- update the log.md file when making meaningful changes to the vault
 
 Agents SHOULD:
 - create decision pages for important schema or interpretation changes
@@ -1764,14 +1764,14 @@ Agents SHOULD:
 - reuse canonical IDs instead of duplicating objects
 
 Agents MUST NOT:
-- silently rewrite human commentary outside generated blocks
+- silently rewrite human commentary unless explicitly directed otherwise
 - delete unresolved uncertainty by omission
 - convert weak evidence into strong support semantics
 - treat reports as primary truth records
 
 ---
 
-## 29. Example Minimal Entity Page
+## 26. Example Minimal Entity Page
 
 ```md
 ---
@@ -1820,16 +1820,13 @@ relations:
 
 # <canonical name>
 
-Human note content here.
-
-<!-- AI:GENERATED START name=summary -->
 <canonical name> is a project that uses structured claims and compile-time outputs for agent-facing knowledge access.
-<!-- AI:GENERATED END name=summary -->
+
 ```
 
 ---
 
-## 30. Example Question Page
+## 27Example Question Page
 
 ```md
 ---
@@ -1862,7 +1859,7 @@ We need a rule for canonical claim ownership versus claim reuse.
 
 ---
 
-## 31. Example Decision Page
+## 28. Example Decision Page
 
 ```md
 ---
@@ -1894,7 +1891,7 @@ The claim status enum is fixed in v1 and must not be freestyle text.
 
 ---
 
-## 32. Compatibility Notes
+## 29. Compatibility Notes
 
 v1 implementations MAY add fields beyond this spec, provided they do not break:
 
