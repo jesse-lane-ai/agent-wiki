@@ -20,7 +20,7 @@ description: Ingest raw notes, links, or snippets into the vault inbox queue usi
 
 ## UUID Generation
 - Use `scripts/uuid.py` to generate a new UUID for each inbox pointer.
-- The pointer and source note must have the same UUID.
+- Also generate a new uuid for each source attachment.
 
 ## Source Slug
 - For any incoming URL or source, always generate a 4 word slug for the source note.
@@ -31,16 +31,52 @@ description: Ingest raw notes, links, or snippets into the vault inbox queue usi
 Create pointer files in `_inbox/` using frontmatter and exactly these fields:
 - `id`: unique inbox ID, format: `yyyy-mm-dd-inbox-<UUID>`
 - `url`: original URL of the source
-- `pointer`: pointer to raw item path. format: `sources/yyyy-mm-dd-<source-slug>-<UUID>.md`. Use a native Obsidian wikilink.
-- `status`: `UNPROCESSED`
+- `pointer`: pointer to raw item path. format: `sources/source.<yyyy-mm-dd>.<source-slug>`. Always use a native Obsidian wikilink.
+- `status`: `unprocessed`
 
 Example:
 ```yaml
 ---
 id: yyyy-mm-dd-inbox-<UUID>
 url: <original URL of the source>
-pointer: "[[sources/yyyy-mm-dd-<source-slug>-<UUID>.md]]"
-status: UNPROCESSED
+pointer: "[[sources/source.<yyyy-mm-dd>.<source-slug>]]"
+status: unprocessed
+---
+```
+
+## Source Schema (required, strictly enforced)
+
+Create source files in `sources/` using frontmatter and exactly these fields:
+- `id`: unique source ID, format: `source.<yyyy-mm-dd>.<source-slug>`
+- `pageType`: `source`
+- `title`: `<title>`
+- `status`: `unprocessed`
+- `sourceType`: appropriate source type (allowed values: `webpage`, `article`, `pdf`, `transcript`, `email`, `meeting-notes`, `dataset`, `screenshot`, `bridge`, `import`, `other`)
+- `originUrl`: original URL of the source
+- `publishedAt`: publication date if known, otherwise leave blank
+- `retrievedAt`: `YYYY-MM-DD`
+- `updatedAt`: `YYYY-MM-DD`
+- `createdAt`: `YYYY-MM-DD`
+- `aliases`: `[]`
+- `tags`: `[]`
+- `attachments`: list of attachment wikilinks or empty `[]`
+
+Example:
+```yaml
+---
+id: source.<yyyy-mm-dd>.<source-slug>
+pageType: source
+title: <title>
+status: unprocessed
+sourceType: webpage
+originUrl: <original URL of the source>
+publishedAt:
+retrievedAt: yyyy-mm-dd
+updatedAt: yyyy-mm-dd
+createdAt: yyyy-mm-dd
+aliases: []
+tags: []
+attachments: []
 ---
 ```
 
@@ -62,7 +98,8 @@ status: UNPROCESSED
    - Create the uuid using `scripts/uuid.py`
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
 6. Write raw source to:
-   - `sources/yyyy-mm-dd-<source-slug>-<UUID>.md` (full captured body with inline images + source URLs).
+   - `sources/source.<yyyy-mm-dd>.<source-slug>` using the frontmatter defined in **Source Schema**.
+   - Include the full captured body with inline images + source URLs below the frontmatter.
    - images save to `_attachments`. filename: `yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.
    - inline images uses Obsidian image syntax `![[filename]]`
@@ -71,3 +108,4 @@ status: UNPROCESSED
 8. Confirm in chat with:
    - pointer path
    - source path
+   - number of attachments saved
