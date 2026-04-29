@@ -1259,18 +1259,17 @@ updatedAt: <yyyy-mm-dd>
 
 **Example:**
 ```yaml
-id: contradiction.date-conflict.initial-release-date
-type: date-conflict
+id: contradiction.interpretation-conflict.ai-impact
+type: interpretation-conflict
 status: open
-summary: Two claims disagree on the initial release date.
+summary: Two claims disagree on the impact of AI on knowledge management.
 claimIds:
-  - claim.product.release.date.a
-  - claim.product.release.date.b
+  - claim.descriptive.knowledge-management-revolution
+  - claim.weakly-supported.ai-generated-content
 sourceIds:
-  - source.2026-04-12.article-a
-  - source.2026-04-12.article-b
+  - source.webpage.ai-changing-knowledge-management
 resolution:
-updatedAt: 2026-04-12
+updatedAt: 2026-04-29
 ```
 
 ### 14.2 Required fields
@@ -1293,7 +1292,7 @@ updatedAt: 2026-04-12
 ### 14.4 Allowed contradiction status values
 
 - `open`
-- `under_review`
+- `under-review`
 - `resolved`
 - `dismissed`
 
