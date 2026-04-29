@@ -1179,7 +1179,7 @@ relations:
 relations:
   - subject: entity.project.ai-harness
     predicate: uses
-    object: concept.structured-claims
+    object: concept.method.structured-claims
     confidence: 0.88
     sourceClaimIds: ["[[claim.descriptive.compile-outputs]]"]
 ```
@@ -1245,6 +1245,19 @@ v1 does not require contradiction pages, but the compiler MUST be able to surfac
 
 ### 14.1 Compiled contradiction shape
 
+**Schema:**
+```yaml
+id: contradiction.<namespace>.<contradiction-slug>
+type: <type>
+status: <status>
+summary: <summary>
+claimIds: []
+sourceIds: []
+resolution: <resolution>
+updatedAt: <yyyy-mm-dd>
+```
+
+**Example:**
 ```yaml
 id: contradiction.release-date.001
 type: date_conflict
