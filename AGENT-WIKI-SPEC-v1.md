@@ -313,20 +313,18 @@ _wiki/skills/
 
 ### 7.1 `sources/`
 
-`source` pages represent information origins or normalized bridge pages pointing to origins.
+`source` pages represent verbatim source material. They are created by the `import-note` skill.
 
 A `source` page SHOULD include:
+- verbatim content (text and images)
 - source metadata
-- origin type
-- retrieval information when relevant
-- links to attachments when relevant
-- extracted claims when useful
-- summary or notes inside managed or human blocks
+- attachments (images, pdfs, etc.)
+- retrieval information
 
 A page in `sources/` MUST have `pageType: source`.
 
 ### 7.2 `entities/`
-
+`
 An `entity` page represents a durable thing.
 
 Typical entity kinds:
@@ -419,11 +417,12 @@ Each page MUST have a stable `id`.
 - `id` SHOULD be stable over time
 - `id` SHOULD NOT depend on the page filename alone
 - `id` SHOULD use dotted lowercase namespace-style format
+  - *Exception for Source Pages:* Source pages use the format `source.<yyyy-mm-dd>.<source-slug>` to balance semantic density with chronological sorting and collision prevention.
 
 Examples:
 - `entity.project.ai-harness`
 - `concept.structured-claims`
-- `source.ai-harness.docs`
+- `source.2026-04-12.ai-harness`
 - `synthesis.market-overview.automation`
 - `question.claim-ownership.multi-page`
 - `decision.claim-status-enum-v1`
@@ -432,7 +431,7 @@ Examples:
 
 While UUIDs guarantee mathematical uniqueness without central coordination, the dotted lowercase namespace format prioritizes **semantic density** and **agent ergonomics**:
 - **Context at a Glance:** Humans and agents can immediately infer what an ID points to without needing to resolve the node.
-- **Token Efficiency:** Descriptive IDs like `source.ai-harness.docs` provide rich metadata at a low token cost.
+- **Token Efficiency:** Descriptive IDs like `synthesis.market-overview.automation` provide rich metadata at a low token cost.
 - **Collision Prevention:** Scoping IDs by `<pageType>.<namespace>.<slug>` prevents common naming collisions in a flat namespace.
 
 ### 8.2 Filenames
@@ -460,6 +459,18 @@ This convention applies to:
 - `relatedPages`, `relatedClaims`, and similar string reference fields in frontmatter
 
 Rationale: wikilinks decouple references from file system paths, survive renames, and are resolved natively by Obsidian and compatible tooling.
+
+### 8.5 Attachment IDs
+
+Attachments (binary assets like images, PDFs, etc.) stored in `_attachments/` do not use frontmatter IDs. Instead, their **filename** acts as their unique identifier for internal linking (e.g., via Obsidian wikilinks).
+
+To prevent silent overwrites in the flat `_attachments/` directory, attachment IDs MUST use the following pattern:
+`yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>`
+
+- `yyyy-mm-dd`: The date of capture.
+- `<source-slug>`: The same 4-word summary as the source file.
+- `<UUID>`: A unique identifier generated specifically for the attachment.
+- `<index>`: An incremental index (starting at 1) for sources containing multiple attachments.
 
 ---
 
@@ -550,10 +561,10 @@ These are optional in v1, but strongly recommended where applicable.
 Recommended shape:
 
 ```yaml
-id: source.<topic-slug>.docs
+id: source.<yyyy-mm-dd>.<source-slug>
 pageType: source
-title: <title> Docs
-status: active
+title: <title>
+status: processed
 sourceType: webpage
 originUrl:
 publishedAt:
@@ -565,7 +576,15 @@ tags: []
 attachments: []
 ```
 
+#### `status`
+
+Allowed values:
+- `unprocessed`
+- `processed`
+- `archived`
+
 #### `sourceType`
+
 Allowed values:
 - `webpage`
 - `article`
@@ -803,8 +822,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: ev.compile.docs.01
-        sourceId: source.<topic-slug>.docs
-        path: sources/<topic-slug>-docs.md
+        sourceId: source.<yyyy-mm-dd>.<source-slug>
+        path: sources/yyyy-mm-dd-<source-slug>.md
         lines: 55-79
         kind: quote
         relation: supports
@@ -900,8 +919,8 @@ Evidence entries attach provenance and support semantics to a claim.
 ```yaml
 evidence:
   - id: ev.001
-    sourceId: source.sample
-    path: sources/sample.md
+    sourceId: source.2026-04-12.sample
+    path: sources/2026-04-12-sample.md
     lines: 10-18
     kind: quote
     relation: supports
@@ -1066,8 +1085,8 @@ claimIds:
   - claim.product.release.date.a
   - claim.product.release.date.b
 sourceIds:
-  - source.article.a
-  - source.article.b
+  - source.2026-04-12.article-a
+  - source.2026-04-12.article-b
 resolution:
 updatedAt: 2026-04-12
 ```
@@ -1178,7 +1197,7 @@ timeline:
     relatedClaims:
       - claim.<topic-slug>.compile.outputs
     sourceIds:
-      - source.<topic-slug>.docs
+      - source.<yyyy-mm-dd>.<source-slug>
     updatedAt: 2026-04-12
 ```
 
@@ -1651,8 +1670,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: ev.compile.docs.01
-        sourceId: source.<topic-slug>.docs
-        path: sources/<topic-slug>-docs.md
+        sourceId: source.<yyyy-mm-dd>.<source-slug>
+        path: sources/yyyy-mm-dd-<source-slug>.md
         lines: 55-79
         kind: quote
         relation: supports
