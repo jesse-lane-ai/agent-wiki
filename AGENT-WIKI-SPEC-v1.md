@@ -1247,7 +1247,7 @@ v1 does not require contradiction pages, but the compiler MUST be able to surfac
 
 **Schema:**
 ```yaml
-id: contradiction.<namespace>.<contradiction-slug>
+id: contradiction.<contradictionType>.<contradictionSlug>
 type: <type>
 status: <status>
 summary: <summary>
@@ -1259,8 +1259,8 @@ updatedAt: <yyyy-mm-dd>
 
 **Example:**
 ```yaml
-id: contradiction.release-date.001
-type: date_conflict
+id: contradiction.date-conflict.initial-release-date
+type: date-conflict
 status: open
 summary: Two claims disagree on the initial release date.
 claimIds:
@@ -1284,11 +1284,11 @@ updatedAt: 2026-04-12
 
 ### 14.3 Allowed contradiction types
 
-- `direct_conflict`
-- `date_conflict`
-- `scope_conflict`
-- `definition_conflict`
-- `interpretation_conflict`
+- `direct-conflict`
+- `date-conflict`
+- `scope-conflict`
+- `definition-conflict`
+- `interpretation-conflict`
 
 ### 14.4 Allowed contradiction status values
 
