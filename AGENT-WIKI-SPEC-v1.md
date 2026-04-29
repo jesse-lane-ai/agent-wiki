@@ -930,9 +930,37 @@ For v1, frontmatter claims are the normative shape.
 
 ### 11.1 Claim shape
 
+**Schema:**
 ```yaml
 claims:
-  - id: claim.<topic-slug>.compile.outputs
+  - id: claim.<claimType>.<claim-slug>
+    text: <text>
+    status: <status>
+    confidence: <float>
+    claimType: <claimType>
+    relatedClaimIds: []
+    evidence:
+      - id: <evidence-id>
+        sourceId: <source-id>
+        path: <source-path>
+        lines: <line-range>
+        kind: <kind>
+        relation: <relation>
+        weight: <float>
+        note: <note>
+        excerpt: <text>
+        retrievedAt: <yyyy-mm-dd>
+        updatedAt: <yyyy-mm-dd>
+    createdAt: <yyyy-mm-dd>
+    updatedAt: <yyyy-mm-dd>
+    validFrom: <yyyy-mm-dd>
+    validTo: <yyyy-mm-dd>
+```
+
+**Example:**
+```yaml
+claims:
+  - id: claim.descriptive.compile-outputs
     text: The compile step emits stable machine-facing artifacts for agents.
     status: supported
     confidence: 0.91
@@ -940,8 +968,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: ev.compile.docs.01
-        sourceId: source.<yyyy-mm-dd>.<source-slug>
-        path: sources/yyyy-mm-dd-<source-slug>.md
+        sourceId: source.2026-04-12.ai-harness
+        path: sources/2026-04-12-ai-harness.md
         lines: 55-79
         kind: quote
         relation: supports
@@ -952,7 +980,7 @@ claims:
         updatedAt: 2026-04-12
     createdAt: 2026-04-12
     updatedAt: 2026-04-12
-    validFrom:
+    validFrom: 2026-04-12
     validTo:
 ```
 
@@ -1037,7 +1065,7 @@ Evidence entries attach provenance and support semantics to a claim.
 ```yaml
 evidence:
   - id: ev.001
-    sourceId: source.2026-04-12.sample
+    sourceId: `sources/yyyy-mm-dd-<source-slug>-<UUID>.md`
     path: sources/2026-04-12-sample.md
     lines: 10-18
     kind: quote
