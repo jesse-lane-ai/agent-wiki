@@ -920,13 +920,9 @@ tags: []
 
 ## 11. Structured Claims
 
-Claims are first-class records that can either be embedded in the frontmatter of other pages or authored as top-level standalone files in `claims/`.
+Claims are a primary **pagetype** in the system. They are authored as top-level, standalone files in the `claims/` directory. 
 
-A page MAY contain zero or more embedded claims.
-
-Claims MUST live in frontmatter under `claims:` or in a managed structured block that compile can normalize into the same format.
-
-For v1, frontmatter claims are the normative shape.
+For v1, Standalone Claim Pages are the normative shape. However, pages MAY also contain zero or more embedded claims in their frontmatter under the `claims:` key for convenience. Both formats are parsed identically by the compile pipeline.
 
 ### 11.1 Claim shape
 
