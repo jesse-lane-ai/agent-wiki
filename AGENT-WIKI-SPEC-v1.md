@@ -1058,10 +1058,27 @@ Evidence entries attach provenance and support semantics to a claim.
 
 ### 12.1 Evidence shape
 
+**Schema:**
+```yaml
+evidence:
+  - id: <evidence-id>
+    sourceId: <source-id>
+    path: <source-path>
+    lines: <line-range>
+    kind: <kind>
+    relation: <relation>
+    weight: <float>
+    note: <note>
+    excerpt: <text>
+    retrievedAt: <yyyy-mm-dd>
+    updatedAt: <yyyy-mm-dd>
+```
+
+**Example:**
 ```yaml
 evidence:
   - id: ev.001
-    sourceId: `sources/yyyy-mm-dd-<source-slug>-<UUID>.md`
+    sourceId: source.2026-04-12.sample
     path: sources/2026-04-12-sample.md
     lines: 10-18
     kind: quote
