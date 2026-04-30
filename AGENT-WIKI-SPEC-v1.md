@@ -208,7 +208,7 @@ A v1-compliant vault MUST use the following top-level structure.
     skills/
 ```
 
-The folders `_attachments/`, `_archive/`, `_views/`, and `_docs/` do not need to contain content at vault creation time. They SHOULD be created as empty directories (with a `.gitkeep` if using git) during initial vault setup so the structure is in place.
+Fresh template repositories MAY omit empty runtime/content directories. Initialization tooling and workflows SHOULD create missing directories when they are needed.
 
 ### 6.1 Required top-level files
 
@@ -1578,7 +1578,7 @@ When dashboard generation is enabled, the system SHOULD generate:
 
 - Reports SHOULD be fully regenerable.
 - Reports SHOULD NOT be treated as primary truth.
-- Reports MAY include human commentary blocks if explicitly configured, but generated sections MUST remain replaceable.
+- Compiler-generated reports SHOULD be treated as fully replaceable generated files, not managed-block documents.
 - Reports SHOULD identify the compile timestamp.
 
 ---

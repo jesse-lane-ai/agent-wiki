@@ -5,7 +5,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Confirm the required folders exist: `sources/`, `entities/`, `concepts/`, `claims/`, `syntheses/`, `procedures/`, `questions/`, `reports/`, `_inbox/`, `_attachments/`, `_archive/`, `_views/`, and `_wiki/`.
+4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_wiki/cache/`, `_wiki/indexes/`, `_wiki/logs/`, and `reports/`; import workflows create `_inbox/`, `_inbox/trash/`, `sources/`, and `_attachments/`.
 5. Configure `import-note` before importing external material.
 6. Run the compile pipeline and confirm it reports zero validation issues.
 

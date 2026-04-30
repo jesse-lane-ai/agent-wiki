@@ -219,7 +219,7 @@ Generated content here.
 
 **Human-authored content outside managed blocks is always preserved.**
 
-Common block names: `summary`, `claims`, `evidence`, `relations`, `timeline`, `source-metadata`, `report-body`.
+Common block names: `summary`, `claims`, `evidence`, `relations`, `timeline`, `source-metadata`.
 
 ---
 

@@ -216,7 +216,6 @@ Standard block names agents should use:
 | `relations` | Generated relations block |
 | `timeline` | Generated timeline block |
 | `source-metadata` | Generated source metadata |
-| `report-body` | Generated report content |
 
 ---
 

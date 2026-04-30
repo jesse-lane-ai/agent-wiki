@@ -31,7 +31,7 @@ Have your agent verify the wiki is initialized. Before using `import-note`, conf
 
 This repo currently gives you:
 
-- a vault structure for sources, entities, concepts, claims, syntheses, procedures, questions, and reports
+- schema and initialization guidance for sources, entities, concepts, claims, syntheses, procedures, questions, and reports
 - a compile pipeline that emits normalized caches under `_wiki/cache/`
 - an import skill in `_wiki/skills/import-note/`
 - an inbox-processing skill in `_wiki/skills/process-new-notes/`
