@@ -4,7 +4,7 @@ pageType: index
 title: Agentics Wiki Index
 status: active
 createdAt: 2026-04-12
-updatedAt: 2026-04-13
+updatedAt: 2026-04-30
 aliases: []
 tags:
   - meta
@@ -21,21 +21,20 @@ Welcome to the Agentics vault — a structured knowledge base designed for both 
 
 | Section | Purpose |
 |---|---|
-| [`sources/`](sources/) | Raw material and source-backed pages |
-| [`entities/`](entities/) | Durable things: people, orgs, projects, products |
-| [`concepts/`](concepts/) | Definitions, methods, frameworks, principles |
-| [`claims/`](claims/) | Standalone atomic claim pages with evidence |
-| [`syntheses/`](syntheses/) | Cross-source analyses and overviews |
-| [`procedures/`](procedures/) | Runbooks, checklists, workflows |
-| [`questions/`](questions/) | Open questions and research gaps |
-| [`decisions/`](decisions/) | Recorded schema and interpretation choices |
-| [`reports/`](reports/) | Generated maintenance views |
+| `sources/` | Raw material and source-backed pages |
+| `entities/` | Durable things: people, orgs, projects, products |
+| `concepts/` | Definitions, methods, frameworks, principles |
+| `claims/` | Standalone atomic claim pages with evidence |
+| `syntheses/` | Cross-source analyses and overviews |
+| `procedures/` | Runbooks, checklists, workflows |
+| `questions/` | Open questions and research gaps |
+| `reports/` | Generated maintenance views |
 
 ---
 
 ## Intake
 
-New material lands in [`_inbox/`](_inbox/) as pointer files before being processed into canonical `source` pages.
+New material lands in `_inbox/` as pointer files before being processed into canonical `source` pages.
 
 See [[INBOX]] for the pointer schema and intake lifecycle.
 

@@ -1662,7 +1662,7 @@ Humans MAY:
 - create new pages
 - update frontmatter
 - add or revise claims manually
-- add decisions and questions
+- add questions
 
 Humans SHOULD NOT:
 - directly hand-edit cache files

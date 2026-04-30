@@ -16,7 +16,7 @@ Before touching anything, read the vault's agent contract in this order:
  
 You need to understand the contract before editing anything. The key things from AGENTS.md that apply here:
 - Never rewrite human content outside managed blocks
-- Use stable dotted-namespace IDs (`source.<namespace>.<slug>`)
+- Use stable source IDs (`source.<yyyy-mm-dd>.<source-slug>`)
 - Update `updatedAt` when you change structured content
 - Do not invent certainty
  
@@ -43,11 +43,11 @@ The `pointer:` field is a wikilink to the raw source file. Resolve it to the fil
 ### 3b. Infer frontmatter fields from content
  
 Generate a complete source frontmatter block. Use the schema below.
-Source pages use the normal page status vocabulary from [[WIKI]]; after intake, they should usually be `active`, not `processed`.
+Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]; after intake, retained source pages should usually be `processed`.
  
-**ID format:** `source.<namespace>.<slug>`
-- `namespace`: author handle, platform name, or topic area (e.g., `nav-toor`, `timothy-carbat`, `youtube`)
-- `slug`: short kebab-case descriptor of the content (e.g., `ai-income-stack-2026`, `minimax-m2-7-review`)
+**ID format:** `source.<yyyy-mm-dd>.<source-slug>`
+- `yyyy-mm-dd`: retrieval or capture date
+- `source-slug`: short kebab-case descriptor of the content, preferably the same 4-word slug used by `import-note`
  
 **sourceType** — infer from content:
 - YouTube transcript → `transcript`
@@ -63,10 +63,10 @@ Source pages use the normal page status vocabulary from [[WIKI]]; after intake, 
 **Required fields:**
  
 ```yaml
-id: source.<namespace>.<slug>
+id: source.<yyyy-mm-dd>.<source-slug>
 pageType: source
 title: "<title from content>"
-status: active
+status: processed
 sourceType: <inferred>
 originUrl: <url if present in content>
 author: <author if present>

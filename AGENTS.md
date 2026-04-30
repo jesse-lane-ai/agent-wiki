@@ -2,7 +2,7 @@
 
 Agent behavior contract for the Agentics vault.  
 Version: v1  
-Last updated: 2026-04-13
+Last updated: 2026-04-30
 
 ---
 
@@ -11,6 +11,8 @@ Last updated: 2026-04-13
 This file is the authoritative description of how agents are expected to behave when reading, writing, or compiling this vault. It is not a style guide — it is a contract.
 
 Agents MUST read this file before making any edits to the vault. See also [[WIKI]] for schema and editorial rules, and [[INBOX]] for the intake pointer schema.
+
+For field-level schema details, [[AGENT-WIKI-SPEC-v1]] is canonical. This file only defines agent behavior.
 
 ---
 
@@ -106,35 +108,35 @@ IDs use dotted lowercase namespace format.
 Pattern: `<pageType>.<namespace>.<slug>`
 
 Examples:
-- `entity.project.my-project`
-- `concept.structured-claims`
-- `source.my-project.docs`
-- `synthesis.market-overview.automation`
-- `question.claim-ownership.multi-page`
+- `entity.place.riverside-community-garden`
+- `concept.watershed-management`
+- `source.2026-04-12.urban-tree-canopy`
+- `synthesis.overview.coastal-resilience`
+- `question.evacuation-routing.accessibility`
 
 ### Claim IDs
 
 Pattern: `claim.<page-namespace>.<descriptor>`
 
-Example: `claim.my-project.compile-outputs`
+Example: `claim.garden.weekly-produce-donations`
 
 ### Evidence IDs
 
 Pattern: `ev.<claim-slug>.<index>`
 
-Example: `ev.compile-outputs.01`
+Example: `ev.weekly-produce-donations.01`
 
 ### Timeline entry IDs
 
 Pattern: `tl.<page-slug>.<index>`
 
-Example: `tl.my-project.001`
+Example: `tl.riverside-garden.001`
 
 ### Filenames
 
 Filenames SHOULD use kebab-case and match the page slug.
 
-Example: `entities/my-project.md`
+Example: `entities/riverside-community-garden.md`
 
 ---
 

@@ -1,3 +1,43 @@
+## First-Run Initialization
+
+Use this file when setting up a fresh checkout or when a new agent needs to orient itself before editing the vault.
+
+1. Read [[AGENTS]] for the agent behavior contract.
+2. Read [[WIKI]] for the human-facing schema guide.
+3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
+4. Confirm the required folders exist: `sources/`, `entities/`, `concepts/`, `claims/`, `syntheses/`, `procedures/`, `questions/`, `reports/`, `_inbox/`, `_attachments/`, `_archive/`, `_views/`, and `_wiki/`.
+5. Configure `import-note` before importing external material.
+6. Run the compile pipeline and confirm it reports zero validation issues.
+
+```bash
+python3 _wiki/skills/compile-wiki/scripts/compile.py
+```
+
+---
+
+## Import Note Configuration
+
+The `import-note` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
+
+Set or confirm these values before importing:
+
+| Setting | Required | Notes |
+|---|---|---|
+| `vaultRoot` | yes | Absolute path to the vault where `_inbox/`, `sources/`, and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault. |
+| `defaultVaultName` | no | Optional display name for the target vault. |
+| `retrievalMode` | yes | Choose available retrieval methods, such as direct fetch, browser capture, manual content paste, or transcript extraction. |
+| `browserProfile` | no | Only needed if browser fallback is available in the user's environment. |
+| `youtubeTranscriptTool` | no | Only set if `yt-dlp` or another transcript tool is installed. |
+| `attachmentPolicy` | yes | Decide whether imported images/files are copied into `_attachments/` or linked externally. |
+
+If any required value is unknown, the agent should ask the user before running `import-note`.
+
+The inbox pointer lifecycle uses uppercase statuses: `UNPROCESSED`, `PROCESSING`, `PROCESSED`, `FAILED`, `IGNORED`, and `TRASHED`.
+
+Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unprocessed`, `processed`, and `archived`.
+
+---
+
 ## Recommended v1 Implementation Sequence
 
 1. Create vault skeleton
@@ -31,35 +71,10 @@ The following are out of scope for strict v1 compliance:
 
 ## Philosophy
 
-The v1 model is built on three layers:
+The v1 model has three layers:
 
-### The vault is the container
-Markdown pages, folders, human notes, and generated blocks.
+- The vault is the container: markdown pages, folders, human notes, and generated blocks.
+- The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, syntheses, and procedures.
+- The compile layer is the bridge: stable machine-facing cache files and generated maintenance reports.
 
-### The ontology is the truth model
-Entities, concepts, sources, claims, evidence, relations, contradictions, questions, syntheses, and procedures.
-
-### The compile layer is the bridge
-Stable machine-facing cache files and generated maintenance reports.
-
-That is the v1 contract.
-
-It is strict enough to be machine-usable, but still readable and workable as a markdown-first wiki.
-
----
-
-## Core principle
-
-The wiki should separate:
-
-- **what exists**  
-- **what is claimed**  
-- **what supports it**  
-- **what conflicts with it**  
-- **what is still unknown**  
-- **how everything connects**  
-- **how agents consume it**
-
-That gives you a wiki that is both:
-- readable by humans
-- dependable for agents
+The wiki should separate what exists, what is claimed, what supports it, what conflicts with it, what is unknown, how things connect, and how agents consume it.

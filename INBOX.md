@@ -29,7 +29,7 @@ Inbox pointer files are simple tracking records for raw items that landed in `_i
 
 ```yaml
 id: 2026-04-12-inbox-2042925773300908103
-pointer: "[[sources/2042925773300908103]]"
+pointer: "[[source.2026-04-12.riverside-garden-newsletter]]"
 status: UNPROCESSED
 ```
 
@@ -49,6 +49,6 @@ Items moved to `_inbox/trash/` SHOULD use one of these statuses:
 ### Notes
 
 - `_inbox` pointer files are not canonical `source` pages.
-- The `pointer` field references the raw item using an Obsidian wikilink.
+- The `pointer` field references the raw item or source page using an Obsidian wikilink.
 - When processing is complete, the item should be turned into a canonical page under `sources/`.
 - Items in `_inbox/trash/` are no longer part of the active processing queue.

@@ -8,15 +8,15 @@ It is a starting framework, not a finished product. The value comes from adaptin
 
 A fresh agent should not start by guessing how the vault works. Initialize it by having the agent read:
 
-1. `INITIALIZE.md` for the implementation philosophy and rollout sequence.
-2. `AGENTS.md` for the operating contract it must follow before making edits.
+1. [[INITIALIZE]] for the first-run checklist and local configuration.
+2. [[AGENTS]] for the operating contract it must follow before making edits.
 
 After that, the agent should read:
 
-- `[[index]]` for navigation
-- `[[WIKI]]` for schema and editorial rules
-- `[[INBOX]]` for intake pointer handling
-- `[[AGENT-WIKI-SPEC-v1]]` for the full technical specification
+- [[index]] for navigation
+- [[WIKI]] for schema and editorial rules
+- [[INBOX]] for intake pointer handling
+- [[AGENT-WIKI-SPEC-v1]] for the full technical specification
 
 In practice, the initialization prompt can be as simple as:
 
@@ -25,15 +25,17 @@ Read INITIALIZE.md and AGENTS.md first. Then read index.md and WIKI.md.
 Follow the vault contract before making any changes.
 ```
 
-Have your agent verify the wiki is initialized.
+Have your agent verify the wiki is initialized. Before using `import-note`, configure the local vault/import settings in [[INITIALIZE]].
 
 ## What Exists Today
 
 This repo currently gives you:
 
-- a vault structure for sources, entities, concepts, claims, syntheses, procedures, questions, decisions, and reports
+- a vault structure for sources, entities, concepts, claims, syntheses, procedures, questions, and reports
 - a compile pipeline that emits normalized caches under `_wiki/cache/`
+- an import skill in `_wiki/skills/import-note/`
 - an inbox-processing skill in `_wiki/skills/process-new-notes/`
+- an extraction skill in `_wiki/skills/extract-knowledge-primitives/`
 - a compile skill in `_wiki/skills/compile-wiki/`
 
 The compile pipeline is run with:
@@ -52,7 +54,7 @@ Typical scheduled jobs look like this:
 
 - inbox triage on a frequent schedule, pointed at `_wiki/skills/process-new-notes/`
 - compile/regeneration on a frequent or post-ingest schedule, pointed at `_wiki/skills/compile-wiki/`
-- future extraction or cleanup passes, each pointed at a dedicated skill once those skills exist
+- extraction or cleanup passes, each pointed at a dedicated skill
 
 The important part is the pattern:
 
@@ -69,13 +71,10 @@ This vault is not feature-complete yet.
 
 Skills still need to be created for:
 
-- extracting claims from raw notes and source pages
-- extracting or reconciling entities
-- extracting or normalizing concepts
 - relation extraction and cleanup
 - broader maintenance and QA workflows
 
-Testing is also still incomplete. The compile pipeline has been hardened, but the larger workflow needs stronger coverage around extraction, validation, scheduled runs, and end-to-end agent behavior.
+Testing is also still incomplete. The compile pipeline has been hardened, but the larger workflow needs stronger coverage around import, extraction, validation, scheduled runs, and end-to-end agent behavior.
 
 ## Make It Your Own
 
@@ -84,8 +83,9 @@ This repository should be treated as a foundation for your own wiki, not as a fi
 You will need to:
 
 - refine the schema to match your domain
+- configure `import-note` for your local vault paths and retrieval tools
 - add or replace skills to fit your workflows
 - decide what should be automated versus reviewed by a human
-- keep curating pages, claims, evidence, and decisions over time
+- keep curating pages, claims, evidence, and open questions over time
 
 If you work on the vault consistently, it can become a reliable personal or team knowledge system. If you do not keep shaping it, it will stay a generic starter skeleton.

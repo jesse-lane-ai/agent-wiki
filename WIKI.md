@@ -2,13 +2,15 @@
 
 Human-readable schema and editorial guide for the Agentics vault.  
 Spec version: v1  
-Last updated: 2026-04-13
+Last updated: 2026-04-30
 
 ---
 
 ## 1. What this wiki is
 
 This vault is a structured knowledge base designed to be useful for both humans and AI agents.
+
+This file is a quick editorial guide. The canonical technical schema lives in [[AGENT-WIKI-SPEC-v1]].
 
 It separates:
 - **things** from **ideas**
@@ -256,6 +258,7 @@ Reports in `reports/` are generated views. They are NOT authoritative.
 | `stale-pages.md` | Pages not updated recently |
 
 Do not treat reports as primary data — they derive from page frontmatter and caches.
+
 ---
 
 ## 12. Source types
