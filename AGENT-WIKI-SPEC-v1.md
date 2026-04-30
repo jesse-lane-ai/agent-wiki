@@ -2,7 +2,7 @@
 # Agentic Wiki v1 Specification
 
 Version: 1.1
-Last Updated: 2026-04-28
+Last Updated: 2026-04-30
 
 ---
 
@@ -239,6 +239,11 @@ SHOULD be the human-facing landing page.
 
 #### `INBOX.md`
 MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` folder pointer schema — the intake queue for raw items that have not yet been processed into canonical `source` pages.
+
+### 6.1.1 Optional top-level files
+
+#### `log.md`
+MAY be used as a human-readable operational changelog for meaningful vault changes. It is not a source of canonical knowledge.
 
 ### 6.2 Required directories
 
@@ -1398,6 +1403,8 @@ Primary truth sources:
 
 These are views, not truth sources:
 - `reports/`
+- `log.md`
+- `_wiki/logs/`
 - ad hoc dashboard summaries
 - search indexes
 - prompt supplements that do not round-trip back to pages
@@ -1576,11 +1583,37 @@ When dashboard generation is enabled, the system SHOULD generate:
 
 ---
 
-## 21. Health Rules
+## 21. Logs
+
+Logs capture operational history. They do not replace page frontmatter, structured claims, evidence, or compile caches.
+
+### 21.1 Log locations
+
+- `_wiki/logs/` stores generated compile and runtime logs. These files SHOULD be written by tooling and MUST NOT be hand-edited.
+- `log.md`, if present, is a human-readable changelog for meaningful vault changes.
+
+### 21.2 Log authority
+
+Logs are non-authoritative operational records. Agents and tooling MUST NOT treat log entries as primary evidence for claims unless the relevant material is promoted into a canonical `source` page.
+
+### 21.3 `log.md` entries
+
+When used, `log.md` entries SHOULD be append-only and concise. Each entry SHOULD include:
+
+- date
+- actor or tool, when known
+- changed area
+- short reason or outcome
+
+Trivial report/cache regeneration does not need a `log.md` entry unless it records a meaningful vault change or operational incident.
+
+---
+
+## 22. Health Rules
 
 The system SHOULD compute health signals at compile time.
 
-### 21.1 Low confidence
+### 22.1 Low confidence
 
 A claim SHOULD be considered low confidence when:
 - `confidence < 0.50`
@@ -1588,13 +1621,13 @@ A claim SHOULD be considered low confidence when:
 
 Exact threshold MAY be configurable, but SHOULD be stable.
 
-#### 21.2 Evidence gaps
+#### 22.2 Evidence gaps
 
 A claim SHOULD appear in evidence-gap reporting when:
 - it has zero evidence entries
 - or only `context_only` evidence exists
 
-### 21.3 Staleness
+### 22.3 Staleness
 
 A page or claim MAY be considered stale when:
 - `updatedAt` exceeds configured freshness expectations
@@ -1603,7 +1636,7 @@ A page or claim MAY be considered stale when:
 
 v1 does not prescribe one universal stale threshold because domains vary.
 
-#### 21.4 Contradictions
+#### 22.4 Contradictions
 
 A contradiction SHOULD be surfaced when:
 - two claims with overlapping scope conflict materially
@@ -1613,28 +1646,28 @@ A contradiction SHOULD be surfaced when:
 
 ---
 
-## 22. Freshness Model
+## 23. Freshness Model
 
 Freshness SHOULD be tracked at multiple levels when possible.
 
-### 22.1 Recommended fields
+### 23.1 Recommended fields
 - page `updatedAt`
 - claim `updatedAt`
 - evidence `updatedAt`
 - source `publishedAt`
 - source `retrievedAt`
 
-#### 22.2 Rule
+#### 23.2 Rule
 A recently edited page is not automatically a fresh page.  
 Compile SHOULD distinguish between recent edits and recent underlying evidence.
 
 ---
 
-## 23. Validation Rules
+## 24. Validation Rules
 
 A v1 validator SHOULD check the following.
 
-### 23.1 Required validation
+### 24.1 Required validation
 - every page has a valid `pageType`
 - every page has a unique `id`
 - required frontmatter fields are present
@@ -1646,7 +1679,7 @@ A v1 validator SHOULD check the following.
 - question pages use allowed status enums
 - pages are stored in folders consistent with `pageType`
 
-#### 23.2 Recommended validation
+#### 24.2 Recommended validation
 - source IDs referenced by evidence exist
 - related page references exist
 - claim IDs referenced by relationships exist when provided
@@ -1654,7 +1687,7 @@ A v1 validator SHOULD check the following.
 
 ---
 
-## 24. Human Editing Expectations
+## 25. Human Editing Expectations
 
 Humans MAY:
 - add prose
@@ -1672,14 +1705,14 @@ Humans SHOULD NOT:
 
 ---
 
-## 25. Agent Editing Expectations
+## 26. Agent Editing Expectations
 
 Agents MUST:
 - preserve human-authored content unless explicitly directed otherwise
 - use stable IDs when generating claims or pages
 - update `updatedAt` when meaningfully changing structured content
 - avoid inventing unsupported certainty
-- update the log.md file when making meaningful changes to the vault
+- update `log.md` when making meaningful changes to the vault, if `log.md` is present or requested by the operator
 
 Agents SHOULD:
 - create question pages for unresolved important unknowns
@@ -1694,7 +1727,7 @@ Agents MUST NOT:
 
 ---
 
-## 26. Example Minimal Entity Page
+## 27. Example Minimal Entity Page
 
 ```md
 ---
@@ -1749,7 +1782,7 @@ Riverside Community Garden is a neighborhood garden that coordinates volunteer p
 
 ---
 
-## 27. Example Question Page
+## 28. Example Question Page
 
 ```md
 ---
@@ -1782,7 +1815,7 @@ We need to identify which sensors require calibration before they are used for s
 
 ---
 
-## 28. Compatibility Notes
+## 29. Compatibility Notes
 
 v1 implementations MAY add fields beyond this spec, provided they do not break:
 

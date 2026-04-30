@@ -72,9 +72,9 @@ Agents MUST NOT read reports as primary data sources when page frontmatter or ca
 
 ### 2.7 Do not hand-edit cache files
 
-Files in `_wiki/cache/` and `_wiki/indexes/` are compile artifacts.
+Files in `_wiki/cache/`, `_wiki/indexes/`, and `_wiki/logs/` are compile artifacts.
 
-Agents MUST NOT manually patch cache files except by running the compile pipeline.
+Agents MUST NOT manually patch cache, index, or generated log files except by running the compile pipeline.
 
 ### 2.8 Respect the inbox boundary
 
@@ -182,7 +182,29 @@ The compile pipeline MUST be run after meaningful vault changes to keep caches f
 
 ---
 
-## 7. Managed block names
+## 7. Logs
+
+There are two log surfaces:
+
+- `_wiki/logs/` contains generated compile/runtime logs. Agents MUST NOT hand-edit these files.
+- `log.md`, if present, is a human-readable operational changelog.
+
+Agents SHOULD append to `log.md` after meaningful vault changes, such as schema updates, new workflows, import configuration changes, or significant content migrations.
+
+Agents SHOULD NOT log trivial report/cache regeneration unless it records a meaningful vault change or operational incident.
+
+Each `log.md` entry SHOULD include:
+
+- date
+- actor or tool, when known
+- changed area
+- short reason or outcome
+
+Logs are not authoritative truth records. Agents MUST NOT treat `log.md` or `_wiki/logs/` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.
+
+---
+
+## 8. Managed block names
 
 Standard block names agents should use:
 
@@ -198,7 +220,7 @@ Standard block names agents should use:
 
 ---
 
-## 8. Claim rules summary
+## 9. Claim rules summary
 
 - Claims MUST be atomic (one proposition per claim)
 - Claims MUST have a stable unique ID
@@ -209,7 +231,7 @@ Standard block names agents should use:
 
 ---
 
-## 9. Evidence rules summary
+## 10. Evidence rules summary
 
 - Evidence MUST reference a `sourceId` when possible
 - Evidence `relation` MUST use: `supports`, `weakens`, `contradicts`, `context_only`
@@ -218,7 +240,7 @@ Standard block names agents should use:
 
 ---
 
-## 10. Question hygiene
+## 11. Question hygiene
 
 - Agents SHOULD create question pages for important unresolved unknowns
 - Resolved questions MUST remain in the vault with updated status
@@ -226,13 +248,13 @@ Standard block names agents should use:
 
 ---
 
-## 11. What agents MUST NOT do
+## 12. What agents MUST NOT do
 
 - Rewrite human content outside managed blocks
 - Delete unresolved uncertainty by omission
 - Convert weak evidence to strong support semantics
 - Treat reports as primary truth records
-- Hand-edit cache files
+- Hand-edit cache, index, or generated log files
 - Create duplicate IDs
 - Place pages in the wrong folder for their `pageType`
 - Invent unsupported certainty in claims
@@ -240,7 +262,7 @@ Standard block names agents should use:
 
 ---
 
-## 12. Internal linking convention
+## 13. Internal linking convention
 
 All internal links within the vault MUST use Obsidian-style wikilinks.
 
@@ -261,6 +283,6 @@ This convention applies to:
 
 ---
 
-## 13. Full Specification
+## 14. Full Specification
 
 [[AGENT-WIKI-SPEC-v1]]
