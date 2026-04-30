@@ -460,7 +460,7 @@ id: claim.<topic>.<descriptor>
 pageType: claim
 title: <Claim Statement>
 claimType: <type>
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: <Exact claim text>
 subjectPageId: <entity or concept being claimed about>
@@ -501,7 +501,7 @@ This claim is extracted from [[<source page ID>]].
 
 - **claimType**: One of: descriptive, historical, causal, interpretive, normative, forecast
 
-- **claimStatus**: Always `unverified` for extracted claims
+- **status**: Always `unverified` for extracted claims
   - Confidence: Always `0.70` (moderate) for extracted claims
 
 - **subjectPageId**: The entity or concept this claim is about
@@ -944,7 +944,7 @@ id: claim.acme.founded-2010
 pageType: claim
 title: Acme Corp was founded in 2010
 claimType: historical
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: Acme Corp was founded in 2010
 subjectPageId: entity.org.acme-corp

@@ -3,7 +3,7 @@ id: claim.<topic>.<descriptor>
 pageType: claim
 title: <Exact Claim Statement>
 claimType: <descriptive|historical|causal|interpretive|normative|forecast>
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: <Exact claim proposition>
 subjectPageId: <entity.<category>.<slug>|concept.<slug>>

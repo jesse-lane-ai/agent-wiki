@@ -199,7 +199,7 @@ id: claim.anthropic.founded-2021
 pageType: claim
 title: Anthropic was founded in 2021
 claimType: historical
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: Anthropic was founded in 2021
 subjectPageId: entity.org.anthropic
@@ -234,7 +234,7 @@ id: claim.claude.45-improves-40
 pageType: claim
 title: Claude 4.5 improves on Claude 4.0 in reasoning speed, code generation accuracy, and safety
 claimType: descriptive
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: Claude 4.5 improves on Claude 4.0 in reasoning speed, code generation accuracy, and safety
 subjectPageId: entity.product.claude-ai
@@ -269,7 +269,7 @@ id: claim.claude.45-95-percent-accuracy
 pageType: claim
 title: Claude 4.5 achieves 95% accuracy on standard benchmarks
 claimType: descriptive
-claimStatus: unverified
+status: unverified
 confidence: 0.70
 text: Claude 4.5 achieves 95% accuracy on standard benchmarks
 subjectPageId: entity.product.claude-ai

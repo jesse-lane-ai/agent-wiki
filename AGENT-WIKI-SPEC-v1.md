@@ -319,7 +319,7 @@ A `source` page SHOULD include:
 A page in `sources/` MUST have `pageType: source`.
 
 ### 7.2 `entities/`
-`
+
 An `entity` page represents a durable thing.
 
 Typical entity kinds:
@@ -374,6 +374,12 @@ A page in `questions/` MUST have `pageType: question`.
 
 
 
+### 7.7 `claims/`
+
+A `claim` page represents a standalone atomic proposition that tracks its own evidence independent of any one source.
+
+A page in `claims/` MUST have `pageType: claim`.
+
 ### 7.8 `reports/`
 
 A `report` page is generated and SHOULD NOT be treated as an authoritative source of truth.
@@ -382,13 +388,7 @@ A page in `reports/` MUST have `pageType: report` if it includes frontmatter.
 
 Reports are views over compiled or source page data.
 
-### 7.9 `claims/`
-
-A `claim` page represents a standalone atomic proposition that tracks its own evidence independent of any one source.
-
-A page in `claims/` MUST have `pageType: claim`.
-
-### 7.10 `index.md`
+### 7.9 `index.md`
 
 `index.md` is the human-facing landing page for the vault.
 
@@ -834,7 +834,7 @@ id: claim.<claimType>.<claim-slug>
 pageType: claim
 title: <title>
 claimType: <claimType>
-claimStatus: supported
+status: <status>
 confidence: <float>
 text: <text>
 subjectPageId: <page-id>
@@ -852,7 +852,7 @@ id: claim.descriptive.some-fact
 pageType: claim
 title: Some Fact
 claimType: descriptive
-claimStatus: supported
+status: supported
 confidence: 0.90
 text: This is the actual claim text.
 subjectPageId: entity.person.john-doe
@@ -1208,7 +1208,7 @@ updatedAt: <yyyy-mm-dd>
 **Example:**
 ```yaml
 id: contradiction.interpretation-conflict.ai-impact
-type: interpretation-conflict
+type: interpretation_conflict
 status: open
 summary: Two claims disagree on the impact of AI on knowledge management.
 claimIds:
@@ -1231,11 +1231,11 @@ updatedAt: 2026-04-29
 
 ### 14.3 Allowed contradiction types
 
-- `direct-conflict`
-- `date-conflict`
-- `scope-conflict`
-- `definition-conflict`
-- `interpretation-conflict`
+- `direct_conflict`
+- `date_conflict`
+- `scope_conflict`
+- `definition_conflict`
+- `interpretation_conflict`
 
 ### 14.4 Allowed contradiction status values
 
@@ -1760,7 +1760,7 @@ status: open
 relatedClaims:
   - claim.descriptive.compile-outputs
 relatedPages:
-  - syntheses/wiki-architecture.md
+  - "[[wiki-architecture]]"
 openedAt: 2026-04-12
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
@@ -1781,7 +1781,7 @@ We need a rule for canonical claim ownership versus claim reuse.
 
 ---
 
-## 29. Compatibility Notes
+## 28. Compatibility Notes
 
 v1 implementations MAY add fields beyond this spec, provided they do not break:
 

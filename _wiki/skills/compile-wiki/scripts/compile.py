@@ -517,7 +517,6 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
             record["openedAt"] = str(meta.get("openedAt", ""))
         elif page_type == "claim":
             record["claimType"] = meta.get("claimType", "")
-            record["claimStatus"] = meta.get("claimStatus", meta.get("status", ""))
             record["confidence"] = meta.get("confidence", None)
             record["text"] = meta.get("text", "")
             record["subjectPageId"] = meta.get("subjectPageId", "")
@@ -553,7 +552,7 @@ def extract_claims(pages: list[dict], validation_issues: list[dict]) -> list[dic
                 {
                     "id": page["id"],
                     "text": page["meta"].get("text", page["title"]),
-                    "status": page["meta"].get("claimStatus", page["meta"].get("status", "")),
+                    "status": page["meta"].get("status", page["meta"].get("claimStatus", "")),
                     "confidence": page.get("confidence"),
                     "claimType": page["meta"].get("claimType", ""),
                     "evidence": page["meta"].get("evidence") or [],
@@ -1314,7 +1313,7 @@ def main():
             "id": p["id"],
             "title": p["title"],
             "path": p["path"],
-            "claimStatus": p.get("claimStatus", p["status"]),
+            "status": p["status"],
             "claimType": p.get("claimType", ""),
             "confidence": p.get("confidence"),
             "text": p.get("text", ""),
