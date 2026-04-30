@@ -1380,12 +1380,14 @@ timeline:
     updatedAt: 2026-04-12
 ```
 
-Required fields
+### 15.2 Required and Optional Fields
+
+**Required fields:**
 - `id`
 - `date`
 - `text`
 
-Optional fields:
+**Optional fields:**
 - `endDate`
 - `eventType`
 - `status`
@@ -1397,7 +1399,7 @@ Optional fields:
 - `createdAt`
 - `updatedAt`
 
-#### 15.2 Placement and Semantics
+### 15.3 Placement and Semantics
 
 Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, question, and decision pages.
 
@@ -1411,7 +1413,8 @@ A synthesis page that acts as a dedicated chronology MUST use:
 pageType: synthesis
 synthesisType: timeline
 ```
-#### 15.3 Compile and Validation
+
+### 15.4 Compile and Validation
 
 The compile pipeline SHOULD extract timeline entries into:
 
