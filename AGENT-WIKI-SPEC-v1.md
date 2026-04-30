@@ -198,7 +198,6 @@ A v1-compliant vault MUST use the following top-level structure.
 
   _attachments/
   _archive/
-  _views/
 
   _wiki/
     cache/
@@ -276,9 +275,6 @@ Stores binary assets and attachments referenced by source pages or other pages (
 
 #### `_archive/`
 Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
-
-#### `_views/`
-Optional. Stores reusable view templates or layout helpers. Created on vault initialization; MAY be empty.
 
 #### `_wiki/`
 Stores machine-generated runtime and compile artifacts, and the `skills/` directory for agent skill definitions.

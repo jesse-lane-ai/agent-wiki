@@ -46,7 +46,7 @@ from typing import Any
 # Config
 # ---------------------------------------------------------------------------
 
-SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "_views", "reports"}
+SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "reports"}
 SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
 CACHE_DIR = "_wiki/cache"
 INDEX_DIR = "_wiki/indexes"
