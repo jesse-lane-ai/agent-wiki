@@ -1733,15 +1733,13 @@ A v1 validator SHOULD check the following.
 - related page references exist
 - claim IDs referenced by relationships exist when provided
 - aliases do not duplicate canonical title unnecessarily
-- report pages are not edited outside allowed managed blocks
-- generated blocks are balanced and well formed
 
 ---
 
 ## 24. Human Editing Expectations
 
 Humans MAY:
-- add prose outside managed blocks
+- add prose
 - add notes and commentary
 - create new pages
 - update frontmatter
@@ -1783,21 +1781,21 @@ Agents MUST NOT:
 
 ```md
 ---
-id: entity.project.<topic-slug>
+id: entity.project.agent-wiki
 pageType: entity
-title: <title>
+title: Agent Wiki
 entityType: project
-canonicalName: <canonical name>
+canonicalName: Agentic Wiki Project
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases:
-  - <alias>
+  - wiki-project
 tags:
   - wiki
   - agents
 claims:
-  - id: claim.<topic-slug>.compile.outputs
+  - id: claim.descriptive.compile-outputs
     text: The compile step emits stable machine-facing artifacts for agents.
     status: supported
     confidence: 0.91
@@ -1805,8 +1803,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: evidence.quote.supports.a1b2c3d4
-        sourceId: source.<yyyy-mm-dd>.<source-slug>
-        path: sources/yyyy-mm-dd-<source-slug>.md
+        sourceId: source.2026-04-12.ai-harness
+        path: sources/2026-04-12-ai-harness.md
         lines: 55-79
         kind: quote
         relation: supports
@@ -1818,23 +1816,23 @@ claims:
     createdAt: 2026-04-12
     updatedAt: 2026-04-12
 relations:
-  - subject: entity.project.<topic-slug>
+  - subject: entity.project.agent-wiki
     predicate: uses
     object: concept.structured-claims
     confidence: 0.88
     sourceClaimIds:
-      - claim.<topic-slug>.compile.outputs
+      - claim.descriptive.compile-outputs
 ---
 
-# <canonical name>
+# Agentic Wiki Project
 
-<canonical name> is a project that uses structured claims and compile-time outputs for agent-facing knowledge access.
+Agentic Wiki Project is a project that uses structured claims and compile-time outputs for agent-facing knowledge access.
 
 ```
 
 ---
 
-## 27Example Question Page
+## 27. Example Question Page
 
 ```md
 ---
@@ -1844,7 +1842,7 @@ title: How should claim ownership be handled across multiple synthesis pages?
 priority: high
 status: open
 relatedClaims:
-  - claim.<topic-slug>.compile.outputs
+  - claim.descriptive.compile-outputs
 relatedPages:
   - syntheses/wiki-architecture.md
 openedAt: 2026-04-12
