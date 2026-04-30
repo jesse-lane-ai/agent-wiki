@@ -227,6 +227,7 @@ The v1 controlled predicate set:
 | `depends_on` | Dependency |
 | `uses` | Usage relationship |
 | `produces` | Output relationship |
+| `founded_by` | Founding relationship |
 | `owned_by` | Ownership |
 | `located_in` | Location |
 | `related_to` | General association |

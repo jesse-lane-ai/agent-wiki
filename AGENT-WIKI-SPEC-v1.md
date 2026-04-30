@@ -321,7 +321,7 @@ An `entity` page represents a durable thing.
 
 Typical entity kinds:
 - person
-- org
+- organization
 - project
 - product
 - system
@@ -1164,6 +1164,7 @@ v1 SHOULD use a controlled predicate set:
 - `depends_on`
 - `uses`
 - `produces`
+- `founded_by`
 - `owned_by`
 - `located_in`
 - `related_to`

@@ -6,9 +6,10 @@
 
 ```yaml
 ---
-id: source.anthropic.claude-ai-announcement
+id: source.2026-04-15.claude-ai-announcement
 pageType: source
 title: Anthropic Announces Claude 4.5
+status: processed
 sourceType: article
 originUrl: https://example.com/claude-45-announcement
 publishedAt: 2026-04-01
@@ -52,10 +53,10 @@ Based on the source above, an agent would extract the following:
 
 ```yaml
 ---
-id: entity.org.anthropic
+id: entity.organization.anthropic
 pageType: entity
 title: Anthropic
-entityType: org
+entityType: organization
 canonicalName: Anthropic
 status: active
 createdAt: 2026-04-15
@@ -71,13 +72,13 @@ relatedPages:
   - entity.person.daniela-amodei
   - entity.product.claude-ai
 relations:
-  - subject: entity.org.anthropic
+  - subject: entity.organization.anthropic
     predicate: founded_by
     object: entity.person.darian-amodei
     confidence: 0.85
     sourceClaimIds:
       - claim.anthropic.founded-by-darian-amodei
-  - subject: entity.org.anthropic
+  - subject: entity.organization.anthropic
     predicate: produces
     object: entity.product.claude-ai
     confidence: 0.90
@@ -117,11 +118,11 @@ tags:
   - extracted
   - ai
 relatedPages:
-  - entity.org.anthropic
+  - entity.organization.anthropic
 relations:
   - subject: entity.product.claude-ai
     predicate: owned_by
-    object: entity.org.anthropic
+    object: entity.organization.anthropic
     confidence: 0.90
     sourceClaimIds: []
 ---
@@ -154,7 +155,7 @@ aliases: []
 tags:
   - extracted
 relatedPages:
-  - entity.org.anthropic
+  - entity.organization.anthropic
 ---
 
 # Darian Amodei
@@ -168,7 +169,7 @@ CEO and co-founder of Anthropic.
 
 ```yaml
 ---
-id: concept.rlhf
+id: concept.method.rlhf
 pageType: concept
 title: Reinforcement Learning from Human Feedback
 conceptType: method
@@ -202,12 +203,12 @@ claimType: historical
 status: unverified
 confidence: 0.70
 text: Anthropic was founded in 2021
-subjectPageId: entity.org.anthropic
+subjectPageId: entity.organization.anthropic
 sourceIds:
-  - source.anthropic.claude-ai-announcement
+  - source.2026-04-15.claude-ai-announcement
 evidence:
   - id: ev.anthropic.founded-2021.01
-    sourceId: source.anthropic.claude-ai-announcement
+    sourceId: source.2026-04-15.claude-ai-announcement
     path: sources/claude-ai-announcement.md
     kind: quote
     relation: supports
@@ -223,7 +224,7 @@ tags:
 
 # Anthropic was founded in 2021
 
-Extracted from [[source.anthropic.claude-ai-announcement|Claude Announcement]].
+Extracted from [[2026-04-15-claude-ai-announcement|Claude Announcement]].
 ```
 
 **File:** `claims/claude-45-improves-on-claude-40.md`
@@ -239,10 +240,10 @@ confidence: 0.70
 text: Claude 4.5 improves on Claude 4.0 in reasoning speed, code generation accuracy, and safety
 subjectPageId: entity.product.claude-ai
 sourceIds:
-  - source.anthropic.claude-ai-announcement
+  - source.2026-04-15.claude-ai-announcement
 evidence:
   - id: ev.claude.45-improves.01
-    sourceId: source.anthropic.claude-ai-announcement
+    sourceId: source.2026-04-15.claude-ai-announcement
     path: sources/claude-ai-announcement.md
     kind: quote
     relation: supports
@@ -258,7 +259,7 @@ tags:
 
 # Claude 4.5 improves on Claude 4.0
 
-Extracted from [[source.anthropic.claude-ai-announcement|Claude Announcement]].
+Extracted from [[2026-04-15-claude-ai-announcement|Claude Announcement]].
 ```
 
 **File:** `claims/claude-45-accuracy.md`
@@ -274,10 +275,10 @@ confidence: 0.70
 text: Claude 4.5 achieves 95% accuracy on standard benchmarks
 subjectPageId: entity.product.claude-ai
 sourceIds:
-  - source.anthropic.claude-ai-announcement
+  - source.2026-04-15.claude-ai-announcement
 evidence:
   - id: ev.claude.45-accuracy.01
-    sourceId: source.anthropic.claude-ai-announcement
+    sourceId: source.2026-04-15.claude-ai-announcement
     path: sources/claude-ai-announcement.md
     kind: quote
     relation: supports
@@ -293,7 +294,7 @@ tags:
 
 # Claude 4.5 achieves 95% accuracy on standard benchmarks
 
-Extracted from [[source.anthropic.claude-ai-announcement|Claude Announcement]].
+Extracted from [[2026-04-15-claude-ai-announcement|Claude Announcement]].
 ```
 
 ---
@@ -304,9 +305,10 @@ The original source page is updated with extraction metadata:
 
 ```yaml
 ---
-id: source.anthropic.claude-ai-announcement
+id: source.2026-04-15.claude-ai-announcement
 pageType: source
 title: Anthropic Announces Claude 4.5
+status: processed
 sourceType: article
 originUrl: https://example.com/claude-45-announcement
 publishedAt: 2026-04-01
@@ -316,12 +318,12 @@ updatedAt: 2026-04-15
 extractionStatus: extracted
 extractedAt: 2026-04-15
 extractedEntities:
-  - entity.org.anthropic
+  - entity.organization.anthropic
   - entity.product.claude-ai
   - entity.person.darian-amodei
   - entity.person.daniela-amodei
 extractedConcepts:
-  - concept.rlhf
+  - concept.method.rlhf
 extractedClaims:
   - claim.anthropic.founded-2021
   - claim.claude.45-improves-40
@@ -342,7 +344,7 @@ attachments: []
 ## Summary
 
 This example shows:
-1. **Entities extracted:** Anthropic (org), Claude (product), Darian Amodei (person), Daniela Amodei (person)
+1. **Entities extracted:** Anthropic (organization), Claude (product), Darian Amodei (person), Daniela Amodei (person)
 2. **Concepts extracted:** RLHF (technique)
 3. **Claims extracted:** 4 atomic propositions with evidence pointing back to the source
 4. **Relations:** Ownership, founding, product relationships

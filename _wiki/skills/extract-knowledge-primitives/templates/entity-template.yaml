@@ -1,8 +1,8 @@
 ---
-id: entity.<category>.<slug>
+id: entity.<entityType>.<slug>
 pageType: entity
 title: <Official Name>
-entityType: <person|org|project|product|system|place|event|artifact|other>
+entityType: <person|organization|project|product|system|place|event|artifact|document|other>
 canonicalName: <Preferred Name>
 status: active
 createdAt: 2026-04-16
@@ -14,12 +14,12 @@ tags:
   - extracted
   - <topical-tag>
 relatedPages:
-  - entity.<category>.<slug>  # Related entities
-  - concept.<slug>             # Related concepts
+  - entity.<entityType>.<slug> # Related entities
+  - concept.<conceptType>.<slug> # Related concepts
 relations:
-  - subject: entity.<category>.<slug>
-    predicate: <is_a|part_of|depends_on|uses|produces|owned_by|located_in|related_to|supports|contradicts|mentions|applies_to|derived_from>
-    object: entity.<category>.<slug>
+  - subject: entity.<entityType>.<slug>
+    predicate: <is_a|part_of|depends_on|uses|produces|founded_by|owned_by|located_in|related_to|supports|contradicts|mentions|applies_to|derived_from>
+    object: entity.<entityType>.<slug>
     confidence: 0.70
     sourceClaimIds: []
 ---

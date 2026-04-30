@@ -31,7 +31,7 @@ description: Ingest raw notes, links, or snippets into the vault inbox queue usi
 Create pointer files in `_inbox/` using frontmatter and exactly these fields:
 - `id`: unique inbox ID, format: `yyyy-mm-dd-inbox-<UUID>`
 - `url`: original URL of the source
-- `pointer`: pointer to raw item path. format: `sources/source.<yyyy-mm-dd>.<source-slug>`. Always use a native Obsidian wikilink.
+- `pointer`: pointer to raw source file path. format: `sources/<yyyy-mm-dd>-<source-slug>`. Always use a native Obsidian wikilink.
 - `status`: `UNPROCESSED`
 
 Example:
@@ -39,7 +39,7 @@ Example:
 ---
 id: yyyy-mm-dd-inbox-<UUID>
 url: <original URL of the source>
-pointer: "[[sources/source.<yyyy-mm-dd>.<source-slug>]]"
+pointer: "[[sources/<yyyy-mm-dd>-<source-slug>]]"
 status: UNPROCESSED
 ---
 ```
@@ -97,7 +97,7 @@ attachments: []
    - Create the uuid using `scripts/uuid.py`
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
 5. Write raw source to:
-   - `sources/source.<yyyy-mm-dd>.<source-slug>` using the frontmatter defined in **Source Schema**.
+   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the frontmatter defined in **Source Schema**.
    - Include the full captured body with inline images + source URLs below the frontmatter.
    - images save to `_attachments`. filename: `yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.

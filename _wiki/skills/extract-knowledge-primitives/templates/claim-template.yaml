@@ -6,12 +6,12 @@ claimType: <descriptive|historical|causal|interpretive|normative|forecast>
 status: unverified
 confidence: 0.70
 text: <Exact claim proposition>
-subjectPageId: <entity.<category>.<slug>|concept.<slug>>
+subjectPageId: <entity.<entityType>.<slug>|concept.<conceptType>.<slug>>
 sourceIds:
-  - <source.<namespace>.<slug>>
+  - <source.<yyyy-mm-dd>.<source-slug>>
 evidence:
   - id: ev.<claim-descriptor>.01
-    sourceId: <source.<namespace>.<slug>>
+    sourceId: <source.<yyyy-mm-dd>.<source-slug>>
     path: <sources/filename.md>
     lines: <line-range or omit>
     kind: <quote|summary|measurement|observation|screenshot|transcript|inference>

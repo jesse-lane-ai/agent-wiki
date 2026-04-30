@@ -64,11 +64,47 @@ MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent dig
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
 VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "report", "claim", "index"}
+VALID_GENERAL_STATUSES = {"active", "draft", "archived", "deprecated"}
+VALID_SOURCE_STATUSES = {"unprocessed", "processed", "archived"}
+VALID_SOURCE_TYPES = {"webpage", "article", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
+VALID_ENTITY_TYPES = {"person", "organization", "project", "product", "system", "place", "event", "artifact", "document", "other"}
+VALID_CONCEPT_TYPES = {"definition", "principle", "framework", "method", "policy", "standard", "pattern", "theory", "taxonomy", "other"}
+VALID_SYNTHESIS_TYPES = {"summary", "overview", "analysis", "timeline", "brief", "comparison"}
+VALID_PROCEDURE_TYPES = {"runbook", "workflow", "checklist", "playbook"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
 VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
 VALID_EVIDENCE_KINDS = {"quote", "summary", "measurement", "observation", "screenshot", "transcript", "inference"}
 VALID_QUESTION_STATUSES = {"open", "researching", "blocked", "resolved", "dropped"}
+VALID_QUESTION_PRIORITIES = {"low", "medium", "high", "critical"}
+VALID_RELATION_PREDICATES = {
+    "is_a",
+    "part_of",
+    "depends_on",
+    "uses",
+    "produces",
+    "founded_by",
+    "owned_by",
+    "located_in",
+    "related_to",
+    "supports",
+    "contradicts",
+    "mentions",
+    "applies_to",
+    "derived_from",
+}
+REQUIRED_UNIVERSAL_FIELDS = {"id", "pageType", "title", "status", "createdAt", "updatedAt", "aliases", "tags"}
+FOLDER_PAGE_TYPES = {
+    "sources": "source",
+    "entities": "entity",
+    "concepts": "concept",
+    "claims": "claim",
+    "syntheses": "synthesis",
+    "procedures": "procedure",
+    "questions": "question",
+    "reports": "report",
+}
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 # ---------------------------------------------------------------------------
@@ -364,6 +400,116 @@ def add_validation_issue(issues: list[dict], issue_type: str, path: str, message
     print(f"  WARNING: [{issue_type}] {path}: {message}")
 
 
+def is_blank(value: Any) -> bool:
+    """Return True when a required value is absent."""
+    return value is None or value == ""
+
+
+def is_yyyy_mm_dd(value: Any) -> bool:
+    """Return True for YYYY-MM-DD strings that are real calendar dates."""
+    text = str(value)
+    if not DATE_PATTERN.fullmatch(text):
+        return False
+    try:
+        date.fromisoformat(text)
+    except ValueError:
+        return False
+    return True
+
+
+def validate_required_fields(record: dict, fields: set[str], owner_path: str, issues: list[dict],
+                             object_type: str, object_id: str = "") -> None:
+    """Warn when required fields are missing or blank."""
+    missing = [field for field in sorted(fields) if field not in record or is_blank(record.get(field))]
+    if missing:
+        add_validation_issue(
+            issues,
+            f"missing_{object_type}_fields",
+            owner_path,
+            f"{object_type.replace('_', ' ').title()} is missing required field(s): {', '.join(missing)}.",
+            objectId=object_id,
+            fields=missing,
+        )
+
+
+def validate_enum(value: Any, allowed: set[str], issue_type: str, owner_path: str, issues: list[dict],
+                  field: str, object_id: str = "") -> None:
+    """Warn when a non-empty enum value is outside its allowed set."""
+    if is_blank(value):
+        return
+    if str(value) not in allowed:
+        add_validation_issue(
+            issues,
+            issue_type,
+            owner_path,
+            f"Field `{field}` has unsupported value {value!r}.",
+            objectId=object_id,
+            field=field,
+            value=value,
+            allowed=sorted(allowed),
+        )
+
+
+def validate_number_range(value: Any, low: float, high: float, issue_type: str, owner_path: str,
+                          issues: list[dict], field: str, object_id: str = "") -> float | None:
+    """Warn when a numeric value is missing, non-numeric, or outside range."""
+    numeric = coerce_float(value)
+    if numeric is None:
+        add_validation_issue(
+            issues,
+            issue_type,
+            owner_path,
+            f"Field `{field}` must be numeric.",
+            objectId=object_id,
+            field=field,
+            value=value,
+        )
+        return None
+    if numeric < low or numeric > high:
+        add_validation_issue(
+            issues,
+            issue_type,
+            owner_path,
+            f"Field `{field}` must be between {low} and {high}.",
+            objectId=object_id,
+            field=field,
+            value=value,
+        )
+    return numeric
+
+
+def validate_date_field(value: Any, issue_type: str, owner_path: str, issues: list[dict],
+                        field: str, object_id: str = "") -> None:
+    """Warn when a non-empty date does not use YYYY-MM-DD."""
+    if is_blank(value):
+        return
+    if not is_yyyy_mm_dd(value):
+        add_validation_issue(
+            issues,
+            issue_type,
+            owner_path,
+            f"Field `{field}` must use YYYY-MM-DD.",
+            objectId=object_id,
+            field=field,
+            value=value,
+        )
+
+
+def validate_array_field(value: Any, issue_type: str, owner_path: str, issues: list[dict],
+                         field: str, object_id: str = "") -> None:
+    """Warn when a field expected to be an array is not a list."""
+    if not isinstance(value, list):
+        add_validation_issue(
+            issues,
+            issue_type,
+            owner_path,
+            f"Field `{field}` must be an array.",
+            objectId=object_id,
+            field=field,
+            valueType=type(value).__name__,
+        )
+
+
 def summarize_validation_issues(issues: list[dict]) -> dict[str, int]:
     """Return a simple count by validation issue type."""
     summary = {}
@@ -373,34 +519,82 @@ def summarize_validation_issues(issues: list[dict]) -> dict[str, int]:
     return summary
 
 
+def validate_evidence_record(evidence: Any, claim_id: str, owner_path: str, issues: list[dict], index: int) -> None:
+    """Validate one evidence entry against required v1 fields."""
+    if not isinstance(evidence, dict):
+        add_validation_issue(
+            issues,
+            "invalid_evidence_record",
+            owner_path,
+            f"Evidence entry {index} on claim {claim_id or '(missing id)'} must be a mapping.",
+            claimId=claim_id,
+            index=index,
+        )
+        return
+
+    evidence_id = str(evidence.get("id", "")).strip()
+    validate_required_fields(
+        evidence,
+        {"id", "sourceId", "path", "kind", "relation", "weight", "updatedAt"},
+        owner_path,
+        issues,
+        "evidence",
+        evidence_id,
+    )
+    validate_enum(evidence.get("kind"), VALID_EVIDENCE_KINDS, "invalid_evidence_kind", owner_path, issues, "kind", evidence_id)
+    validate_enum(evidence.get("relation"), VALID_EVIDENCE_RELATIONS, "invalid_evidence_relation", owner_path, issues, "relation", evidence_id)
+    if "weight" in evidence and not is_blank(evidence.get("weight")):
+        validate_number_range(evidence.get("weight"), 0.0, 1.0, "invalid_evidence_weight", owner_path, issues, "weight", evidence_id)
+    validate_date_field(evidence.get("updatedAt"), "invalid_evidence_date", owner_path, issues, "updatedAt", evidence_id)
+    validate_date_field(evidence.get("retrievedAt"), "invalid_evidence_date", owner_path, issues, "retrievedAt", evidence_id)
+
+
+def validate_claim_record(record: dict, owner_id: str, owner_path: str, issues: list[dict]) -> None:
+    """Validate a standalone or embedded claim record against v1 fields."""
+    claim_id = str(record.get("id", "")).strip()
+    validate_required_fields(
+        record,
+        {"id", "text", "status", "confidence", "claimType", "evidence", "createdAt", "updatedAt"},
+        owner_path,
+        issues,
+        "claim",
+        claim_id,
+    )
+    validate_enum(record.get("status"), VALID_CLAIM_STATUSES, "invalid_claim_status", owner_path, issues, "status", claim_id)
+    validate_enum(record.get("claimType"), VALID_CLAIM_TYPES, "invalid_claim_type", owner_path, issues, "claimType", claim_id)
+    if "confidence" in record and not is_blank(record.get("confidence")):
+        validate_number_range(record.get("confidence"), 0.0, 1.0, "invalid_claim_confidence", owner_path, issues, "confidence", claim_id)
+    validate_date_field(record.get("createdAt"), "invalid_claim_date", owner_path, issues, "createdAt", claim_id)
+    validate_date_field(record.get("updatedAt"), "invalid_claim_date", owner_path, issues, "updatedAt", claim_id)
+
+    evidence = record.get("evidence")
+    if isinstance(evidence, list):
+        for index, evidence_record in enumerate(evidence, start=1):
+            validate_evidence_record(evidence_record, claim_id, owner_path, issues, index)
+    elif "evidence" in record and not is_blank(evidence):
+        validate_array_field(evidence, "invalid_claim_evidence", owner_path, issues, "evidence", claim_id)
+
+    if "claimStatus" in record:
+        add_validation_issue(
+            issues,
+            "deprecated_claim_status_field",
+            owner_path,
+            "Use `status` for claims; `claimStatus` is no longer part of the v1 schema.",
+            ownerId=owner_id,
+            claimId=claim_id,
+        )
+
+
 def normalize_claim_record(record: dict, owner_id: str, owner_path: str, issues: list[dict]) -> dict:
     """Normalize a claim record and emit validation warnings for bad fields."""
     normalized = dict(record)
 
-    claim_id = str(normalized.get("id", "")).strip()
-    if not claim_id:
-        add_validation_issue(
-            issues,
-            "missing_claim_id",
-            owner_path,
-            "Claim is missing a stable id.",
-            ownerId=owner_id,
-        )
+    validate_claim_record(normalized, owner_id, owner_path, issues)
 
     confidence_raw = normalized.get("confidence")
     confidence = coerce_float(confidence_raw)
     if confidence_raw not in (None, ""):
         if confidence is None:
-            add_validation_issue(
-                issues,
-                "invalid_claim_confidence",
-                owner_path,
-                f"Claim {claim_id or '(missing id)'} has non-numeric confidence {confidence_raw!r}.",
-                ownerId=owner_id,
-                claimId=claim_id,
-                field="confidence",
-                value=confidence_raw,
-            )
             normalized["confidenceRaw"] = confidence_raw
             normalized["confidence"] = None
         else:
@@ -412,16 +606,107 @@ def normalize_claim_record(record: dict, owner_id: str, owner_path: str, issues:
 def normalize_page_record(record: dict, issues: list[dict]) -> dict:
     """Normalize page-level fields that the compiler depends on."""
     normalized = dict(record)
-
-    if normalized.get("pageType") == "claim":
-        normalized = normalize_claim_record(
-            normalized,
-            owner_id=normalized.get("id", ""),
-            owner_path=normalized.get("path", ""),
-            issues=issues,
-        )
-
     return normalized
+
+
+def validate_page_record(record: dict, issues: list[dict]) -> None:
+    """Validate page metadata and folder ownership against the v1 spec."""
+    page_id = record.get("id", "")
+    path = record.get("path", "")
+    meta = record.get("meta", {})
+    page_type = record.get("pageType", "")
+
+    validate_required_fields(meta, REQUIRED_UNIVERSAL_FIELDS, path, issues, "page", page_id)
+    validate_date_field(meta.get("createdAt"), "invalid_page_date", path, issues, "createdAt", page_id)
+    validate_date_field(meta.get("updatedAt"), "invalid_page_date", path, issues, "updatedAt", page_id)
+    if "aliases" in meta:
+        validate_array_field(meta.get("aliases"), "invalid_page_array", path, issues, "aliases", page_id)
+    if "tags" in meta:
+        validate_array_field(meta.get("tags"), "invalid_page_array", path, issues, "tags", page_id)
+
+    parts = Path(path).parts
+    if page_type == "index":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        if path != "index.md":
+            add_validation_issue(
+                issues,
+                "invalid_page_location",
+                path,
+                "`pageType: index` is reserved for index.md.",
+                pageId=page_id,
+                pageType=page_type,
+            )
+    elif parts:
+        expected = FOLDER_PAGE_TYPES.get(parts[0])
+        if expected and expected != page_type:
+            add_validation_issue(
+                issues,
+                "invalid_page_location",
+                path,
+                f"Page in `{parts[0]}/` must use pageType `{expected}`.",
+                pageId=page_id,
+                pageType=page_type,
+                expectedPageType=expected,
+            )
+
+    if page_type == "source":
+        validate_enum(meta.get("status"), VALID_SOURCE_STATUSES, "invalid_source_status", path, issues, "status", page_id)
+        validate_enum(meta.get("sourceType"), VALID_SOURCE_TYPES, "invalid_source_type", path, issues, "sourceType", page_id)
+        validate_required_fields(meta, {"sourceType", "originUrl", "retrievedAt", "attachments"}, path, issues, "source", page_id)
+        validate_date_field(meta.get("publishedAt"), "invalid_source_date", path, issues, "publishedAt", page_id)
+        validate_date_field(meta.get("retrievedAt"), "invalid_source_date", path, issues, "retrievedAt", page_id)
+        if "attachments" in meta:
+            validate_array_field(meta.get("attachments"), "invalid_source_array", path, issues, "attachments", page_id)
+    elif page_type == "entity":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        validate_required_fields(meta, {"entityType"}, path, issues, "entity", page_id)
+        validate_enum(meta.get("entityType"), VALID_ENTITY_TYPES, "invalid_entity_type", path, issues, "entityType", page_id)
+    elif page_type == "concept":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        validate_required_fields(meta, {"conceptType"}, path, issues, "concept", page_id)
+        validate_enum(meta.get("conceptType"), VALID_CONCEPT_TYPES, "invalid_concept_type", path, issues, "conceptType", page_id)
+    elif page_type == "synthesis":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        validate_required_fields(meta, {"synthesisType", "sourcePages", "derivedClaims"}, path, issues, "synthesis", page_id)
+        validate_enum(meta.get("synthesisType"), VALID_SYNTHESIS_TYPES, "invalid_synthesis_type", path, issues, "synthesisType", page_id)
+        if "sourcePages" in meta:
+            validate_array_field(meta.get("sourcePages"), "invalid_synthesis_array", path, issues, "sourcePages", page_id)
+        if "derivedClaims" in meta:
+            validate_array_field(meta.get("derivedClaims"), "invalid_synthesis_array", path, issues, "derivedClaims", page_id)
+    elif page_type == "procedure":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        validate_required_fields(meta, {"procedureType"}, path, issues, "procedure", page_id)
+        validate_enum(meta.get("procedureType"), VALID_PROCEDURE_TYPES, "invalid_procedure_type", path, issues, "procedureType", page_id)
+    elif page_type == "question":
+        validate_required_fields(meta, {"priority", "relatedClaims", "relatedPages", "openedAt"}, path, issues, "question", page_id)
+        validate_enum(meta.get("status"), VALID_QUESTION_STATUSES, "invalid_question_status", path, issues, "status", page_id)
+        validate_enum(meta.get("priority"), VALID_QUESTION_PRIORITIES, "invalid_question_priority", path, issues, "priority", page_id)
+        validate_date_field(meta.get("openedAt"), "invalid_question_date", path, issues, "openedAt", page_id)
+        if "relatedClaims" in meta:
+            validate_array_field(meta.get("relatedClaims"), "invalid_question_array", path, issues, "relatedClaims", page_id)
+        if "relatedPages" in meta:
+            validate_array_field(meta.get("relatedPages"), "invalid_question_array", path, issues, "relatedPages", page_id)
+
+def validate_relation_record(record: Any, owner_id: str, owner_path: str, issues: list[dict], index: int) -> None:
+    """Validate one relation entry against v1 fields."""
+    if not isinstance(record, dict):
+        add_validation_issue(
+            issues,
+            "invalid_relation_record",
+            owner_path,
+            f"Relation entry {index} on page {owner_id} must be a mapping.",
+            ownerId=owner_id,
+            index=index,
+        )
+        return
+
+    relation_id = f"{owner_id}:relation:{index}"
+    validate_required_fields(record, {"subject", "predicate", "object", "confidence"}, owner_path, issues, "relation", relation_id)
+    validate_enum(record.get("predicate"), VALID_RELATION_PREDICATES, "non_controlled_relation_predicate", owner_path, issues, "predicate", relation_id)
+    if "confidence" in record and not is_blank(record.get("confidence")):
+        validate_number_range(record.get("confidence"), 0.0, 1.0, "invalid_relation_confidence", owner_path, issues, "confidence", relation_id)
+    if "sourceClaimIds" in record:
+        validate_array_field(record.get("sourceClaimIds"), "invalid_relation_array", owner_path, issues, "sourceClaimIds", relation_id)
 
 
 # ---------------------------------------------------------------------------
@@ -530,7 +815,9 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
         record["relationCount"] = len(relations)
         record["timelineCount"] = len(timeline)
 
-        pages.append(normalize_page_record(record, validation_issues))
+        normalized_record = normalize_page_record(record, validation_issues)
+        validate_page_record(normalized_record, validation_issues)
+        pages.append(normalized_record)
 
         if verbose:
             print(f"  [PAGE] {page_id} ({page_type}) — {rel}")
@@ -552,10 +839,12 @@ def extract_claims(pages: list[dict], validation_issues: list[dict]) -> list[dic
                 {
                     "id": page["id"],
                     "text": page["meta"].get("text", page["title"]),
-                    "status": page["meta"].get("status", page["meta"].get("claimStatus", "")),
+                    "status": page["meta"].get("status", ""),
                     "confidence": page.get("confidence"),
                     "claimType": page["meta"].get("claimType", ""),
                     "evidence": page["meta"].get("evidence") or [],
+                    "createdAt": page["meta"].get("createdAt", ""),
+                    "updatedAt": page["meta"].get("updatedAt", ""),
                     "_owningPageId": page["meta"].get("subjectPageId", ""),
                     "_owningPagePath": page["path"],
                     "_owningPageType": "claim",
@@ -592,12 +881,13 @@ def extract_claims(pages: list[dict], validation_issues: list[dict]) -> list[dic
 # Relation extraction
 # ---------------------------------------------------------------------------
 
-def extract_relations(pages: list[dict]) -> list[dict]:
+def extract_relations(pages: list[dict], validation_issues: list[dict]) -> list[dict]:
     """Extract all relations from page metadata."""
     all_relations = []
     for page in pages:
         raw_relations = page["meta"].get("relations") or []
-        for rel in raw_relations:
+        for index, rel in enumerate(raw_relations, start=1):
+            validate_relation_record(rel, page["id"], page["path"], validation_issues, index)
             if not isinstance(rel, dict):
                 continue
             record = dict(rel)
@@ -1157,14 +1447,37 @@ def main():
         print(f"  WARNING: Duplicate page IDs found:")
         for dup_id, paths in duplicate_ids.items():
             print(f"    - {dup_id} in files: {', '.join(paths)}")
+            add_validation_issue(
+                validation_issues,
+                "duplicate_page_id",
+                paths[0],
+                f"Page id {dup_id!r} appears in multiple files.",
+                pageId=dup_id,
+                paths=paths,
+            )
 
     # --- Extract structured data ---
     print("Extracting claims...")
     claims = extract_claims(pages, validation_issues)
     print(f"  Found {len(claims)} claims")
+    claim_id_paths = {}
+    for claim in claims:
+        claim_id = str(claim.get("id", "")).strip()
+        if claim_id:
+            claim_id_paths.setdefault(claim_id, []).append(claim.get("_owningPagePath", ""))
+    duplicate_claim_ids = {k: v for k, v in claim_id_paths.items() if len(v) > 1}
+    for claim_id, paths in duplicate_claim_ids.items():
+        add_validation_issue(
+            validation_issues,
+            "duplicate_claim_id",
+            paths[0],
+            f"Claim id {claim_id!r} appears in multiple claim records.",
+            claimId=claim_id,
+            paths=paths,
+        )
 
     print("Extracting relations...")
-    relations = extract_relations(pages)
+    relations = extract_relations(pages, validation_issues)
     print(f"  Found {len(relations)} relations")
 
     print("Extracting timeline events...")

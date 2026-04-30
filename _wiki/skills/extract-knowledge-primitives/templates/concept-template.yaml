@@ -1,5 +1,5 @@
 ---
-id: concept.<slug>
+id: concept.<conceptType>.<slug>
 pageType: concept
 title: <Concept Name>
 conceptType: <definition|principle|framework|method|policy|standard|pattern|theory|taxonomy|other>
@@ -12,12 +12,12 @@ tags:
   - extracted
   - <topical-tag>
 relatedPages:
-  - concept.<slug>              # Related concepts
-  - entity.<category>.<slug>    # Related entities
+  - concept.<conceptType>.<slug> # Related concepts
+  - entity.<entityType>.<slug>  # Related entities
 relations:
-  - subject: concept.<slug>
+  - subject: concept.<conceptType>.<slug>
     predicate: <is_a|part_of|depends_on|uses|produces|owned_by|related_to|supports|contradicts|mentions|applies_to|derived_from>
-    object: concept.<slug>
+    object: concept.<conceptType>.<slug>
     confidence: 0.70
     sourceClaimIds: []
 ---

@@ -79,7 +79,7 @@ A durable thing that is referred to by name and remains (mostly) unchanged over 
 
 **Examples:**
 - `entity.person.john-doe` — a specific person
-- `entity.org.acme-corp` — an organization
+- `entity.organization.acme-corp` — an organization
 - `entity.project.ai-harness` — a project
 - `entity.system.kubernetes` — a system or technology
 - `entity.product.claude-3` — a product or service
@@ -92,8 +92,8 @@ Look for proper nouns (capitalized names) that are:
 - Mentioned multiple times or as the main subject
 - Worth tracking and linking to across the vault
 
-**ID format:** `entity.<category>.<slug>`
-- `category`: `person`, `org`, `project`, `product`, `system`, `place`, `event`, etc.
+**ID format:** `entity.<entityType>.<slug>`
+- `entityType`: `person`, `organization`, `project`, `product`, `system`, `place`, `event`, etc.
 - `slug`: kebab-case version of the name (e.g., `john-doe`, `acme-corp`)
 
 **Example entity from source text:**
@@ -101,7 +101,7 @@ Look for proper nouns (capitalized names) that are:
 Source mentions: "Acme Corp was founded in 2010 by John Doe."
 
 Extracted entities:
-- entity.org.acme-corp (Acme Corp)
+- entity.organization.acme-corp (Acme Corp)
 - entity.person.john-doe (John Doe)
 ```
 
@@ -111,11 +111,11 @@ Extracted entities:
 An abstract idea, definition, method, framework, or principle that is reusable and applies to multiple contexts.
 
 **Examples:**
-- `concept.structured-claims` — a methodology or pattern
-- `concept.claim-confidence` — a metric or principle
-- `concept.vault-lifecycle` — a process or workflow
-- `concept.managed-blocks` — a pattern
-- `concept.proof-of-work` — a mechanism
+- `concept.method.adaptive-reuse` — a reuse methodology
+- `concept.principle.chain-of-custody` — a provenance principle
+- `concept.workflow.stormwater-inspection` — an operational workflow pattern
+- `concept.pattern.cool-roof-retrofit` — a building upgrade pattern
+- `concept.framework.service-blueprint` — a planning framework
 
 **Extraction heuristic:**
 Look for:
@@ -125,16 +125,16 @@ Look for:
 - Taxonomies or classifications
 - Frameworks or patterns
 
-**ID format:** `concept.<slug>`
-- `slug`: kebab-case descriptor (e.g., `structured-claims`)
+**ID format:** `concept.<conceptType>.<slug>`
+- `conceptType`: definition, principle, framework, method, policy, standard, pattern, theory, taxonomy, or other
+- `slug`: kebab-case descriptor (e.g., `adaptive-reuse`)
 
 **Example concept from source text:**
 ```
-Source mentions: "The vault uses structured claims — atomic propositions 
-with evidence and confidence scores."
+Source mentions: "Adaptive reuse converts existing buildings to new uses while preserving much of the original structure."
 
 Extracted concept:
-- concept.structured-claims (structured claims methodology)
+- concept.method.adaptive-reuse (adaptive reuse methodology)
 ```
 
 ### 3c. Extract Claims
@@ -264,6 +264,7 @@ A typed connection between two entities or concepts.
 - `depends_on` — dependency
 - `uses` — usage
 - `produces` — output
+- `founded_by` — founding relationship
 - `owned_by` — ownership
 - `located_in` — location
 - `related_to` — general association
@@ -303,10 +304,10 @@ For each extracted entity, create a new file in `entities/` with proper frontmat
 
 ```yaml
 ---
-id: entity.<category>.<slug>
+id: entity.<entityType>.<slug>
 pageType: entity
 title: <Canonical Name>
-entityType: <category>
+entityType: <entityType>
 canonicalName: <Official Name>
 status: active
 createdAt: 2026-04-16
@@ -330,10 +331,10 @@ A brief auto-generated summary of this entity based on source mentions.
 
 ### Guidelines
 
-- **ID**: Use stable dotted-namespace format: `entity.<category>.<slug>`
-  - `category`: person, org, project, product, system, place, event, artifact, etc.
+- **ID**: Use stable dotted-namespace format: `entity.<entityType>.<slug>`
+  - `entityType`: person, organization, project, product, system, place, event, artifact, document, or other
   - `slug`: kebab-case version of the name
-  - Example: `entity.org.acme-corp`
+  - Example: `entity.organization.acme-corp`
 
 - **title** & **canonicalName**: The official/preferred name of the entity
   - Example: `title: "Acme Corporation"`, `canonicalName: "Acme Corp"`
@@ -364,7 +365,7 @@ For each extracted concept, create a new file in `concepts/` with proper frontma
 
 ```yaml
 ---
-id: concept.<slug>
+id: concept.<conceptType>.<slug>
 pageType: concept
 title: <Concept Name>
 conceptType: <type>
@@ -388,8 +389,8 @@ Auto-generated definition or explanation of the concept.
 
 ### Guidelines
 
-- **ID**: `concept.<slug>` (no category prefix needed)
-  - Example: `concept.structured-claims`
+- **ID**: `concept.<conceptType>.<slug>`
+  - Example: `concept.method.adaptive-reuse`
 
 - **conceptType**: method, definition, framework, principle, policy, standard, pattern, theory, etc.
 
@@ -466,10 +467,10 @@ This claim is extracted from [[<source page ID>]].
   - Confidence: Always `0.70` (moderate) for extracted claims
 
 - **subjectPageId**: The entity or concept this claim is about
-  - Example: `entity.org.acme-corp`
+  - Example: `entity.organization.acme-corp`
 
 - **sourceIds**: Array of source page IDs
-  - Example: `["source.example.acme-homepage"]`
+  - Example: `["source.2026-04-16.acme-homepage"]`
 
 - **evidence**: Array of evidence entries
   - Each entry has id, sourceId, path, kind, relation, weight, note, excerpt, retrievedAt, updatedAt
@@ -633,14 +634,14 @@ Add a `relations:` section to entity pages:
 
 ```yaml
 relations:
-  - subject: entity.org.acme-corp
+  - subject: entity.organization.acme-corp
     predicate: founded_by
     object: entity.person.john-doe
     confidence: 0.80
     sourceClaimIds:
       - claim.acme.founder-is-john-doe
   
-  - subject: entity.org.acme-corp
+  - subject: entity.organization.acme-corp
     predicate: uses
     object: entity.system.kubernetes
     confidence: 0.70
@@ -653,9 +654,9 @@ Link related concepts:
 
 ```yaml
 relations:
-  - subject: concept.structured-claims
+  - subject: concept.method.adaptive-reuse
     predicate: related_to
-    object: concept.vault-lifecycle
+    object: concept.policy.historic-preservation
     confidence: 0.60
     sourceClaimIds: []
 ```
@@ -663,7 +664,7 @@ relations:
 ### Relation Guidelines
 
 - **subject** & **object**: Page IDs of the related items
-- **predicate**: Use controlled predicates from the spec (is_a, part_of, depends_on, uses, produces, owned_by, located_in, related_to, supports, contradicts, mentions, applies_to, derived_from)
+- **predicate**: Use controlled predicates from the spec (is_a, part_of, depends_on, uses, produces, founded_by, owned_by, located_in, related_to, supports, contradicts, mentions, applies_to, derived_from)
 - **confidence**: 0.0-1.0, typically 0.70-0.80 for extracted relations
 - **sourceClaimIds**: Claims that support this relation (if any)
 
@@ -682,10 +683,10 @@ After extracting primitives from a source page, update the source file's frontma
 extractionStatus: extracted
 extractedAt: 2026-04-16
 extractedEntities:
-  - entity.org.acme-corp
+  - entity.organization.acme-corp
   - entity.person.john-doe
 extractedConcepts:
-  - concept.structured-claims
+  - concept.method.adaptive-reuse
 extractedClaims:
   - claim.acme.founded-2010
   - claim.acme.founder-is-john-doe
@@ -726,18 +727,18 @@ After extracting from all source pages and running compile, give a concise summa
 Extraction Complete
 
 Processed 3 source pages:
-- source.example.acme-homepage
+- source.2026-04-16.acme-homepage
 
 Created:
-- Entities: 2 (entity.org.acme-corp, entity.person.john-doe)
-- Concepts: 1 (concept.structured-claims)
+- Entities: 2 (entity.organization.acme-corp, entity.person.john-doe)
+- Concepts: 1 (concept.method.adaptive-reuse)
 - Claims: 4 (claim.acme.founded-2010, claim.acme.founder-is-john-doe, ...)
 - Procedures: 1 (procedure.vault.setup)
 - Questions: 1 (question.entity-dedup.strategy)
 - Relations: 3
 
 Pages Updated:
-- source.example.acme-homepage → marked as extracted
+- source.2026-04-16.acme-homepage -> marked as extracted
 
 Validation: ✓ All pages passed schema validation
 Cache regenerated with 4 new claims, 2 entities, 1 procedure, 1 question
@@ -804,15 +805,15 @@ For each source page processed:
 
 ```yaml
 # entities/acme-corp.md
-id: entity.org.acme-corp
+id: entity.organization.acme-corp
 pageType: entity
 title: Acme Corporation
-entityType: org
+entityType: organization
 canonicalName: Acme Corp
 aliases: [Acme, ACME Corporation]
 tags: [extracted, ai, companies]
 relations:
-  - subject: entity.org.acme-corp
+  - subject: entity.organization.acme-corp
     predicate: founded_by
     object: entity.person.john-doe
     confidence: 0.80
@@ -828,11 +829,11 @@ claimType: historical
 status: unverified
 confidence: 0.70
 text: Acme Corp was founded in 2010
-subjectPageId: entity.org.acme-corp
-sourceIds: [source.example.acme-homepage]
+subjectPageId: entity.organization.acme-corp
+sourceIds: [source.2026-04-16.acme-homepage]
 evidence:
   - id: ev.acme.founded-2010.01
-    sourceId: source.example.acme-homepage
+    sourceId: source.2026-04-16.acme-homepage
     path: sources/acme-homepage.md
     kind: quote
     relation: supports
@@ -844,15 +845,15 @@ evidence:
 
 ### Pattern: Concept defined in source
 
-**From source:** "We use structured claims — atomic propositions with evidence and confidence scores."
+**From source:** "Adaptive reuse converts older buildings into new uses while preserving significant existing structure."
 
 ```yaml
-# concepts/structured-claims.md
-id: concept.structured-claims
+# concepts/adaptive-reuse.md
+id: concept.method.adaptive-reuse
 pageType: concept
-title: Structured Claims
+title: Adaptive Reuse
 conceptType: method
-tags: [extracted, methodology]
+tags: [extracted, architecture]
 ```
 
 ### Pattern: Procedure described in source
@@ -906,8 +907,7 @@ These are shell templates to speed up creation. Copy them, fill in the fields, a
 | Primitive | Extract If | Don't Extract If | Example |
 |---|---|---|---|
 | **Entity** | Specific proper noun mentioned multiple times | Generic references ("a company", "a person") | "Acme Corp", "John Doe" |
-| **Concept** | Definition or abstract idea described | Just mentioned in passing | "Structured claims are atomic propositions with evidence" |
+| **Concept** | Definition or abstract idea described | Just mentioned in passing | "Adaptive reuse converts existing buildings to new uses" |
 | **Claim** | Atomic factual statement that can be true/false | Opinion not grounded in source, or too vague | "Acme was founded in 2010", "Claude achieves 95% accuracy" |
 | **Procedure** | Step-by-step instructions or workflow | Casual mention of a process | "Steps to deploy: 1) ..., 2) ..., 3) ..." |
-| **Decision** | A choice was made or policy set | A recommendation or suggestion | "We decided to use wikilinks", "Best practice: always..." |
 | **Question** | An open uncertainty or research gap | A resolved issue | "How should contradictions be detected?", "What's the best way to...?" |
