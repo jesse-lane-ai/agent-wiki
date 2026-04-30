@@ -1,6 +1,6 @@
 ---
 name: extract-knowledge-primitives
-description: "Extract knowledge primitives (entities, concepts, claims, procedures, decisions, questions) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages and creates appropriate wiki pages for entities, concepts, claims, procedures (runbooks/workflows), decisions, and questions, following the v1 schema. Run this after sources have been processed by the process-new-notes skill."
+description: "Extract knowledge primitives (entities, concepts, claims, procedures, questions) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages and creates appropriate wiki pages for entities, concepts, claims, procedures (runbooks/workflows), and questions, following the v1 schema. Run this after sources have been processed by the process-new-notes skill."
 ---
 
 # Extract Knowledge Primitives
@@ -14,7 +14,6 @@ This skill guides the workflow for extracting structured knowledge primitives (e
 - **Concepts** — abstract ideas (definitions, methods, frameworks, principles, policies, standards)
 - **Claims** — atomic factual propositions with evidence
 - **Procedures** — action-oriented instructions (runbooks, workflows, checklists, playbooks)
-- **Decisions** — recorded judgments, resolutions, and schema choices
 - **Questions** — unresolved uncertainties and research gaps
 - **Relations** — typed connections between primitives
 
@@ -37,7 +36,7 @@ Before extracting anything, read the vault's agent contract and schema:
    - Key rule: do not rewrite human-authored content
 
 2. **[[WIKI]]** — editorial schema and page type definitions
-   - Page types: source, entity, concept, claim, synthesis, procedure, question, decision
+   - Page types: source, entity, concept, claim, synthesis, procedure, question
    - Status vocabularies
    - Claim/evidence rules
 
@@ -220,45 +219,7 @@ Extracted procedure:
 - procedure.vault.setup (workflow with 4 steps)
 ```
 
-### 3e. Extract Decisions
-
-**What is a decision?**
-A recorded judgment, resolution of an issue, or explicit choice about schema/interpretation/direction.
-
-**Examples:**
-- `decision.claim-status-enum-v1` — decision to standardize claim status vocabulary
-- `decision.wikilink-convention` — decision to use wikilinks instead of markdown links
-- `decision.entity-merge-policy` — decision on how to handle duplicate entities
-
-**Extraction heuristic:**
-Look for:
-- Explicit choices made ("We decided to...")
-- Resolutions of conflicts or ambiguities
-- Standards or conventions being established
-- Policy decisions
-- "Best practice" or "recommended" approaches
-
-Keep in mind: Not every recommendation in a source is a decision. Only extract if it's:
-- A choice someone has made and wants to record
-- A resolved disagreement
-- A policy or standard being set
-- Important enough to track going forward
-
-**ID format:** `decision.<domain>.<slug>`
-- `domain`: area the decision affects (claims, vault, entity, etc.)
-- `slug`: brief descriptor
-
-**Example decision from source text:**
-```
-Source mentions: "After discussion, we decided that all internal links should 
-use Obsidian wikilinks [[page]] rather than markdown links [text](path). This 
-makes links more portable and decouples them from file paths."
-
-Extracted decision:
-- decision.linking.wikilink-standard (resolved choice about linking convention)
-```
-
-### 3f. Extract Questions
+### 3e. Extract Questions
 
 **What is a question?**
 An unresolved uncertainty, research gap, or something the source identifies as needing further investigation.
@@ -292,7 +253,7 @@ Extracted question:
 - question.contradictions.detection-strategy (open, unresolved)
 ```
 
-### 3g. Identify Relations
+### 3f. Identify Relations
 
 **What is a relation?**
 A typed connection between two entities or concepts.
@@ -591,82 +552,7 @@ Auto-generated summary of this procedure.
 
 ---
 
-## Step 8: Create Decision Pages
-
-For each extracted decision, create a new file in `decisions/` with proper frontmatter.
-
-### Template
-
-```yaml
----
-id: decision.<domain>.<slug>
-pageType: decision
-title: <Decision Title>
-decisionType: <schema|taxonomy|interpretation|resolution|workflow>
-status: accepted
-summary: <Brief summary of what was decided>
-rationale:
-  - <Why this decision was made>
-  - <Problem it solves>
-createdAt: 2026-04-16
-updatedAt: 2026-04-16
-decidedAt: 2026-04-16
-relatedPages: []
-aliases: []
-tags:
-  - extracted
----
-
-# <Decision Title>
-
-## Decision
-
-[The actual decision — what was chosen]
-
-## Rationale
-
-[Why this decision was made, what problem it addresses]
-
-## Implications
-
-[What this decision means for the vault or project]
-
-<!-- AI:GENERATED START name=summary -->
-Auto-generated summary of this decision and its impact.
-<!-- AI:GENERATED END name=summary -->
-```
-
-### Guidelines
-
-- **ID**: `decision.<domain>.<slug>`
-  - `domain`: area affected (claims, vault, entity, linking, etc.)
-  - Example: `decision.linking.wikilink-standard`
-
-- **decisionType**: schema (about structure), taxonomy (about classification), interpretation (about meaning), resolution (about conflicts), workflow (about processes)
-
-- **status**: Always `accepted` for extracted decisions (unless the source says otherwise)
-  - Other statuses: proposed, superseded, rejected
-
-- **summary**: One-line summary of what was decided
-
-- **rationale**: Why this was decided (can be multiple points)
-
-- **relatedPages**: Link to affected pages, concepts, or procedures
-
-- **tags**: Include `extracted` tag
-
-**File path**: `decisions/<slug>.md`
-- Example: `decisions/wikilink-convention.md`
-
-**Important:**
-- Capture both the decision AND the reasoning
-- Link to pages affected by the decision
-- Include context about what problem this solves
-- Mark as `accepted` unless explicitly stated as proposed/superseded
-
----
-
-## Step 9: Create Question Pages
+## Step 8: Create Question Pages
 
 For each extracted question, create a new file in `questions/` with proper frontmatter.
 
@@ -719,7 +605,7 @@ tags:
 - **status**: Always `open` for extracted questions (unless source says it's resolved)
   - Other statuses: researching, blocked, resolved, dropped
 
-- **relatedPages**: Link to related concepts, claims, or decisions
+- **relatedPages**: Link to related concepts, claims, sources, or procedures
 
 - **relatedClaims**: Link to claims relevant to answering this question
 
@@ -737,7 +623,7 @@ tags:
 
 ---
 
-## Step 11: Create/Update Relations
+## Step 9: Create/Update Relations
 
 Relations connect entities and concepts together. Add them to the pages being related.
 
@@ -788,7 +674,7 @@ relations:
 
 ---
 
-## Step 12: Update Source Page with Extraction Metadata
+## Step 10: Update Source Page with Extraction Metadata
 
 After extracting primitives from a source page, update the source file's frontmatter to record what was extracted:
 
@@ -805,8 +691,6 @@ extractedClaims:
   - claim.acme.founder-is-john-doe
 extractedProcedures:
   - procedure.vault.setup
-extractedDecisions:
-  - decision.linking.wikilink-standard
 extractedQuestions:
   - question.entity-dedup.strategy
 ```
@@ -815,7 +699,7 @@ Add these fields to the source page's frontmatter. Do NOT modify any other part 
 
 ---
 
-## Step 13: Run Compile Pipeline
+## Step 11: Run Compile Pipeline
 
 After creating all new pages and updating source metadata, run the compile pipeline to validate and index everything:
 
@@ -834,7 +718,7 @@ This will:
 
 ---
 
-## Step 14: Report to User
+## Step 12: Report to User
 
 After extracting from all source pages and running compile, give a concise summary:
 
@@ -849,7 +733,6 @@ Created:
 - Concepts: 1 (concept.structured-claims)
 - Claims: 4 (claim.acme.founded-2010, claim.acme.founder-is-john-doe, ...)
 - Procedures: 1 (procedure.vault.setup)
-- Decisions: 1 (decision.linking.wikilink-standard)
 - Questions: 1 (question.entity-dedup.strategy)
 - Relations: 3
 
@@ -857,7 +740,7 @@ Pages Updated:
 - source.example.acme-homepage → marked as extracted
 
 Validation: ✓ All pages passed schema validation
-Cache regenerated with 4 new claims, 2 entities, 1 procedure, 1 decision, 1 question
+Cache regenerated with 4 new claims, 2 entities, 1 procedure, 1 question
 ```
 
 ---
@@ -898,14 +781,12 @@ For each source page processed:
 - [ ] Identify concepts (definitions, methods, frameworks)
 - [ ] Extract claims (atomic factual statements)
 - [ ] Extract procedures (action-oriented instructions, workflows)
-- [ ] Extract decisions (choices, resolutions, policies)
 - [ ] Extract questions (unresolved issues, research gaps)
 - [ ] Identify relations between extracted primitives
 - [ ] Create entity pages (with canonical names and aliases)
 - [ ] Create concept pages (with definitions)
 - [ ] Create claim pages (with evidence from source)
 - [ ] Create procedure pages (with step-by-step instructions)
-- [ ] Create decision pages (with rationale)
 - [ ] Create question pages (with context)
 - [ ] Add relations to entity/concept pages
 - [ ] Update source page with extractionStatus: extracted + all metadata
@@ -989,25 +870,6 @@ tags: [extracted, setup]
 
 Content: Extract the actual steps and present them as a numbered list with clear instructions.
 
-### Pattern: Decision made in source
-
-**From source:** "We decided to use Obsidian wikilinks [[page]] instead of markdown links [text](path) because they decouple references from file paths and survive renames."
-
-```yaml
-# decisions/linking-convention.md
-id: decision.linking.wikilink-standard
-pageType: decision
-title: Use Wikilinks for Internal References
-decisionType: schema
-status: accepted
-summary: All internal vault links use Obsidian wikilinks [[page]] rather than markdown links.
-rationale:
-  - Wikilinks decouple from file paths
-  - Survive file renames
-  - Native Obsidian support
-tags: [extracted, conventions]
-```
-
 ### Pattern: Question/uncertainty in source
 
 **From source:** "An open question is how to detect duplicate entities. Should we use string similarity, or require explicit merges?"
@@ -1033,7 +895,6 @@ See the `templates/` folder for complete YAML templates you can copy and fill in
 - `templates/concept-template.yaml` — template for concept pages
 - `templates/claim-template.yaml` — template for claim pages with evidence
 - `templates/procedure-template.yaml` — template for procedure pages
-- `templates/decision-template.yaml` — template for decision pages
 - `templates/question-template.yaml` — template for question pages
 
 These are shell templates to speed up creation. Copy them, fill in the fields, and save to the appropriate folder.

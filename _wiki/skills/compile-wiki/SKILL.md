@@ -12,9 +12,9 @@ Run the compile pipeline to regenerate all machine-facing cache artifacts and ma
 
 Run the compile pipeline after:
 - Adding or editing pages with structured frontmatter (claims, relations, timeline entries)
-- Adding new question or decision pages
+- Adding new question pages
 - Adding source pages
-- Resolving questions or decisions (status changes)
+- Resolving questions (status changes)
 - Any bulk edit to page metadata
 
 The compile pipeline is **safe to run at any time**. It is fully regenerative and does not modify page content.
@@ -55,7 +55,6 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 | `agent-digest.json` | High-signal agent context pack |
 | `contradictions.json` | Detected contradiction registry |
 | `questions.json` | Question registry |
-| `decisions.json` | Decision registry |
 | `timeline-events.json` | Chronological event index |
 | `source-index.json` | Source metadata registry |
 

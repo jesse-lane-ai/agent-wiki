@@ -24,6 +24,40 @@ It separates:
 
 ## 2. Folder meanings
 
+Current vault structure:
+
+```text
+<vault>/
+  AGENTS.md
+  AGENT-WIKI-SPEC-v1.md
+  INBOX.md
+  INITIALIZE.md
+  README.md
+  WIKI.md
+  index.md
+
+  sources/
+  entities/
+  concepts/
+  claims/
+  syntheses/
+  procedures/
+  questions/
+  reports/
+
+  _inbox/
+  _attachments/
+  _archive/
+  _views/
+  _wiki/
+    cache/
+    indexes/
+    logs/
+    skills/
+```
+
+Fresh template checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders as needed.
+
 | Folder | What goes here |
 |---|---|
 | `sources/` | Raw material and source-backed pages: webpages, PDFs, articles, transcripts, meeting notes, datasets |
@@ -37,7 +71,6 @@ It separates:
 | `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
 | `_views/` | Reusable view templates or layout helpers (created on init, may be empty) |
-| `_docs/` | Repository and structural documentation not part of the ontology |
 | `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 

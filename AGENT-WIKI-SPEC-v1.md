@@ -199,7 +199,6 @@ A v1-compliant vault MUST use the following top-level structure.
   _attachments/
   _archive/
   _views/
-  _docs/
 
   _wiki/
     cache/
@@ -280,9 +279,6 @@ Stores deprecated or no-longer-maintained pages that have been removed from acti
 
 #### `_views/`
 Optional. Stores reusable view templates or layout helpers. Created on vault initialization; MAY be empty.
-
-#### `_docs/`
-Optional. Stores structural or repository-level documentation that does not belong in the primary ontology (e.g., directory guides, onboarding notes). Pages in `_docs/` are not required to conform to the standard page type schema.
 
 #### `_wiki/`
 Stores machine-generated runtime and compile artifacts, and the `skills/` directory for agent skill definitions.
