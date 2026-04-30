@@ -411,17 +411,17 @@ Each page MUST have a stable `id`.
   - *Exception for Source Pages:* Source pages use the format `source.<yyyy-mm-dd>.<source-slug>` to balance semantic density with chronological sorting and collision prevention.
 
 Examples:
-- `entity.project.ai-harness`
-- `concept.structured-claims`
-- `source.2026-04-12.ai-harness`
-- `synthesis.market-overview.automation`
-- `question.claim-ownership.multi-page`
+- `entity.place.riverside-community-garden`
+- `concept.watershed-management`
+- `source.2026-04-12.urban-tree-canopy`
+- `synthesis.overview.coastal-resilience`
+- `question.evacuation-routing.accessibility`
 
 #### Rationale: Dotted Namespaces vs. UUIDs
 
 While UUIDs guarantee mathematical uniqueness without central coordination, the dotted lowercase namespace format prioritizes **semantic density** and **agent ergonomics**:
 - **Context at a Glance:** Humans and agents can immediately infer what an ID points to without needing to resolve the node.
-- **Token Efficiency:** Descriptive IDs like `synthesis.market-overview.automation` provide rich metadata at a low token cost.
+- **Token Efficiency:** Descriptive IDs like `synthesis.overview.coastal-resilience` provide rich metadata at a low token cost.
 - **Collision Prevention:** Scoping IDs by `<pageType>.<namespace>.<slug>` prevents common naming collisions in a flat namespace.
 
 ### 8.2 Filenames
@@ -471,9 +471,9 @@ Every authored page except purely generated disposable report pages SHOULD inclu
 Minimum universal frontmatter:
 
 ```yaml
-id: entity.project.ai-harness
+id: entity.place.riverside-community-garden
 pageType: entity
-title: ai-harness
+title: Riverside Community Garden
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
@@ -568,18 +568,18 @@ attachments: []
 
 **Example:**
 ```yaml
-id: source.2026-04-28.ai-agents-future
+id: source.2026-04-28.urban-tree-canopy
 pageType: source
-title: The Future of AI Agents
+title: Urban Tree Canopy Assessment
 status: processed
-sourceType: article
-originUrl: https://example.com/ai-agents
+sourceType: pdf
+originUrl: https://example.com/reports/urban-tree-canopy.pdf
 publishedAt: 2026-04-25
 retrievedAt: 2026-04-28
 updatedAt: 2026-04-28
 createdAt: 2026-04-28
 aliases: []
-tags: [ai, agents]
+tags: [urban-planning, tree-canopy]
 attachments: []
 ```
 
@@ -623,16 +623,16 @@ tags: []
 
 **Example:**
 ```yaml
-id: entity.project.agent-wiki
+id: entity.place.riverside-community-garden
 pageType: entity
-title: Agent Wiki
-entityType: project
-canonicalName: Agentic Wiki Project
+title: Riverside Community Garden
+entityType: place
+canonicalName: Riverside Community Garden
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
-aliases: [wiki-project]
-tags: [documentation]
+aliases: [riverside-garden]
+tags: [urban-agriculture]
 ```
 
 #### `entityType`
@@ -654,7 +654,7 @@ Allowed values:
 ```yaml
 id: concept.<conceptType>.<concept-slug>
 pageType: concept
-title: Structured Claims
+title: <title>
 conceptType: <conceptType>
 status: active
 createdAt: <yyyy-mm-dd>
@@ -665,15 +665,15 @@ tags: []
 
 **Example:**
 ```yaml
-id: concept.method.structured-claims
+id: concept.method.adaptive-reuse
 pageType: concept
-title: Structured Claims
+title: Adaptive Reuse
 conceptType: method
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
-aliases: [claims-ontology]
-tags: [ontology]
+aliases: [building-reuse]
+tags: [architecture]
 ```
 
 #### `conceptType`
@@ -709,18 +709,18 @@ tags: []
 
 **Example:**
 ```yaml
-id: synthesis.overview.automation-market
+id: synthesis.overview.coastal-resilience
 pageType: synthesis
-title: Automation Market Overview
+title: Coastal Resilience Overview
 synthesisType: overview
-scope: automation market
+scope: coastal flood mitigation
 status: active
-sourcePages: ["[[source.2026-04-12.market-report]]"]
-derivedClaims: ["[[claim.market.size.2026]]"]
+sourcePages: ["[[source.2026-04-12.tidal-flood-map]]"]
+derivedClaims: ["[[claim.coastal-flooding.high-tide-risk]]"]
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: [market-analysis]
+tags: [climate-resilience]
 ```
 
 #### `synthesisType`
@@ -749,15 +749,15 @@ tags: []
 
 **Example:**
 ```yaml
-id: procedure.workflow.create-video
+id: procedure.runbook.test-emergency-generator
 pageType: procedure
-title: Create Video
-procedureType: workflow
+title: Test Emergency Generator
+procedureType: runbook
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: [video-production]
+tags: [facility-operations]
 ```
 
 #### `procedureType`
@@ -797,9 +797,9 @@ tags: []
 
 **Example:**
 ```yaml
-id: question.multi-page-claim-ownership
+id: question.evacuation-routing.accessibility
 pageType: question
-title: How should claim ownership be handled across multiple synthesis pages?
+title: Which evacuation routes are accessible during high-water events?
 priority: high
 status: open
 relatedClaims: []
@@ -808,7 +808,7 @@ openedAt: 2026-04-12
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
-tags: [governance]
+tags: [emergency-planning]
 ```
 
 #### `priority`
@@ -848,15 +848,16 @@ tags: []
 
 **Example:**
 ```yaml
-id: claim.descriptive.some-fact
+id: claim.historical.library-reopened-2024
 pageType: claim
-title: Some Fact
-claimType: descriptive
+title: Northside Library reopened in 2024
+claimType: historical
 status: supported
 confidence: 0.90
-text: This is the actual claim text.
-subjectPageId: entity.person.john-doe
-sourceIds: []
+text: Northside Library reopened to the public in 2024 after seismic upgrades were completed.
+subjectPageId: entity.place.northside-library
+sourceIds:
+  - source.2026-04-12.library-renovation-notice
 evidence: []
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
@@ -904,22 +905,22 @@ claims:
 **Example:**
 ```yaml
 claims:
-  - id: claim.descriptive.compile-outputs
-    text: The compile step emits stable machine-facing artifacts for agents.
+  - id: claim.descriptive.school-energy-retrofit
+    text: The Lincoln Middle School heat-pump retrofit reduced annual building energy use by 18 percent.
     status: supported
     confidence: 0.91
     claimType: descriptive
     relatedClaimIds: []
     evidence:
       - id: evidence.quote.supports.a1b2c3d4
-        sourceId: source.2026-04-12.ai-harness
-        path: sources/2026-04-12-ai-harness.md
+        sourceId: source.2026-04-12.school-energy-audit
+        path: sources/2026-04-12-school-energy-audit.md
         lines: 55-79
         kind: quote
         relation: supports
         weight: 0.86
-        note: Compile output paths are explicitly described.
-        excerpt: "The compile step reads wiki pages..."
+        note: The audit compares normalized energy use before and after the retrofit.
+        excerpt: "Weather-normalized annual energy consumption fell by 18 percent after commissioning."
         retrievedAt: 2026-04-12
         updatedAt: 2026-04-12
     createdAt: 2026-04-12
@@ -1026,13 +1027,13 @@ evidence:
 ```yaml
 evidence:
   - id: evidence.quote.supports.a1b2c3d4
-    sourceId: source.2026-04-28.ai-agents-future
-    path: sources/source.2026-04-28.ai-agents-future.md
+    sourceId: source.2026-04-28.urban-tree-canopy
+    path: sources/2026-04-28-urban-tree-canopy.md
     lines: 10-18
     kind: quote
     relation: supports
     weight: 0.82
-    note: Direct statement from source
+    note: Direct statement from the canopy assessment
     excerpt: "..."
     retrievedAt: 2026-04-12
     updatedAt: 2026-04-12
@@ -1125,11 +1126,11 @@ relations:
 **Example:**
 ```yaml
 relations:
-  - subject: entity.project.ai-harness
+  - subject: entity.place.lincoln-middle-school
     predicate: uses
-    object: concept.method.structured-claims
+    object: entity.system.ground-source-heat-pump
     confidence: 0.88
-    sourceClaimIds: ["[[claim.descriptive.compile-outputs]]"]
+    sourceClaimIds: ["[[claim.descriptive.school-energy-retrofit]]"]
 ```
 
 ### 13.2 Required relationship fields
@@ -1207,15 +1208,15 @@ updatedAt: <yyyy-mm-dd>
 
 **Example:**
 ```yaml
-id: contradiction.interpretation-conflict.ai-impact
+id: contradiction.interpretation-conflict.ferry-ridership
 type: interpretation_conflict
 status: open
-summary: Two claims disagree on the impact of AI on knowledge management.
+summary: Two claims disagree on whether weekend ferry ridership has recovered to pre-closure levels.
 claimIds:
-  - claim.descriptive.knowledge-management-revolution
-  - claim.weakly-supported.ai-generated-content
+  - claim.descriptive.ferry-ridership-recovered
+  - claim.descriptive.ferry-ridership-still-depressed
 sourceIds:
-  - source.webpage.ai-changing-knowledge-management
+  - source.2026-04-20.ferry-ridership-dashboard
 resolution:
 updatedAt: 2026-04-29
 ```
@@ -1290,17 +1291,17 @@ timeline:
 
 ```yaml
 timeline:
-  - id: tl.compile-pipeline.001
+  - id: tl.riverside-garden.001
     date: 2026-04-12
     endDate:
-    text: Compile pipeline schema was standardized.
-    eventType: schema-change
+    text: Riverside Community Garden opened its spring seedling exchange.
+    eventType: community-event
     status: supported
     confidence: 0.90
     relatedClaims:
-      - claim.descriptive.compile-outputs
+      - "[[claim.historical.seedling-exchange-opened]]"
     sourceIds:
-      - source.2026-04-12.ai-harness
+      - source.2026-04-12.garden-newsletter
     updatedAt: 2026-04-12
 ```
 
@@ -1366,10 +1367,10 @@ Entities and concepts SHOULD include aliases when relevant.
 
 **Example:**
 ```yaml
-canonicalName: Agentic Wiki Project
+canonicalName: Riverside Community Garden
 aliases:
-  - wiki-project
-  - awp
+  - riverside-garden
+  - river-garden
 ```
 
 Alias support exists to improve:
@@ -1697,52 +1698,52 @@ Agents MUST NOT:
 
 ```md
 ---
-id: entity.project.agent-wiki
+id: entity.place.riverside-community-garden
 pageType: entity
-title: Agent Wiki
-entityType: project
-canonicalName: Agentic Wiki Project
+title: Riverside Community Garden
+entityType: place
+canonicalName: Riverside Community Garden
 status: active
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases:
-  - wiki-project
+  - riverside-garden
 tags:
-  - wiki
-  - agents
+  - urban-agriculture
+  - community
 claims:
-  - id: claim.descriptive.compile-outputs
-    text: The compile step emits stable machine-facing artifacts for agents.
+  - id: claim.descriptive.garden-weekly-produce-donations
+    text: Riverside Community Garden donates a portion of its weekly produce harvest to the neighborhood food pantry.
     status: supported
     confidence: 0.91
     claimType: descriptive
     relatedClaimIds: []
     evidence:
       - id: evidence.quote.supports.a1b2c3d4
-        sourceId: source.2026-04-12.ai-harness
-        path: sources/2026-04-12-ai-harness.md
+        sourceId: source.2026-04-12.garden-newsletter
+        path: sources/2026-04-12-garden-newsletter.md
         lines: 55-79
         kind: quote
         relation: supports
         weight: 0.86
-        note: Compile output paths are explicitly described.
-        excerpt: "The compile step reads wiki pages..."
+        note: The newsletter describes the weekly donation arrangement.
+        excerpt: "Each Friday harvest includes a pantry donation box."
         retrievedAt: 2026-04-12
         updatedAt: 2026-04-12
     createdAt: 2026-04-12
     updatedAt: 2026-04-12
 relations:
-  - subject: entity.project.agent-wiki
-    predicate: uses
-    object: concept.structured-claims
+  - subject: entity.place.riverside-community-garden
+    predicate: supports
+    object: entity.organization.neighborhood-food-pantry
     confidence: 0.88
     sourceClaimIds:
-      - claim.descriptive.compile-outputs
+      - "[[claim.descriptive.garden-weekly-produce-donations]]"
 ---
 
-# Agentic Wiki Project
+# Riverside Community Garden
 
-Agentic Wiki Project is a project that uses structured claims and compile-time outputs for agent-facing knowledge access.
+Riverside Community Garden is a neighborhood garden that coordinates volunteer planting, harvest tracking, and weekly produce donations.
 
 ```
 
@@ -1752,31 +1753,31 @@ Agentic Wiki Project is a project that uses structured claims and compile-time o
 
 ```md
 ---
-id: question.claim-ownership.multi-page
+id: question.flood-sensors.calibration-before-storm-season
 pageType: question
-title: How should claim ownership be handled across multiple synthesis pages?
+title: Which flood sensors need calibration before storm season?
 priority: high
 status: open
 relatedClaims:
-  - claim.descriptive.compile-outputs
+  - "[[claim.descriptive.sensor-readings-drifted]]"
 relatedPages:
-  - "[[wiki-architecture]]"
+  - "[[coastal-resilience-overview]]"
 openedAt: 2026-04-12
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
 tags:
-  - schema
+  - flood-monitoring
   - open-question
 ---
 
-# How should claim ownership be handled across multiple synthesis pages?
+# Which flood sensors need calibration before storm season?
 
 ## Context
-This question exists because the same underlying claim may appear in multiple maintained syntheses.
+This question exists because several river gauge readings drifted from manual spot checks during the spring inspection.
 
 ## Current concern
-We need a rule for canonical claim ownership versus claim reuse.
+We need to identify which sensors require calibration before they are used for storm-season alerting.
 ```
 
 ---
