@@ -25,7 +25,6 @@ This document defines the v1 contract for:
 - folder layout
 - page types
 - frontmatter fields
-- managed block conventions
 - structured claims and evidence
 - relationship representation
 - compile output files
@@ -44,7 +43,7 @@ The wiki must separate:
 - **sources** from **summaries**
 - **facts** from **interpretations**
 - **confidence** from **certainty theater**
-- **human-edited content** from **managed/generated content**
+- **human-edited content** from **compiled/generated artifacts**
 - **page structure** from **compiled machine caches**
 
 The wiki is intended to act as:
@@ -215,7 +214,7 @@ MUST describe how agents are expected to behave in the vault.
 
 Typical contents:
 - editing conventions
-- managed block rules
+- generated artifact rules
 - compile expectations
 - page ownership expectations
 - naming conventions
@@ -440,7 +439,7 @@ All internal references within the vault MUST use Obsidian-style wikilinks.
 Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs only.
 
 This convention applies to:
-- page body content and managed block content
+- page body content
 - skill instruction files
 - root-level docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `CLAUDE.md`, etc.)
 - `relatedPages`, `relatedClaims`, and similar string reference fields in frontmatter
@@ -1388,9 +1387,8 @@ The system has multiple layers. Their authority is different.
 
 Primary truth sources:
 1. page frontmatter
-2. managed block content
-3. authored page content where structured references exist
-4. compiled caches derived from the above
+2. authored page content where structured references exist
+3. compiled caches derived from the above
 
 ### 17.2 Non-authoritative layers
 
@@ -1571,7 +1569,7 @@ When dashboard generation is enabled, the system SHOULD generate:
 
 - Reports SHOULD be fully regenerable.
 - Reports SHOULD NOT be treated as primary truth.
-- Compiler-generated reports SHOULD be treated as fully replaceable generated files, not managed-block documents.
+- Compiler-generated reports SHOULD be treated as fully replaceable generated files.
 - Reports SHOULD identify the compile timestamp.
 
 ---
@@ -1814,7 +1812,6 @@ v1 implementations MAY add fields beyond this spec, provided they do not break:
 
 - required fields
 - required enum values
-- managed block preservation
 - compile output expectations
 
 Unknown fields MUST be preserved by conforming tooling when possible.

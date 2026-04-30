@@ -73,7 +73,7 @@ The following are out of scope for strict v1 compliance:
 
 The v1 model has three layers:
 
-- The vault is the container: markdown pages, folders, human notes, and generated blocks.
+- The vault is the container: markdown pages, folders, human notes, and generated artifacts.
 - The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, syntheses, and procedures.
 - The compile layer is the bridge: stable machine-facing cache files and generated maintenance reports.
 

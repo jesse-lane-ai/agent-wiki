@@ -67,7 +67,3 @@ Cache outputs live in `_wiki/cache/`. Required outputs:
 - `agent-digest.json` — high-signal agent context
 
 ---
-
-<!-- AI:GENERATED START name=summary -->
-This vault is initialized with the v1 schema. Folders, compile pipeline, and root docs are in place. Begin adding source, entity, and concept pages to populate the knowledge graph.
-<!-- AI:GENERATED END name=summary -->

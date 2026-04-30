@@ -17,7 +17,7 @@ It separates:
 - **claims** from **evidence**
 - **sources** from **summaries**
 - **facts** from **interpretations**
-- **human-edited content** from **generated content**
+- **human-edited content** from **compiled/generated artifacts**
 - **page structure** from **compiled machine caches**
 
 ---
@@ -239,19 +239,11 @@ The v1 controlled predicate set:
 
 ---
 
-## 9. Managed blocks
+## 9. Generated content
 
-Generated content lives inside managed blocks so agents can safely regenerate it without clobbering human notes.
+Generated structured knowledge should live in frontmatter fields, claim/evidence/relation records, cache files, indexes, or reports.
 
-```md
-<!-- AI:GENERATED START name=summary -->
-Generated content here.
-<!-- AI:GENERATED END name=summary -->
-```
-
-**Human-authored content outside managed blocks is always preserved.**
-
-Common block names: `summary`, `claims`, `evidence`, `relations`, `timeline`, `source-metadata`.
+Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
 
 ---
 
@@ -353,6 +345,6 @@ Standard markdown links are only used for external URLs.
 - Claims should be atomic — one proposition per claim.
 - Important assertions should be in frontmatter, not buried in prose, if they matter for agents.
 - Questions should remain open until explicitly resolved.
-- Human notes outside managed blocks will always be preserved.
+- Human-authored notes should be preserved unless explicitly changed by the operator.
 - Reports are views, not truth sources.
 - Inbox items MUST be processed into canonical source pages before being treated as evidence.

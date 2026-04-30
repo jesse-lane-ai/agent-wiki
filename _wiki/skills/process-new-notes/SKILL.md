@@ -11,11 +11,11 @@ This skill captures the workflow for processing the Agentics vault inbox: readin
  
 Before touching anything, read the vault's agent contract in this order:
  
-1. [[AGENTS]] — the behavioral contract (managed blocks, ID rules, what agents may/must not do)
+1. [[AGENTS]] — the behavioral contract (ID rules, generated artifact rules, what agents may/must not do)
 2. [[AGENT-WIKI-SPEC-v1]] — the full v1 schema
  
 You need to understand the contract before editing anything. The key things from AGENTS.md that apply here:
-- Never rewrite human content outside managed blocks
+- Never rewrite human-authored content without explicit instruction
 - Use stable source IDs (`source.<yyyy-mm-dd>.<source-slug>`)
 - Update `updatedAt` when you change structured content
 - Do not invent certainty

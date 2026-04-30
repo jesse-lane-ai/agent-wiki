@@ -20,25 +20,15 @@ For field-level schema details, [[AGENT-WIKI-SPEC-v1]] is canonical. This file o
 
 ### 2.1 Preserve human content
 
-Agents MUST NOT rewrite or delete content that lives outside of managed blocks unless explicitly instructed to do so by the human operator.
+Agents MUST NOT rewrite or delete human-authored prose, notes, or commentary unless explicitly instructed to do so by the human operator.
 
 Human-authored prose, notes, and commentary are protected.
 
-### 2.2 Stay inside managed blocks
+### 2.2 Keep generated content explicit
 
-All generated content MUST live inside managed block boundaries.
+Agents SHOULD keep generated structured knowledge in frontmatter fields, claim/evidence/relation records, generated cache files, or fully generated report files.
 
-Managed block format:
-
-```md
-<!-- AI:GENERATED START name=<block-name> -->
-Generated content here.
-<!-- AI:GENERATED END name=<block-name> -->
-```
-
-Agents MUST only rewrite the content between matching `START` and `END` delimiters.  
-Agents MUST NOT nest managed blocks.  
-Agents MUST use stable `name=` values.
+When updating page body prose, agents MUST preserve human-authored content unless the human operator explicitly asks for a rewrite.
 
 ### 2.3 Use stable IDs
 
@@ -51,8 +41,6 @@ IDs MUST NOT be regenerated on recompile. Once assigned, an ID is permanent.
 ### 2.4 Update timestamps
 
 When an agent meaningfully changes structured content (frontmatter, claims, relations), it MUST update `updatedAt` on the affected page.
-
-Minor regeneration of managed blocks (summary rewrites) SHOULD also update `updatedAt`.
 
 ### 2.5 Do not invent certainty
 
@@ -92,7 +80,7 @@ Agents SHOULD process inbox items by converting retained items into canonical `s
 - Add frontmatter to existing pages
 - Add or update claims and evidence in frontmatter
 - Add or update relations in frontmatter
-- Rewrite content inside managed blocks
+- Update page body prose when explicitly instructed
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate caches and reports
 - Add aliases and tags to existing pages
@@ -204,22 +192,7 @@ Logs are not authoritative truth records. Agents MUST NOT treat `log.md` or `_wi
 
 ---
 
-## 8. Managed block names
-
-Standard block names agents should use:
-
-| Name | Purpose |
-|---|---|
-| `summary` | Generated summary of the page |
-| `claims` | Generated claims block (if not in frontmatter) |
-| `evidence` | Generated evidence block |
-| `relations` | Generated relations block |
-| `timeline` | Generated timeline block |
-| `source-metadata` | Generated source metadata |
-
----
-
-## 9. Claim rules summary
+## 8. Claim rules summary
 
 - Claims MUST be atomic (one proposition per claim)
 - Claims MUST have a stable unique ID
@@ -230,7 +203,7 @@ Standard block names agents should use:
 
 ---
 
-## 10. Evidence rules summary
+## 9. Evidence rules summary
 
 - Evidence MUST reference a `sourceId` when possible
 - Evidence `relation` MUST use: `supports`, `weakens`, `contradicts`, `context_only`
@@ -239,7 +212,7 @@ Standard block names agents should use:
 
 ---
 
-## 11. Question hygiene
+## 10. Question hygiene
 
 - Agents SHOULD create question pages for important unresolved unknowns
 - Resolved questions MUST remain in the vault with updated status
@@ -247,9 +220,9 @@ Standard block names agents should use:
 
 ---
 
-## 12. What agents MUST NOT do
+## 11. What agents MUST NOT do
 
-- Rewrite human content outside managed blocks
+- Rewrite human-authored content without explicit instruction
 - Delete unresolved uncertainty by omission
 - Convert weak evidence to strong support semantics
 - Treat reports as primary truth records
@@ -261,7 +234,7 @@ Standard block names agents should use:
 
 ---
 
-## 13. Internal linking convention
+## 12. Internal linking convention
 
 All internal links within the vault MUST use Obsidian-style wikilinks.
 
@@ -275,13 +248,12 @@ Standard markdown links (`[text](path)`) MUST NOT be used for internal vault ref
 
 This convention applies to:
 - page body content
-- managed block content
 - `relatedPages` values in frontmatter (use wikilink strings)
 - skill instruction files
 - all root-level docs (AGENTS.md, WIKI.md, INBOX.md, CLAUDE.md, etc.)
 
 ---
 
-## 14. Full Specification
+## 13. Full Specification
 
 [[AGENT-WIKI-SPEC-v1]]

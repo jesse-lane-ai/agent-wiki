@@ -89,12 +89,6 @@ relations:
 # Anthropic
 
 AI safety research company focused on building safe, interpretable AI systems.
-
-<!-- AI:GENERATED START name=summary -->
-Anthropic is an AI safety research company founded by Darian and Daniela Amodei 
-in 2021. Known for developing Claude, an AI assistant focused on safety and 
-interpretability.
-<!-- AI:GENERATED END name=summary -->
 ```
 
 ### Extracted Entity: Claude (Product)
@@ -130,11 +124,6 @@ relations:
 # Claude
 
 AI assistant developed by Anthropic, available via API and web interface.
-
-<!-- AI:GENERATED START name=summary -->
-Claude is an AI assistant developed by Anthropic, available as both an API 
-and a web-based interface. Latest version is Claude 4.5 (as of 2026-04).
-<!-- AI:GENERATED END name=summary -->
 ```
 
 ### Extracted Entity: People

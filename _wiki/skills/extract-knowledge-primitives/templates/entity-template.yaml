@@ -26,8 +26,4 @@ relations:
 
 # <Official Name>
 
-[Human-written context about this entity, or leave for managed block generation]
-
-<!-- AI:GENERATED START name=summary -->
-Auto-generated summary of this entity extracted from sources.
-<!-- AI:GENERATED END name=summary -->
+[Brief source-grounded context about this entity.]

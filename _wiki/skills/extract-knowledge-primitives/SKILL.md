@@ -30,7 +30,7 @@ This skill guides the workflow for extracting structured knowledge primitives (e
 Before extracting anything, read the vault's agent contract and schema:
 
 1. **[[AGENTS]]** — behavior expectations for agents in this vault
-   - Key rule: preserve human content outside managed blocks
+   - Key rule: preserve human-authored content unless explicitly instructed to rewrite it
    - Key rule: use stable dotted-namespace IDs
    - Key rule: do not invent unsupported certainty
    - Key rule: do not rewrite human-authored content
@@ -322,11 +322,7 @@ relations: []
 
 # <Canonical Name>
 
-[Add a brief human-written summary here, or leave it for managed block generation]
-
-<!-- AI:GENERATED START name=summary -->
-A brief auto-generated summary of this entity based on source mentions.
-<!-- AI:GENERATED END name=summary -->
+[Add a brief source-grounded summary here when useful.]
 ```
 
 ### Guidelines
@@ -380,11 +376,7 @@ relatedPages: []
 
 # <Concept Name>
 
-[Brief human summary of what this concept is, or leave for generation]
-
-<!-- AI:GENERATED START name=summary -->
-Auto-generated definition or explanation of the concept.
-<!-- AI:GENERATED END name=summary -->
+[Add a brief source-grounded explanation of this concept when useful.]
 ```
 
 ### Guidelines
@@ -514,7 +506,7 @@ relatedPages: []
 
 # <Procedure Name>
 
-[Brief description of what this procedure is for]
+[Brief source-grounded description of what this procedure is for]
 
 ## Steps
 
@@ -522,9 +514,6 @@ relatedPages: []
 2. [Step two]
 3. [Step three]
 
-<!-- AI:GENERATED START name=summary -->
-Auto-generated summary of this procedure.
-<!-- AI:GENERATED END name=summary -->
 ```
 
 ### Guidelines

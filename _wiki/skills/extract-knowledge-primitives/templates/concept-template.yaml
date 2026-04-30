@@ -24,8 +24,4 @@ relations:
 
 # <Concept Name>
 
-[Human-written explanation of this concept, or leave for managed block generation]
-
-<!-- AI:GENERATED START name=summary -->
-Auto-generated definition or explanation of this concept extracted from sources.
-<!-- AI:GENERATED END name=summary -->
+[Brief source-grounded explanation of this concept extracted from sources.]
