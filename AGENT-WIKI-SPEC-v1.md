@@ -1346,31 +1346,38 @@ Timeline data does not require a top-level `timelines/` folder in v1. It is repr
 
 Timeline entries MUST be represented under a `timeline:` field.
 
-Minimal shape:
+**Schema:**
 
 ```yaml
 timeline:
-  - id: tl.<topic-slug>.001
-    date: 2026-04-12
-    text: Compile pipeline schema was standardized.
+  - id: tl.<namespace>.<index>
+    date: <yyyy-mm-dd>
+    endDate: <yyyy-mm-dd>
+    text: <text>
+    eventType: <eventType>
+    status: <status>
+    confidence: <float>
+    relatedClaims: []
+    sourceIds: []
+    updatedAt: <yyyy-mm-dd>
 ```
 
-Recommended shape:
+**Example:**
 
 ```yaml
 timeline:
-  - id: tl.<topic-slug>.001
-    date: 2026-04-12
-    endDate:
-    text: Compile pipeline schema was standardized.
-    eventType: schema-change
-    status: supported
-    confidence: 0.90
-    relatedClaims:
-      - claim.<topic-slug>.compile.outputs
-    sourceIds:
-      - source.<yyyy-mm-dd>.<source-slug>
-    updatedAt: 2026-04-12
+  - id: tl.compile-pipeline.001
+    date: 2026-04-12
+    endDate:
+    text: Compile pipeline schema was standardized.
+    eventType: schema-change
+    status: supported
+    confidence: 0.90
+    relatedClaims:
+      - claim.descriptive.compile-outputs
+    sourceIds:
+      - source.2026-04-12.ai-harness
+    updatedAt: 2026-04-12
 ```
 
 Required fields
