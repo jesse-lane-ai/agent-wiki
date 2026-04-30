@@ -1,91 +1,118 @@
 # Agentics Vault
 
-Agentics Vault is a structured, markdown-first wiki for building an Obsidian knowledge base that agents can read, maintain, and compile into machine-facing caches.
+Agentics Vault is a structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
 
-It is a starting framework, not a finished product. The value comes from adapting it to your own domain, curating the ontology, and iterating on the workflows over time.
+The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [[AGENT-WIKI-SPEC-v1]] is the canonical technical contract.
 
-## Initialize The Wiki
+## Quick Start
 
-A fresh agent should not start by guessing how the vault works. Initialize it by having the agent read:
+Start with the onboarding docs:
 
-1. [[INITIALIZE]] for the first-run checklist and local configuration.
-2. [[AGENTS]] for the operating contract it must follow before making edits.
+1. [[INITIALIZE]] for first-run setup and local `import-note` configuration.
+2. [[AGENTS]] for the agent behavior contract.
+3. [[WIKI]] for the human-readable schema guide.
+4. [[AGENT-WIKI-SPEC-v1]] for the full v1.1 specification.
 
-After that, the agent should read:
-
-- [[index]] for navigation
-- [[WIKI]] for schema and editorial rules
-- [[INBOX]] for intake pointer handling
-- [[AGENT-WIKI-SPEC-v1]] for the full technical specification
-
-In practice, the initialization prompt can be as simple as:
+For a new agent session, use a prompt like:
 
 ```text
-Read INITIALIZE.md and AGENTS.md first. Then read index.md and WIKI.md.
-Follow the vault contract before making any changes.
+Read INITIALIZE.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing.
+Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
 ```
 
-Have your agent verify the wiki is initialized. Before using `import-note`, configure the local vault/import settings in [[INITIALIZE]].
+Before importing external material, configure `import-note` in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
 
-## What Exists Today
+## What This Repo Contains
 
-This repo currently gives you:
+- The v1.1 wiki specification in [[AGENT-WIKI-SPEC-v1]]
+- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], [[INBOX]], and [[index]]
+- A stdlib-only compile pipeline in `_wiki/skills/compile-wiki/`
+- Agent skills for import, inbox processing, extraction, and compilation under `_wiki/skills/`
+- Gitignored runtime outputs for caches, indexes, logs, and reports
 
-- schema and initialization guidance for sources, entities, concepts, claims, syntheses, procedures, questions, and reports
-- a compile pipeline that emits normalized caches under `_wiki/cache/`
-- an import skill in `_wiki/skills/import-note/`
-- an inbox-processing skill in `_wiki/skills/process-new-notes/`
-- an extraction skill in `_wiki/skills/extract-knowledge-primitives/`
-- a compile skill in `_wiki/skills/compile-wiki/`
+Fresh checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders when needed.
 
-The compile pipeline is run with:
+Current top-level vault shape:
+
+```text
+<vault>/
+  AGENTS.md
+  AGENT-WIKI-SPEC-v1.md
+  INBOX.md
+  INITIALIZE.md
+  README.md
+  WIKI.md
+  index.md
+
+  sources/
+  entities/
+  concepts/
+  claims/
+  syntheses/
+  procedures/
+  questions/
+  reports/
+
+  _inbox/
+  _attachments/
+  _archive/
+  _wiki/
+    cache/
+    indexes/
+    logs/
+    skills/
+```
+
+## Compile
+
+The compiler has no third-party Python dependencies. Run it with the system Python:
 
 ```bash
 python3 _wiki/skills/compile-wiki/scripts/compile.py
 ```
 
-That script parses the vault and regenerates machine-facing artifacts such as `pages.json`, `claims.jsonl`, `relations.jsonl`, `agent-digest.json`, and the report pages.
+It reads vault pages and emits generated artifacts such as:
 
-## Scheduled Agent Work
+- `_wiki/cache/pages.json`
+- `_wiki/cache/claims.jsonl`
+- `_wiki/cache/relations.jsonl`
+- `_wiki/cache/agent-digest.json`
+- `_wiki/cache/validation-issues.json`
+- `_wiki/indexes/`
+- `_wiki/logs/`
+- `reports/`
 
-If you want recurring maintenance, do not rely on a long-running hidden process inside the vault. Set up your own scheduler outside the repo and have it launch an agent or subagent on a defined cadence.
+These outputs are compile artifacts. Do not hand-edit them, and do not treat reports as primary truth.
 
-Typical scheduled jobs look like this:
+## Skills
 
-- inbox triage on a frequent schedule, pointed at `_wiki/skills/process-new-notes/`
-- compile/regeneration on a frequent or post-ingest schedule, pointed at `_wiki/skills/compile-wiki/`
-- extraction or cleanup passes, each pointed at a dedicated skill
+Skills live under `_wiki/skills/`:
 
-The important part is the pattern:
+- `compile-wiki` regenerates caches, indexes, logs, and reports.
+- `import-note` imports external material after local configuration in [[INITIALIZE]].
+- `process-new-notes` triages `_inbox/` pointer files into canonical `source` pages.
+- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, and relations from sources.
 
-1. launch an agent with a narrow task
-2. point it at the relevant skill
-3. let it run on its own schedule
-4. re-run compile so caches and reports stay current
+## Scheduled Work
 
-This repo does not currently ship a scheduler, heartbeat daemon, or task runner. You need to supply that orchestration in your own environment.
+This repo does not ship a scheduler, daemon, or task runner. For recurring maintenance, run an external scheduler that launches agents with narrow tasks:
 
-## What Is Still Missing
+- inbox triage via `_wiki/skills/process-new-notes/`
+- compile/regeneration via `_wiki/skills/compile-wiki/`
+- extraction or cleanup via the relevant skill
 
-This vault is not feature-complete yet.
+Re-run compile after meaningful vault changes so caches, indexes, logs, and reports stay current.
 
-Skills still need to be created for:
+## Customization
 
-- relation extraction and cleanup
-- broader maintenance and QA workflows
+Treat this repository as a foundation for your own wiki, not a finished off-the-shelf knowledge system.
 
-Testing is also still incomplete. The compile pipeline has been hardened, but the larger workflow needs stronger coverage around import, extraction, validation, scheduled runs, and end-to-end agent behavior.
+You will likely customize:
 
-## Make It Your Own
+- domain-specific page conventions
+- source import settings
+- extraction prompts and review workflows
+- maintenance schedules
+- ontology and relationship vocabularies
 
-This repository should be treated as a foundation for your own wiki, not as a finished off-the-shelf knowledge system.
-
-You will need to:
-
-- refine the schema to match your domain
-- configure `import-note` for your local vault paths and retrieval tools
-- add or replace skills to fit your workflows
-- decide what should be automated versus reviewed by a human
-- keep curating pages, claims, evidence, and open questions over time
-
-If you work on the vault consistently, it can become a reliable personal or team knowledge system. If you do not keep shaping it, it will stay a generic starter skeleton.
+Keep [[AGENT-WIKI-SPEC-v1]] as the source of truth when changing schema behavior.
