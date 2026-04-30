@@ -1440,14 +1440,12 @@ The compiler SHOULD flag timeline conflicts when multiple entries appear to desc
 
 Entities and concepts SHOULD include aliases when relevant.
 
-Example:
-
+**Example:**
 ```yaml
-canonicalName: <canonical name>
+canonicalName: Agentic Wiki Project
 aliases:
-  - <alias>
-  - <alias>
-  - <alias>
+  - wiki-project
+  - awp
 ```
 
 Alias support exists to improve:
@@ -1471,7 +1469,7 @@ Primary truth sources:
 3. authored page content where structured references exist
 4. compiled caches derived from the above
 
-#### 17.2 Non-authoritative layers
+### 17.2 Non-authoritative layers
 
 These are views, not truth sources:
 - `reports/`
@@ -1479,7 +1477,7 @@ These are views, not truth sources:
 - search indexes
 - prompt supplements that do not round-trip back to pages
 
-#### 17.3 Rule
+### 17.3 Rule
 Compiled outputs MUST reflect page truth.  
 Reports MUST reflect compiled or page truth.  
 Reports MUST NOT silently become the canonical data layer.
