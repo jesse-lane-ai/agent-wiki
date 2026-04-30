@@ -31,7 +31,6 @@ It separates:
 | `syntheses/` | Maintained cross-source interpretations: overviews, analyses, comparisons, briefs, timelines |
 | `procedures/` | Action-oriented instructions: runbooks, checklists, workflows, playbooks |
 | `questions/` | Unresolved uncertainties and research gaps |
-| `decisions/` | Recorded judgments, resolutions, and schema choices |
 | `reports/` | Generated maintenance views and dashboards |
 | `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
@@ -55,7 +54,6 @@ Every authored page has a `pageType` in its frontmatter.
 | `synthesis` | `syntheses/`  | Cross-source rollup or interpretation |
 | `procedure` | `procedures/` | Workflow or instructions              |
 | `question`  | `questions/`  | Open question or research gap         |
-| `decision`  | `decisions/`  | Recorded judgment or choice           |
 | `report`    | `reports/`    | Generated view or dashboard           |
 | `index`     | `index.md`    | Vault landing page (not a report)     |
 
@@ -111,14 +109,6 @@ freshness:
 | `resolved` | Answer found and recorded |
 | `dropped` | No longer relevant or pursued |
 
-### Decision status
-
-| Status | Meaning |
-|---|---|
-| `proposed` | Under consideration |
-| `accepted` | Adopted and in effect |
-| `superseded` | Replaced by a newer decision |
-| `rejected` | Considered and declined |
 
 ---
 
@@ -248,7 +238,7 @@ Required outputs:
 - `agent-digest.json` — high-signal agent context
 
 Recommended outputs:
-- `contradictions.json`, `questions.json`, `decisions.json`
+- `contradictions.json`, `questions.json`
 - `timeline-events.json`, `source-index.json`
 
 ---
@@ -328,7 +318,6 @@ Standard markdown links are only used for external URLs.
 - Claims should be atomic — one proposition per claim.
 - Important assertions should be in frontmatter, not buried in prose, if they matter for agents.
 - Questions should remain open until explicitly resolved.
-- Decisions should be recorded when schema or interpretation choices are made.
 - Human notes outside managed blocks will always be preserved.
 - Reports are views, not truth sources.
 - Inbox items MUST be processed into canonical source pages before being treated as evidence.

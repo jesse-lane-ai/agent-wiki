@@ -17,7 +17,7 @@ The goal of the system is to make the wiki useful for both:
 
 This spec merges two requirements:
 
-1. a **knowledge ontology** that distinguishes entities, concepts, sources, claims, evidence, relationships, contradictions, questions, and decisions
+1. a **knowledge ontology** that distinguishes entities, concepts, sources, claims, evidence, relationships, contradictions, and questions
 2. a **practical vault architecture** that works as a markdown-first knowledge system with compile-time normalization
 
 This document defines the v1 contract for:
@@ -156,8 +156,6 @@ A tracked conflict between claims, sources, definitions, dates, or interpretatio
 #### Question
 An unresolved uncertainty or research gap.
 
-#### Decision
-A recorded judgment, resolution, or schema choice.
 
 ### 5.2 Secondary object types
 
@@ -196,7 +194,6 @@ A v1-compliant vault MUST use the following top-level structure.
   syntheses/
   procedures/
   questions/
-  decisions/
   reports/
 
   _attachments/
@@ -266,8 +263,6 @@ Stores workflows, runbooks, playbooks, and checklists.
 #### `questions/`
 Stores open question pages.
 
-#### `decisions/`
-Stores recorded decision pages.
 
 #### `reports/`
 Stores generated dashboard pages and maintenance views.
@@ -377,11 +372,7 @@ A `question` page represents an unresolved issue.
 
 A page in `questions/` MUST have `pageType: question`.
 
-### 7.7 `decisions/`
 
-A `decision` page represents a recorded judgment, resolution, or schema/process choice.
-
-A page in `decisions/` MUST have `pageType: decision`.
 
 ### 7.8 `reports/`
 
@@ -425,7 +416,6 @@ Examples:
 - `source.2026-04-12.ai-harness`
 - `synthesis.market-overview.automation`
 - `question.claim-ownership.multi-page`
-- `decision.claim-status-enum-v1`
 
 #### Rationale: Dotted Namespaces vs. UUIDs
 
@@ -509,7 +499,6 @@ Allowed values:
 - `synthesis`
 - `procedure`
 - `question`
-- `decision`
 - `report`
 - `index`
 
@@ -837,72 +826,7 @@ Allowed values for question pages:
 - `resolved`
 - `dropped`
 
-### 10.7 Decision pages
-Decisions are first-class authored pages in v1.
-
-They capture:
-- schema choices
-- taxonomy choices
-- interpretation judgments
-- contradiction resolutions
-- workflow decisions
-
-#### Decision rules
-
-- Important schema or interpretation changes SHOULD be recorded as decisions.
-- Superseded decisions SHOULD remain present with updated status.
-- Decision pages SHOULD link affected pages or schemas.
-
-**Schema:**
-```yaml
-id: decision.<decisionType>.<decision-slug>
-pageType: decision
-title: <title>
-decisionType: <decisionType>
-status: accepted
-summary: <summary>
-rationale: []
-relatedPages: []
-decidedAt: <yyyy-mm-dd>
-createdAt: <yyyy-mm-dd>
-updatedAt: <yyyy-mm-dd>
-aliases: []
-tags: []
-```
-
-**Example:**
-```yaml
-id: decision.schema.claim-status-vocabulary
-pageType: decision
-title: Standardize Claim Status Vocabulary
-decisionType: schema
-status: accepted
-summary: Claim status will use a fixed enum for compile consistency.
-rationale: ["Consistent enums prevent compile errors."]
-relatedPages: []
-decidedAt: 2026-04-12
-createdAt: 2026-04-12
-updatedAt: 2026-04-12
-aliases: []
-tags: [schema-update]
-```
-
-#### `decisionType`
-Allowed values:
-- `schema`
-- `taxonomy`
-- `interpretation`
-- `resolution`
-- `workflow`
-
-#### `status`
-Allowed values for decision pages:
-- `proposed`
-- `accepted`
-- `superseded`
-- `rejected`
-
-### 10.8 Claim pages
+### 10.7 Claim pages
 
 **Schema:**
 ```yaml
@@ -1071,7 +995,7 @@ Required: yes
 - Claim IDs MUST be unique across the vault.
 - Claims SHOULD be atomic and not overloaded.
 - A claim SHOULD express one proposition, not several glued together.
-- A claim MAY be attached to entity, concept, source, synthesis, procedure, question, or decision pages when appropriate.
+- A claim MAY be attached to entity, concept, source, synthesis, procedure, or question pages when appropriate.
 - Pages SHOULD NOT hide all important assertions in prose if those assertions matter for machine use.
 
 ---
@@ -1263,7 +1187,7 @@ v1 SHOULD use a controlled predicate set:
 
 v1 tracks contradictions primarily through compiled outputs and reports.
 
-Contradictions MAY also be represented in page content or decision pages.
+Contradictions MAY also be represented in page content.
 
 v1 does not require contradiction pages, but the compiler MUST be able to surface contradiction records.
 
@@ -1401,7 +1325,7 @@ timeline:
 
 ### 15.3 Placement and Semantics
 
-Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, question, and decision pages.
+Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, and question pages.
 
 A timeline entry SHOULD be authored on the page that most naturally owns the event. It SHOULD reference related claims and source IDs when the event matters for reasoning, retrieval, or contradiction analysis.
   
@@ -1514,7 +1438,6 @@ The following files SHOULD also be emitted:
 
 - `contradictions.json`
 - `questions.json`
-- `decisions.json`
 - `timeline-events.json`
 - `source-index.json`
 
@@ -1531,7 +1454,6 @@ This file SHOULD contain:
 - important claims
 - notable open questions
 - notable contradictions
-- recent decisions
 - high-priority entity/concept summaries
 
 #### `claims.jsonl`
@@ -1586,9 +1508,6 @@ Conflict registry.
 #### `questions.json`
 Open question registry.
 
-#### `decisions.json`
-Decision registry.
-
 #### `timeline-events.json`
 Chronological event index.
 
@@ -1603,7 +1522,6 @@ The `agent-digest.json` output truncates content to keep the file compact for us
 |---|---|---|
 | `MAX_DIGEST_KEY_PAGES` | `50` | Max entity/concept pages included |
 | `MAX_DIGEST_CLAIMS` | `30` | Max top supported claims included |
-| `MAX_DIGEST_DECISIONS` | `20` | Max recent decision pages included |
 | `MAX_DIGEST_QUESTIONS` | `20` | Max open question pages included |
 | `MAX_DIGEST_CONTRADICTIONS` | `10` | Max open contradictions included |
 
@@ -1645,7 +1563,6 @@ When dashboard generation is enabled, the system SHOULD generate:
 
 - `reports/orphaned-claims.md`
 - `reports/evidence-gaps.md`
-- `reports/unresolved-decisions.md`
 - `reports/relationship-gaps.md`
 - `reports/timeline-conflicts.md`
 
@@ -1725,7 +1642,7 @@ A v1 validator SHOULD check the following.
 - confidence fields are numeric and in range
 - evidence entries have required fields
 - relation entries have required fields
-- question and decision pages use allowed status enums
+- question pages use allowed status enums
 - pages are stored in folders consistent with `pageType`
 
 #### 23.2 Recommended validation
@@ -1764,7 +1681,6 @@ Agents MUST:
 - update the log.md file when making meaningful changes to the vault
 
 Agents SHOULD:
-- create decision pages for important schema or interpretation changes
 - create question pages for unresolved important unknowns
 - attach evidence to claims where possible
 - reuse canonical IDs instead of duplicating objects
@@ -1861,38 +1777,6 @@ This question exists because the same underlying claim may appear in multiple ma
 
 ## Current concern
 We need a rule for canonical claim ownership versus claim reuse.
-```
-
----
-
-## 28. Example Decision Page
-
-```md
----
-id: decision.claim-status-enum-v1
-pageType: decision
-title: Standardize Claim Status Vocabulary
-decisionType: schema
-status: accepted
-summary: Claim status will use a fixed enum for compile consistency.
-rationale:
-  - Prevent dashboard drift
-  - Improve agent reliability
-relatedPages:
-  - WIKI.md
-  - concepts/claims.md
-decidedAt: 2026-04-12
-createdAt: 2026-04-12
-updatedAt: 2026-04-12
-aliases: []
-tags:
-  - schema
-  - claims
----
-
-# Standardize Claim Status Vocabulary
-
-The claim status enum is fixed in v1 and must not be freestyle text.
 ```
 
 ---

@@ -90,7 +90,7 @@ A daily compile log (`compile-YYYY-MM-DD.jsonl`) is appended on each run.
 ## Requirements
 
 - Python 3.8+
-- `pyyaml` library: `pip install pyyaml --break-system-packages`
+- No third-party Python packages are required.
 
 ---
 

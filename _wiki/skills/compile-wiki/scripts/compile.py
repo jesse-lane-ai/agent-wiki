@@ -14,7 +14,6 @@ Outputs (under _wiki/cache/):
     agent-digest.json     - high-signal agent context
     contradictions.json   - contradiction registry
     questions.json        - open question registry
-    decisions.json        - decision registry
     timeline-events.json  - chronological event index
     source-index.json     - source metadata registry
 
@@ -37,18 +36,10 @@ Reports (under reports/):
 
 import argparse
 import json
-import os
-import sys
 import re
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Any
-
-try:
-    import yaml
-except ImportError:
-    print("ERROR: PyYAML is required. Install with: pip install pyyaml --break-system-packages")
-    sys.exit(1)
 
 
 # ---------------------------------------------------------------------------
@@ -69,22 +60,269 @@ LOW_CONFIDENCE_THRESHOLD = 0.50
 # Increase if high-value pages are being silently truncated.
 MAX_DIGEST_KEY_PAGES = 50        # max entity/concept pages included in agent digest
 MAX_DIGEST_CLAIMS = 30           # max top supported claims included in agent digest
-MAX_DIGEST_DECISIONS = 20        # max recent decision pages included in agent digest
 MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent digest
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
-VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "decision", "report", "claim", "index"}
+VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "report", "claim", "index"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
 VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
 VALID_EVIDENCE_KINDS = {"quote", "summary", "measurement", "observation", "screenshot", "transcript", "inference"}
 VALID_QUESTION_STATUSES = {"open", "researching", "blocked", "resolved", "dropped"}
-VALID_DECISION_STATUSES = {"proposed", "accepted", "superseded", "rejected"}
 
 
 # ---------------------------------------------------------------------------
 # Frontmatter parsing
 # ---------------------------------------------------------------------------
+
+class FrontmatterParseError(ValueError):
+    """Raised when markdown frontmatter is not valid for the supported YAML subset."""
+
+
+def _line_indent(line: str) -> int:
+    """Count leading spaces. Tabs are intentionally not accepted in frontmatter indentation."""
+    if line.startswith("\t"):
+        raise FrontmatterParseError("tabs are not supported for indentation")
+    return len(line) - len(line.lstrip(" "))
+
+
+def _strip_inline_comment(value: str) -> str:
+    """Strip unquoted YAML comments from scalar values."""
+    in_single = False
+    in_double = False
+    escaped = False
+    for i, ch in enumerate(value):
+        if ch == "\\" and in_double and not escaped:
+            escaped = True
+            continue
+        if ch == "'" and not in_double and not escaped:
+            in_single = not in_single
+        elif ch == '"' and not in_single and not escaped:
+            in_double = not in_double
+        elif ch == "#" and not in_single and not in_double:
+            if i == 0 or value[i - 1].isspace():
+                return value[:i].rstrip()
+        escaped = False
+    return value.strip()
+
+
+def _split_inline_items(value: str) -> list[str]:
+    """Split a comma-separated inline YAML list while respecting simple quotes."""
+    items = []
+    buf = []
+    in_single = False
+    in_double = False
+    escaped = False
+    depth = 0
+    for ch in value:
+        if ch == "\\" and in_double and not escaped:
+            escaped = True
+            buf.append(ch)
+            continue
+        if ch == "'" and not in_double and not escaped:
+            in_single = not in_single
+        elif ch == '"' and not in_single and not escaped:
+            in_double = not in_double
+        elif not in_single and not in_double:
+            if ch in "[{":
+                depth += 1
+            elif ch in "]}":
+                depth -= 1
+            elif ch == "," and depth == 0:
+                items.append("".join(buf).strip())
+                buf = []
+                escaped = False
+                continue
+        buf.append(ch)
+        escaped = False
+    final = "".join(buf).strip()
+    if final:
+        items.append(final)
+    return items
+
+
+def _parse_scalar(value: str) -> Any:
+    """Parse a scalar from the supported YAML subset."""
+    value = _strip_inline_comment(value)
+    if value == "":
+        return ""
+    if value in ("[]",):
+        return []
+    if value in ("{}",):
+        return {}
+    if value[0:1] == "[" and value[-1:] == "]":
+        inner = value[1:-1].strip()
+        if not inner:
+            return []
+        return [_parse_scalar(item) for item in _split_inline_items(inner)]
+    if value[0:1] == "{" and value[-1:] == "}":
+        inner = value[1:-1].strip()
+        result = {}
+        if not inner:
+            return result
+        for item in _split_inline_items(inner):
+            key, item_value = _split_key_value(item)
+            result[key] = _parse_scalar(item_value)
+        return result
+    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+        quoted = value[1:-1]
+        if value.startswith('"'):
+            return bytes(quoted, "utf-8").decode("unicode_escape")
+        return quoted.replace("''", "'")
+
+    lower = value.lower()
+    if lower in ("true", "false"):
+        return lower == "true"
+    if lower in ("null", "none", "~"):
+        return None
+    if re.fullmatch(r"[-+]?\d+", value):
+        try:
+            return int(value)
+        except ValueError:
+            pass
+    if re.fullmatch(r"[-+]?(\d+\.\d*|\.\d+)([eE][-+]?\d+)?", value) or re.fullmatch(r"[-+]?\d+[eE][-+]?\d+", value):
+        try:
+            return float(value)
+        except ValueError:
+            pass
+    return value
+
+
+def _split_key_value(text: str) -> tuple[str, str]:
+    """Split `key: value` text on the first colon."""
+    if ":" not in text:
+        raise FrontmatterParseError(f"expected key/value pair, got {text!r}")
+    key, value = text.split(":", 1)
+    key = key.strip()
+    if not key:
+        raise FrontmatterParseError("empty mapping key")
+    return key, value.strip()
+
+
+def _looks_like_key_value(text: str) -> bool:
+    """Return True when text has YAML's `key:` or `key: value` shape."""
+    colon = text.find(":")
+    return colon > 0 and (colon == len(text) - 1 or text[colon + 1].isspace())
+
+
+def _prepare_yaml_lines(text: str) -> list[tuple[int, str]]:
+    """Return non-empty, non-comment YAML lines as (indent, stripped_text)."""
+    prepared = []
+    for raw in text.splitlines():
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        indent = _line_indent(raw)
+        prepared.append((indent, raw.strip()))
+    return prepared
+
+
+def _parse_block_scalar(lines: list[tuple[int, str]], index: int, parent_indent: int, folded: bool) -> tuple[str, int]:
+    """Parse a literal (`|`) or folded (`>`) block scalar."""
+    parts = []
+    while index < len(lines):
+        indent, text = lines[index]
+        if indent <= parent_indent:
+            break
+        parts.append(" " * max(0, indent - parent_indent - 2) + text)
+        index += 1
+    if folded:
+        return " ".join(part.strip() for part in parts).strip(), index
+    return "\n".join(parts), index
+
+
+def _parse_node(lines: list[tuple[int, str]], index: int, indent: int) -> tuple[Any, int]:
+    if index >= len(lines):
+        return {}, index
+    current_indent, text = lines[index]
+    if current_indent < indent:
+        return {}, index
+    if current_indent != indent:
+        raise FrontmatterParseError(f"unexpected indentation before {text!r}")
+    if text.startswith("- "):
+        return _parse_list(lines, index, indent)
+    return _parse_map(lines, index, indent)
+
+
+def _parse_map(lines: list[tuple[int, str]], index: int, indent: int) -> tuple[dict, int]:
+    result = {}
+    while index < len(lines):
+        current_indent, text = lines[index]
+        if current_indent < indent:
+            break
+        if current_indent > indent:
+            raise FrontmatterParseError(f"unexpected indentation before {text!r}")
+        if text.startswith("- "):
+            break
+
+        key, value = _split_key_value(text)
+        index += 1
+        if value in ("|", ">"):
+            result[key], index = _parse_block_scalar(lines, index, current_indent, folded=(value == ">"))
+        elif value == "":
+            if index < len(lines) and lines[index][0] > current_indent:
+                result[key], index = _parse_node(lines, index, lines[index][0])
+            else:
+                result[key] = None
+        else:
+            result[key] = _parse_scalar(value)
+    return result, index
+
+
+def _parse_list(lines: list[tuple[int, str]], index: int, indent: int) -> tuple[list, int]:
+    result = []
+    while index < len(lines):
+        current_indent, text = lines[index]
+        if current_indent < indent:
+            break
+        if current_indent != indent or not text.startswith("- "):
+            break
+
+        item_text = text[2:].strip()
+        index += 1
+        if item_text == "":
+            if index < len(lines) and lines[index][0] > current_indent:
+                item, index = _parse_node(lines, index, lines[index][0])
+            else:
+                item = None
+        elif _looks_like_key_value(item_text) and not item_text.startswith(("'", '"')):
+            key, value = _split_key_value(item_text)
+            item = {}
+            if value in ("|", ">"):
+                item[key], index = _parse_block_scalar(lines, index, current_indent, folded=(value == ">"))
+            elif value == "":
+                if index < len(lines) and lines[index][0] > current_indent:
+                    item[key], index = _parse_node(lines, index, lines[index][0])
+                else:
+                    item[key] = None
+            else:
+                item[key] = _parse_scalar(value)
+
+            if index < len(lines) and lines[index][0] > current_indent:
+                extra, index = _parse_map(lines, index, lines[index][0])
+                item.update(extra)
+        else:
+            item = _parse_scalar(item_text)
+        result.append(item)
+    return result, index
+
+
+def parse_frontmatter_yaml(fm_text: str) -> dict:
+    """Parse the frontmatter subset used by the Agentics vault schema.
+
+    This intentionally avoids external dependencies. It supports mappings,
+    nested block lists, lists of mappings, inline lists/dicts, quoted strings,
+    numbers, booleans, nulls, and literal/folded block scalars.
+    """
+    lines = _prepare_yaml_lines(fm_text)
+    if not lines:
+        return {}
+    parsed, index = _parse_node(lines, 0, lines[0][0])
+    if index != len(lines):
+        raise FrontmatterParseError(f"could not parse line {index + 1}: {lines[index][1]!r}")
+    if not isinstance(parsed, dict):
+        raise FrontmatterParseError(f"frontmatter must be a mapping, got {type(parsed).__name__}")
+    return parsed
+
 
 def parse_frontmatter(text: str) -> tuple[dict, str, str | None]:
     """Extract YAML frontmatter from a markdown file. Returns (meta, body, error)."""
@@ -96,8 +334,8 @@ def parse_frontmatter(text: str) -> tuple[dict, str, str | None]:
     fm_text = text[3:end].strip()
     body = text[end + 4:].strip()
     try:
-        meta = yaml.safe_load(fm_text) or {}
-    except yaml.YAMLError as exc:
+        meta = parse_frontmatter_yaml(fm_text) or {}
+    except FrontmatterParseError as exc:
         return {}, body, f"invalid_frontmatter: {exc}"
     if not isinstance(meta, dict):
         return {}, body, f"invalid_frontmatter: frontmatter must be a mapping, got {type(meta).__name__}"
@@ -277,10 +515,6 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
         elif page_type == "question":
             record["priority"] = meta.get("priority", "")
             record["openedAt"] = str(meta.get("openedAt", ""))
-        elif page_type == "decision":
-            record["decisionType"] = meta.get("decisionType", "")
-            record["decidedAt"] = str(meta.get("decidedAt", ""))
-            record["summary"] = meta.get("summary", "")
         elif page_type == "claim":
             record["claimType"] = meta.get("claimType", "")
             record["claimStatus"] = meta.get("claimStatus", meta.get("status", ""))
@@ -626,10 +860,6 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
     key_pages = [p for p in pages if p["pageType"] in ("entity", "concept")]
     key_pages_summary = [summarize_page(p) for p in key_pages[:MAX_DIGEST_KEY_PAGES]]
 
-    # Recent decisions
-    decisions = [p for p in pages if p["pageType"] == "decision"]
-    decisions_summary = [summarize_page(p) for p in decisions[:MAX_DIGEST_DECISIONS]]
-
     # Open questions
     open_questions = [p for p in pages if p["pageType"] == "question" and p["status"] in ("open", "researching", "blocked")]
     questions_summary = [summarize_page(p) for p in open_questions[:MAX_DIGEST_QUESTIONS]]
@@ -664,7 +894,6 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
             "validationIssues": len(validation_issues),
         },
         "keyPages": key_pages_summary,
-        "recentDecisions": decisions_summary,
         "openQuestions": questions_summary,
         "topClaims": top_claims_summary,
         "openContradictions": open_contradictions,
@@ -979,21 +1208,6 @@ def main():
         for p in pages if p["pageType"] == "question"
     ]
 
-    decisions_registry = [
-        {
-            "id": p["id"],
-            "title": p["title"],
-            "path": p["path"],
-            "status": p["status"],
-            "decisionType": p.get("decisionType", ""),
-            "summary": p.get("summary", "") or p["meta"].get("summary", ""),
-            "decidedAt": p.get("decidedAt", ""),
-            "updatedAt": p["updatedAt"],
-            "relatedPages": p["meta"].get("relatedPages", []),
-        }
-        for p in pages if p["pageType"] == "decision"
-    ]
-
     source_index = [
         {
             "id": p["id"],
@@ -1064,13 +1278,6 @@ def main():
         encoding="utf-8"
     )
     print(f"  Wrote questions.json ({len(questions_registry)} entries)")
-
-    # decisions.json
-    (cache_dir / "decisions.json").write_text(
-        json.dumps({"compiledAt": compiled_at, "decisions": decisions_registry}, indent=2, default=str),
-        encoding="utf-8"
-    )
-    print(f"  Wrote decisions.json ({len(decisions_registry)} entries)")
 
     # timeline-events.json
     (cache_dir / "timeline-events.json").write_text(

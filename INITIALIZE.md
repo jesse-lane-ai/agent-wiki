@@ -11,7 +11,7 @@
 9. Emit `relations.jsonl`
 10. Emit `agent-digest.json`
 11. Generate required reports
-12. Add contradiction/question/decision caches
+12. Add contradiction/question caches
 
 ---
 
@@ -37,7 +37,7 @@ The v1 model is built on three layers:
 Markdown pages, folders, human notes, and generated blocks.
 
 ### The ontology is the truth model
-Entities, concepts, sources, claims, evidence, relations, contradictions, questions, decisions, syntheses, and procedures.
+Entities, concepts, sources, claims, evidence, relations, contradictions, questions, syntheses, and procedures.
 
 ### The compile layer is the bridge
 Stable machine-facing cache files and generated maintenance reports.

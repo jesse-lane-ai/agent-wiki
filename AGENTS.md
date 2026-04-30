@@ -44,7 +44,7 @@ Every page, claim, evidence entry, and relation MUST have a stable ID.
 
 When creating new objects, agents MUST follow the naming conventions in section 4.
 
-IDs MUST NOT be regenerated on recompile. Once assigned, an ID is permanent unless explicitly superseded by a decision page.
+IDs MUST NOT be regenerated on recompile. Once assigned, an ID is permanent.
 
 ### 2.4 Update timestamps
 
@@ -91,7 +91,6 @@ Agents SHOULD process inbox items by converting retained items into canonical `s
 - Add or update claims and evidence in frontmatter
 - Add or update relations in frontmatter
 - Rewrite content inside managed blocks
-- Create decision pages when making schema or interpretation choices
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate caches and reports
 - Add aliases and tags to existing pages
@@ -112,7 +111,6 @@ Examples:
 - `source.my-project.docs`
 - `synthesis.market-overview.automation`
 - `question.claim-ownership.multi-page`
-- `decision.claim-status-enum-v1`
 
 ### Claim IDs
 
@@ -151,7 +149,6 @@ Example: `entities/my-project.md`
 | `syntheses/` | `synthesis` |
 | `procedures/` | `procedure` |
 | `questions/` | `question` |
-| `decisions/` | `decision` |
 | `reports/` | `report` (if frontmatter present) |
 | `index.md` | `index` |
 
@@ -170,7 +167,6 @@ The compile pipeline reads the vault and emits:
 - `_wiki/cache/agent-digest.json` — high-signal prompt supplement
 - `_wiki/cache/contradictions.json` — contradiction registry
 - `_wiki/cache/questions.json` — open question registry
-- `_wiki/cache/decisions.json` — decision registry
 - `_wiki/cache/timeline-events.json` — chronological event index
 - `_wiki/cache/source-index.json` — source metadata registry
 
@@ -220,12 +216,11 @@ Standard block names agents should use:
 
 ---
 
-## 10. Decision and question hygiene
+## 10. Question hygiene
 
-- Agents SHOULD create decision pages for any schema or interpretation changes they make
 - Agents SHOULD create question pages for important unresolved unknowns
-- Resolved questions and superseded decisions MUST remain in the vault with updated status
-- Agents MUST NOT delete resolved or superseded pages
+- Resolved questions MUST remain in the vault with updated status
+- Agents MUST NOT delete resolved pages
 
 ---
 
