@@ -1501,7 +1501,7 @@ It MUST:
 - emit stable cache files
 - generate reports
 
-#### 18.2 Minimum v1 compile outputs
+### 18.2 Minimum v1 compile outputs
 
 The following files MUST be emitted under `_wiki/cache/`:
 
@@ -1518,9 +1518,9 @@ The following files SHOULD also be emitted:
 - `timeline-events.json`
 - `source-index.json`
 
-#### 18.3 Required cache files
+### 18.3 Required cache files
 
-##### `agent-digest.json`
+#### `agent-digest.json`
 Purpose:
 - compact high-signal prompt supplement
 - runtime context pack
@@ -1578,12 +1578,12 @@ Each line SHOULD contain:
 - source claim IDs if present
 - confidence
 
-#### 18.4 Recommended cache files
+### 18.4 Recommended cache files
 
-##### `contradictions.json`
+#### `contradictions.json`
 Conflict registry.
 
-##### `questions.json`
+#### `questions.json`
 Open question registry.
 
 #### `decisions.json`
@@ -1595,7 +1595,7 @@ Chronological event index.
 #### `source-index.json`
 Source metadata registry.
 
-#### 18.5 Agent digest limits
+### 18.5 Agent digest limits
 
 The `agent-digest.json` output truncates content to keep the file compact for use as a prompt supplement. Implementations SHOULD define these as named constants so they can be tuned as vault size grows.
 
