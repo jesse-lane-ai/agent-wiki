@@ -2,7 +2,7 @@
 
 Agent behavior contract for the Agentics vault.  
 Version: v1  
-Last updated: 2026-04-30
+Last updated: 2026-05-01
 
 ---
 
@@ -10,7 +10,7 @@ Last updated: 2026-04-30
 
 This file is the authoritative description of how agents are expected to behave when reading, writing, or compiling this vault. It is not a style guide — it is a contract.
 
-Agents MUST read this file before making any edits to the vault. See also [[WIKI]] for schema and editorial rules, and [[INBOX]] for the intake pointer schema.
+Agents MUST read this file before making any edits to the vault. See also [[WIKI]] for schema and editorial rules, and [[INBOX]] for the raw intake workflow.
 
 For field-level schema details, [[AGENT-WIKI-SPEC-v1]] is canonical. This file only defines agent behavior.
 
@@ -68,9 +68,9 @@ Agents MUST NOT manually patch cache, index, or generated log files except by ru
 
 `_inbox/` is a raw item intake queue — NOT a source of canonical knowledge.
 
-Agents MUST NOT read `_inbox/` pointer files as primary data sources or treat them as evidence for claims.
+Agents MUST NOT read `_inbox/` or `raw/` files as primary data sources or treat them as evidence for claims.
 
-Agents SHOULD process inbox items by converting retained items into canonical `source` pages under `sources/`. See [[INBOX]] for the pointer schema and lifecycle rules.
+Agents SHOULD process inbox items by converting retained raw files into canonical `source` pages under `sources/`. See [[INBOX]] for the raw intake lifecycle rules.
 
 ---
 

@@ -5,8 +5,8 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_wiki/cache/`, `_wiki/indexes/`, `_wiki/logs/`, and `reports/`; import workflows create `_inbox/`, `_inbox/trash/`, `sources/`, and `_attachments/`.
-5. Configure `_wiki/skills/import-note/config.json` before importing external material.
+4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_wiki/cache/`, `_wiki/indexes/`, `_wiki/logs/`, and `reports/`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
+5. Configure `_wiki/skills/import-link/config.json` before importing external material.
 6. Run the compile pipeline and confirm it reports zero validation issues.
 
 ```bash
@@ -15,16 +15,16 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py
 
 ---
 
-## Import Note Configuration
+## Import Link Configuration
 
-The `import-note` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
+The `import-link` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
 
-Edit `_wiki/skills/import-note/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
+Edit `_wiki/skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
 
 Required first-run edits:
 
 1. Set `configured` to `true`.
-2. Set `vaultRoot` to the absolute path where `_inbox/`, `sources/`, and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault.
+2. Set `vaultRoot` to the absolute path where `sources/` and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault.
 3. Confirm `retrievalModes`.
 4. Confirm `attachmentPolicy`.
 
@@ -40,13 +40,8 @@ Default config:
   "browserProfile": null,
   "youtubeTranscriptTool": null,
   "attachmentPolicy": "copy",
-  "inboxDirectory": "_inbox",
   "sourceDirectory": "sources",
-  "attachmentDirectory": "_attachments",
-  "dedupe": {
-    "includeInbox": true,
-    "includeTrash": true
-  }
+  "attachmentDirectory": "_attachments"
 }
 ```
 
@@ -55,20 +50,18 @@ Config fields:
 | Setting | Required | Notes |
 |---|---|---|
 | `configured` | yes | Must be `true` before import. Leave `false` in shared starter repos. |
-| `vaultRoot` | yes | Absolute path to the vault where `_inbox/`, `sources/`, and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault. |
+| `vaultRoot` | yes | Absolute path to the vault where `sources/` and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault. |
 | `defaultVaultName` | no | Optional display name for the target vault. |
 | `retrievalModes` | yes | Ordered list of available retrieval methods. Use `manual_paste` for no-tool setup. Other values may include `direct_fetch`, `browser_capture`, or `transcript`. |
 | `browserProfile` | no | Only needed if browser fallback is available in the user's environment. |
 | `youtubeTranscriptTool` | no | Only set if `yt-dlp` or another transcript tool is installed. |
 | `attachmentPolicy` | yes | Use `copy` to save imported images/files into `_attachments/`, or `external_link` to leave them remote. |
-| `inboxDirectory` | yes | Relative inbox directory, normally `_inbox`. |
 | `sourceDirectory` | yes | Relative source directory, normally `sources`. |
 | `attachmentDirectory` | yes | Relative attachment directory, normally `_attachments`. |
-| `dedupe` | yes | Controls whether duplicate URL checks include `_inbox/` and `_inbox/trash/`. |
 
-If any required value is unknown, the agent should ask the user before running `import-note`.
+If any required value is unknown, the agent should ask the user before running `import-link`.
 
-The inbox pointer lifecycle uses uppercase statuses: `UNPROCESSED`, `PROCESSING`, `PROCESSED`, `FAILED`, `IGNORED`, and `TRASHED`.
+The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
 
 Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unprocessed`, `processed`, and `archived`.
 

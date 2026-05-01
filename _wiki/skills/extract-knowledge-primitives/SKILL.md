@@ -1,6 +1,6 @@
 ---
 name: extract-knowledge-primitives
-description: "Extract knowledge primitives (entities, concepts, claims, questions, and relations) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages and creates appropriate wiki pages after sources have been processed by the process-new-notes skill."
+description: "Extract knowledge primitives (entities, concepts, claims, questions, and relations) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages with status: unprocessed and creates appropriate wiki pages."
 ---
 
 # Extract Knowledge Primitives
@@ -37,12 +37,11 @@ Scan `sources/` for source pages that have not yet been processed for extraction
 
 A source page needs extraction when:
 
-- `extractionStatus` is missing, empty, or `unprocessed`.
+- `status: unprocessed`.
 
 A source page has already been extracted when:
 
-- `extractionStatus: extracted`
-- `extractedAt` is present.
+- `status: processed`.
 
 Read frontmatter first. Do not reprocess already extracted source pages unless the user explicitly asks for re-extraction.
 
@@ -207,12 +206,12 @@ Use `relation: supports` only when the evidence directly supports the claim. Use
 
 ## Step 6: Update Source Extraction Metadata
 
-After extracting primitives from a source page, update that source page's frontmatter with extraction metadata using the fields defined in [[AGENT-WIKI-SPEC-v1]].
+After extracting primitives from a source page, update that source page's frontmatter using the fields defined in [[AGENT-WIKI-SPEC-v1]].
 
 At minimum, record:
 
-- `extractionStatus: extracted`
-- `extractedAt`
+- `status: processed`
+- `updatedAt`
 - IDs of extracted entities, concepts, claims, and questions where applicable
 
 Do not modify the source body unless the user explicitly asks for prose changes.

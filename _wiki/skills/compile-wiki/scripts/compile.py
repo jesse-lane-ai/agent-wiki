@@ -46,7 +46,7 @@ from typing import Any
 # Config
 # ---------------------------------------------------------------------------
 
-SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "reports"}
+SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "raw", "reports"}
 SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
 CACHE_DIR = "_wiki/cache"
 INDEX_DIR = "_wiki/indexes"
@@ -665,7 +665,15 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
     if page_type == "source":
         validate_enum(meta.get("status"), VALID_SOURCE_STATUSES, "invalid_source_status", path, issues, "status", page_id)
         validate_enum(meta.get("sourceType"), VALID_SOURCE_TYPES, "invalid_source_type", path, issues, "sourceType", page_id)
-        validate_required_fields(meta, {"sourceType", "originUrl", "retrievedAt", "attachments"}, path, issues, "source", page_id)
+        validate_required_fields(meta, {"sourceType", "retrievedAt", "attachments"}, path, issues, "source", page_id)
+        if is_blank(meta.get("originUrl")) and is_blank(meta.get("originPath")):
+            add_validation_issue(
+                issues,
+                "missing_source_origin",
+                path,
+                "Source is missing origin metadata; include `originUrl` or `originPath`.",
+                pageId=page_id,
+            )
         validate_date_field(meta.get("publishedAt"), "invalid_source_date", path, issues, "publishedAt", page_id)
         validate_date_field(meta.get("retrievedAt"), "invalid_source_date", path, issues, "retrievedAt", page_id)
         if "attachments" in meta:
@@ -842,6 +850,7 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
         elif page_type == "source":
             record["sourceType"] = meta.get("sourceType", "")
             record["originUrl"] = meta.get("originUrl", "")
+            record["originPath"] = meta.get("originPath", "")
             record["publishedAt"] = str(meta.get("publishedAt", ""))
             record["retrievedAt"] = str(meta.get("retrievedAt", ""))
         elif page_type == "synthesis":
@@ -1593,6 +1602,7 @@ def main():
             "status": p["status"],
             "sourceType": p.get("sourceType", ""),
             "originUrl": p.get("originUrl", ""),
+            "originPath": p.get("originPath", ""),
             "publishedAt": p.get("publishedAt", ""),
             "retrievedAt": p.get("retrievedAt", ""),
             "updatedAt": p["updatedAt"],

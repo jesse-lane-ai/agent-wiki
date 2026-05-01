@@ -8,10 +8,10 @@ The vault keeps human-authored pages, structured frontmatter, claims, evidence, 
 
 Start with the onboarding docs:
 
-1. [[INITIALIZE]] for first-run setup and local `import-note` configuration.
+1. [[INITIALIZE]] for first-run setup and local `import-link` configuration.
 2. [[AGENTS]] for the agent behavior contract.
 3. [[WIKI]] for the human-readable schema guide.
-4. [[AGENT-WIKI-SPEC-v1]] for the full v1.2 specification.
+4. [[AGENT-WIKI-SPEC-v1]] for the full v1.3 specification.
 
 For a new agent session, use a prompt like:
 
@@ -20,11 +20,11 @@ Read INITIALIZE.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing
 Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
 ```
 
-Before importing external material, configure `_wiki/skills/import-note/config.json` as described in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+Before importing external material, configure `_wiki/skills/import-link/config.json` as described in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
 
 ## What This Repo Contains
 
-- The v1.2 wiki specification in [[AGENT-WIKI-SPEC-v1]]
+- The v1.3 wiki specification in [[AGENT-WIKI-SPEC-v1]]
 - Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], [[INBOX]], and [[index]]
 - A stdlib-only compile pipeline in `_wiki/skills/compile-wiki/`
 - Agent skills for import, inbox processing, extraction, and compilation under `_wiki/skills/`
@@ -53,6 +53,7 @@ Current top-level vault shape:
   reports/
 
   _inbox/
+  raw/
   _attachments/
   _archive/
   _wiki/
@@ -88,15 +89,15 @@ These outputs are compile artifacts. Do not hand-edit them, and do not treat rep
 Skills live under `_wiki/skills/`:
 
 - `compile-wiki` regenerates caches, indexes, logs, and reports.
-- `import-note` imports external material after local configuration in `_wiki/skills/import-note/config.json`.
-- `process-new-notes` triages `_inbox/` pointer files into canonical `source` pages.
+- `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_wiki/skills/import-link/config.json`.
+- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources.
 
 ## Scheduled Work
 
 This repo does not ship a scheduler, daemon, or task runner. For recurring maintenance, run an external scheduler that launches agents with narrow tasks:
 
-- inbox triage via `_wiki/skills/process-new-notes/`
+- inbox processing via `_wiki/skills/process-inbox/`
 - compile/regeneration via `_wiki/skills/compile-wiki/`
 - extraction or cleanup via the relevant skill
 

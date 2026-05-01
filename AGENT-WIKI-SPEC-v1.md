@@ -1,8 +1,8 @@
 
 # Agentic Wiki v1 Specification
 
-Version: 1.2
-Last Updated: 2026-04-30
+Version: 1.3
+Last Updated: 2026-05-01
 
 ---
 
@@ -195,6 +195,8 @@ A v1-compliant vault MUST use the following top-level structure.
   questions/
   reports/
 
+  _inbox/
+  raw/
   _attachments/
   _archive/
 
@@ -235,7 +237,7 @@ Typical contents:
 SHOULD be the human-facing landing page.
 
 #### `INBOX.md`
-MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` folder pointer schema — the intake queue for raw items that have not yet been processed into canonical `source` pages.
+MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages.
 
 ### 6.1.1 Optional top-level files
 
@@ -245,7 +247,7 @@ MAY be used as a human-readable operational changelog for meaningful vault chang
 ### 6.2 Required directories
 
 #### `sources/`
-Stores raw material and source-backed source pages.
+Stores canonical verbatim source pages.
 
 #### `entities/`
 Stores durable thing pages.
@@ -265,6 +267,12 @@ Stores open question pages.
 
 #### `reports/`
 Stores generated dashboard pages and maintenance views.
+
+#### `_inbox/`
+Stores raw files waiting to be promoted into canonical source pages. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
+
+#### `raw/`
+Stores retained original raw files after inbox promotion. Files in `raw/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
 #### `_attachments/`
 Stores binary assets and attachments referenced by source pages or other pages (PDFs, images, raw files). Created on vault initialization; MAY be empty.
@@ -291,7 +299,7 @@ _wiki/skills/
     instructions.md
     scripts/
       compile.py
-  process-new-notes/
+  process-inbox/
     instructions.md
 ```
 
@@ -301,7 +309,7 @@ _wiki/skills/
 
 ### 7.1 `sources/`
 
-`source` pages represent verbatim source material. They are created by the `import-note` skill.
+`source` pages represent verbatim source material. They are created by the `import-link` and `process-inbox` skills.
 
 A `source` page SHOULD include:
 - verbatim content (text and images)
@@ -537,6 +545,7 @@ title: <title>
 status: <status>
 sourceType: <sourceType>
 originUrl: <url>
+originPath: <path>
 publishedAt: <yyyy-mm-dd>
 retrievedAt: <yyyy-mm-dd>
 updatedAt: <yyyy-mm-dd>
@@ -554,6 +563,7 @@ title: Urban Tree Canopy Assessment
 status: processed
 sourceType: pdf
 originUrl: https://example.com/reports/urban-tree-canopy.pdf
+originPath:
 publishedAt: 2026-04-25
 retrievedAt: 2026-04-28
 updatedAt: 2026-04-28
@@ -584,6 +594,8 @@ Allowed values:
 - `bridge`
 - `import`
 - `other`
+
+Source pages SHOULD include `originUrl` for externally retrieved material. Source pages promoted from local raw inbox files MAY use `originPath` instead. At least one of `originUrl` or `originPath` SHOULD be present.
 
 ### 10.2 Entity pages
 

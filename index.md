@@ -4,7 +4,7 @@ pageType: index
 title: Agentics Wiki Index
 status: active
 createdAt: 2026-04-12
-updatedAt: 2026-04-30
+updatedAt: 2026-05-01
 aliases: []
 tags:
   - meta
@@ -28,14 +28,15 @@ Welcome to the Agentics vault — a structured knowledge base designed for both 
 | `syntheses/` | Cross-source analyses and overviews |
 | `questions/` | Open questions and research gaps |
 | `reports/` | Generated maintenance views |
+| `raw/` | Retained original raw files |
 
 ---
 
 ## Intake
 
-New material lands in `_inbox/` as pointer files before being processed into canonical `source` pages.
+Raw files can land in `_inbox/` before being promoted into canonical `source` pages. External links can be imported directly into `sources/`.
 
-See [[INBOX]] for the pointer schema and intake lifecycle.
+See [[INBOX]] for the raw intake lifecycle.
 
 ---
 
@@ -45,7 +46,7 @@ See [[INBOX]] for the pointer schema and intake lifecycle.
 |---|---|
 | [[WIKI]] | Schema, page types, folder meanings, and editorial rules |
 | [[AGENTS]] | Agent behavior contract |
-| [[INBOX]] | Inbox pointer schema and intake workflow |
+| [[INBOX]] | Inbox raw intake workflow |
 | [[AGENT-WIKI-SPEC-v1]] | Full v1 specification |
 
 ---

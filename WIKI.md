@@ -2,7 +2,7 @@
 
 Human-readable schema and editorial guide for the Agentics vault.  
 Spec version: v1  
-Last updated: 2026-04-30
+Last updated: 2026-05-01
 
 ---
 
@@ -45,6 +45,7 @@ Current vault structure:
   reports/
 
   _inbox/
+  raw/
   _attachments/
   _archive/
   _wiki/
@@ -69,6 +70,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
 | `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
+| `raw/` | Retained original raw files after inbox promotion |
 
 ---
 
@@ -304,22 +306,21 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 
 The `_inbox/` folder is the raw item intake queue. New unprocessed material should land here first.
 
-Each item in `_inbox/` is tracked by a **pointer file** — a minimal YAML record that references the raw item and tracks its processing state.
-
-See [[INBOX]] for the full pointer schema.
+Raw inbox items are promoted into canonical `source` pages by the `process-inbox` skill. See [[INBOX]] for the full intake lifecycle.
 
 ### Intake lifecycle
 
 1. Raw item arrives in `_inbox/`
-2. A pointer file is created with `status: UNPROCESSED`
-3. The item is reviewed and triaged
-4. If retained: item becomes a canonical `source` page under `sources/`; pointer moves to `_inbox/trash/` with `status: PROCESSED`
-5. If discarded: pointer moves to `_inbox/trash/` with `status: IGNORED` or `TRASHED`
+2. `process-inbox` reads the raw item
+3. If retained: item becomes a canonical `source` page under `sources/` with `status: unprocessed`
+4. The original raw file moves to `raw/`
+5. If discarded: the raw file moves to `_inbox/trash/`
 
 ### `_inbox/` is not canonical
 
-- Inbox pointer files are NOT `source` pages.
-- Agents MUST NOT treat `_inbox/` items as authoritative source records.
+- Inbox raw files are NOT `source` pages.
+- Files in `raw/` are retained originals, not canonical source records.
+- Agents MUST NOT treat `_inbox/` or `raw/` items as authoritative source records.
 - Agents SHOULD process inbox items by converting them into proper `source` pages.
 
 ---

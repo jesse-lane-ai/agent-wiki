@@ -1,54 +1,36 @@
-## `_inbox/` Pointer Schema
+## `_inbox/` Raw Intake
 
-Inbox pointer files are simple tracking records for raw items that landed in `_inbox/` and still need to be processed into canonical `source` pages.
+The `_inbox/` folder is the active drop zone for raw files that still need to be promoted into canonical `source` pages.
 
-**Use the process-new-notes skill to process the inbox.**
-`_wiki/skills/process-new-notes/SKILL.md`
+**Use the process-inbox skill to process the inbox.**
+`_wiki/skills/process-inbox/SKILL.md`
 
 ### Folder meaning
 
-- `_inbox/` = active queue
-- `_inbox/trash/` = discarded or inactive inbox items
+- `_inbox/` = active raw file queue
+- `raw/` = retained original raw files after successful promotion
+- `_inbox/trash/` = rejected, discarded, or inactive inbox items
 
-### Required fields
+### Intake lifecycle
 
-- `id`: unique inbox item ID
-- `pointer`: path or reference to the raw item
-- `status`: processing state
+1. A user or tool drops a raw file into `_inbox/`.
+2. `process-inbox` reads the raw file.
+3. If retained, `process-inbox` creates a canonical source page in `sources/` with `status: unprocessed`.
+4. After successful promotion, `process-inbox` moves the original raw file to `raw/`.
+5. If a raw file cannot be processed or should be discarded, leave it in `_inbox/` for operator review or move it to `_inbox/trash/` when explicitly discarded.
 
-### Allowed `status` values
+### Source status
 
-- `UNPROCESSED`
-- `PROCESSING`
-- `PROCESSED`
-- `FAILED`
-- `IGNORED`
-- `TRASHED`
+Newly promoted source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]:
 
-### Minimal example
+- `unprocessed` = captured as a source page, not yet extracted into knowledge primitives
+- `processed` = extraction completed
+- `archived` = retained but inactive
 
-```yaml
-id: 2026-04-12-inbox-2042925773300908103
-pointer: "[[source.2026-04-12.riverside-garden-newsletter]]"
-status: UNPROCESSED
-```
+### Boundaries
 
-### Trash rule
-
-When an item is confirmed as processed change its status to `PROCESSED` and move it to the trash.
-
-Items moved to `_inbox/trash/` SHOULD use one of these statuses:
-
-- `IGNORED`
-- `FAILED`
-- `TRASHED`
-- `PROCESSED`
-
-`TRASHED` is the clearest status when the file is physically moved into `_inbox/trash/`.
-
-### Notes
-
-- `_inbox` pointer files are not canonical `source` pages.
-- The `pointer` field references the raw item or source page using an Obsidian wikilink.
-- When processing is complete, the item should be turned into a canonical page under `sources/`.
-- Items in `_inbox/trash/` are no longer part of the active processing queue.
+- `_inbox/` files are not canonical `source` pages.
+- `raw/` files are retained originals, not canonical `source` pages.
+- Agents MUST NOT treat `_inbox/` or `raw/` files as evidence for claims.
+- Canonical source material lives in `sources/`.
+- Pointer files are not part of the v1.3 intake workflow.
