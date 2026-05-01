@@ -49,10 +49,10 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
 4. Build a deterministic ID:
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
 5. Write raw source to:
-   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+   - `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` using the source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
    - Set `status: unprocessed`.
    - Include the full captured verbatim body with inline images + source URLs below the frontmatter.
-   - images save to `_attachments`. filename: `yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
+   - images save to `_attachments`. filename: `yyyy-mm-dd-<sourceSlug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.
    - inline images uses Obsidian image syntax `![[filename]]`
 6. Confirm in chat with:
