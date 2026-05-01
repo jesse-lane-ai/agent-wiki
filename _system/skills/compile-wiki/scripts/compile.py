@@ -1635,6 +1635,23 @@ def main():
     )
     print(f"  Wrote pages.json ({len(pages_output)} pages)")
 
+    print("\nWriting root page catalog...")
+    index_result = subprocess.run(
+        [
+            sys.executable,
+            str(vault_root / "_system/scripts/index.py"),
+            "--vault-root",
+            str(vault_root),
+            "--write",
+            "--no-log",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    if index_result.stdout.strip():
+        print(f"  {index_result.stdout.strip()}")
+
     # claims.jsonl
     with open(cache_dir / "claims.jsonl", "w", encoding="utf-8") as f:
         for c in claims:
@@ -1770,7 +1787,7 @@ def main():
         if p["pageType"] == "question" and p["status"] in ("open", "researching", "blocked")
     ])
     log_message = (
-        "compile-wiki: regenerated cache, indexes, and reports; "
+        "compile-wiki: regenerated index, cache, indexes, and reports; "
         f"pages={len(pages)} claims={len(claims)} relations={len(relations)} "
         f"contradictions={len(contradictions)} openQuestions={open_questions_count} "
         f"evidenceGaps={len(health['evidence_gap_claims'])} "
