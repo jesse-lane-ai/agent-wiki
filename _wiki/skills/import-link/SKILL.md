@@ -6,7 +6,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 # Import Link
 
 ## Configuration
-- Before first use, read [[INITIALIZE]] and `_wiki/skills/import-link/config.json`.
+- Before first use, read `INITIALIZE.md` and `_wiki/skills/import-link/config.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
 - If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_wiki/skills/import-link/config.json`.
@@ -29,9 +29,9 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Source Schema (required, strictly enforced)
 
-Create source files in `sources/` using the canonical source page schema and example in [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
+Create source files in `sources/` using the canonical source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 
-Use Section 10 of [[AGENT-WIKI-SPEC-v1]] as the source of truth for page-type schemas, allowed enum values, ID formats, and examples. This skill owns the import workflow, not the source frontmatter schema.
+Use Section 10 of `AGENT-WIKI-SPEC-v1.md` as the source of truth for page-type schemas, allowed enum values, ID formats, and examples. This skill owns the import workflow, not the source frontmatter schema.
 
 Newly imported source pages MUST use `status: unprocessed`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -49,7 +49,7 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
 4. Build a deterministic ID:
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
 5. Write raw source to:
-   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the source page schema and example in [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
+   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
    - Set `status: unprocessed`.
    - Include the full captured verbatim body with inline images + source URLs below the frontmatter.
    - images save to `_attachments`. filename: `yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.

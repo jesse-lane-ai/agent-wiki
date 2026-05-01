@@ -5,20 +5,20 @@ description: "Process raw files dropped into the Agentics vault inbox. Use this 
 
 # Process Inbox
 
-This skill promotes raw files from `_inbox/` into canonical, schema-compliant `source` pages. It does not extract entities, concepts, claims, questions, or relations; use [[extract-knowledge-primitives]] after source pages exist.
+This skill promotes raw files from `_inbox/` into canonical, schema-compliant `source` pages. It does not extract entities, concepts, claims, questions, or relations; use `_wiki/skills/extract-knowledge-primitives/SKILL.md` after source pages exist.
 
 ## Step 1: Read the Vault Contract
 
 Before touching anything, read the vault's agent contract in this order:
 
-1. [[AGENTS]] - the behavioral contract.
-2. [[AGENT-WIKI-SPEC-v1]] - the canonical schema.
+1. `AGENTS.md` - the behavioral contract.
+2. `AGENT-WIKI-SPEC-v1.md` - the canonical schema.
 
 Key rules for this workflow:
 - Preserve raw content.
 - Use stable source IDs.
 - Do not invent metadata.
-- Use Section 10 of [[AGENT-WIKI-SPEC-v1]] for the source page schema and examples.
+- Use Section 10 of `AGENT-WIKI-SPEC-v1.md` for the source page schema and examples.
 
 ## Step 2: Check the Inbox
 
@@ -36,7 +36,7 @@ Read the file fully. Preserve the original content exactly when writing the sour
 
 ### 3b. Infer source metadata
 
-Create a source page using the canonical source page schema and example in [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
+Create a source page using the canonical source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 
 Newly promoted source pages MUST use `status: unprocessed`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -47,7 +47,7 @@ source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
 ```
 
 - `yyyy-mm-dd`: processing date unless the raw file clearly includes a retrieval date.
-- `sourceType`: the inferred source type from [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
+- `sourceType`: the inferred source type from `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 - `sourceSlug`: short kebab-case descriptor, preferably four words.
 
 Infer `sourceType` conservatively:
@@ -60,7 +60,7 @@ Infer `sourceType` conservatively:
 - Screenshot -> `screenshot`
 - Unknown or plain notes -> `other`
 
-If a field such as `publishedAt`, `author`, or `originUrl` cannot be inferred, omit optional fields rather than guessing. For local raw files with no external URL, use `originPath` to record the retained raw file path after promotion. Required source fields must still follow [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
+If a field such as `publishedAt`, `author`, or `originUrl` cannot be inferred, omit optional fields rather than guessing. For local raw files with no external URL, use `originPath` to record the retained raw file path after promotion. Required source fields must still follow `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 
 ### 3c. Write the source page
 
