@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "configured": false,
+  "vaultRoot": null,
+  "defaultVaultName": null,
+  "retrievalModes": [
+    "manual_paste"
+  ],
+  "browserProfile": null,
+  "youtubeTranscriptTool": null,
+  "attachmentPolicy": "copy",
+  "inboxDirectory": "_inbox",
+  "sourceDirectory": "sources",
+  "attachmentDirectory": "_attachments",
+  "dedupe": {
+    "includeInbox": true,
+    "includeTrash": true
+  }
+}

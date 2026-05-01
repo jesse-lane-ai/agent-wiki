@@ -6,14 +6,16 @@ description: Ingest raw notes, links, or snippets into the vault inbox queue usi
 # Import Note
 
 ## Configuration
-- Before first use, read [[INITIALIZE]] and confirm the `import-note` configuration is complete.
+- Before first use, read [[INITIALIZE]] and `_wiki/skills/import-note/config.json`.
+- Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
-- If `vaultRoot`, retrieval mode, or attachment policy is unknown, stop and ask the user to configure it.
+- If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_wiki/skills/import-note/config.json`.
 - Use the repository root as `vaultRoot` only when the user wants imports written into this checkout.
+- The default `manual_paste` retrieval mode requires no external tools. Other retrieval modes only apply when configured and available.
 
 ## Vault Selection (required)
 - Accept an optional vault name or vault root in user input.
-- Resolve the target vault from [[INITIALIZE]] unless the user explicitly supplies a different path.
+- Resolve the target vault from `_wiki/skills/import-note/config.json` unless the user explicitly supplies a different path.
 - If no configured vault root exists, stop and ask the user for the target vault root.
 - If the requested vault folder does not exist, stop and report the missing vault instead of guessing.
 - Use the resolved vault for all paths (`_inbox`, `sources`, `_attachments`).
@@ -83,7 +85,7 @@ attachments: []
 ## Deterministic Workflow
 1. **Deduplication Check:** Before capturing content, check all pointer files in `_inbox/` and `_inbox/trash/` for an existing `url`.
    - If a pointer with the matching URL already exists, stop and inform the user that it has already been imported (provide the existing pointer/source paths) or update the existing files if requested.
-2. Capture source content using the retrieval modes configured in [[INITIALIZE]].
+2. Capture source content using the retrieval modes configured in `_wiki/skills/import-note/config.json`.
    - If direct fetch is available, try it first.
    - If a transcript tool is configured and the source is a video, capture one English transcript when available and use it as the primary source body.
    - If browser fallback is configured and direct retrieval is blocked or incomplete, use the configured browser profile.

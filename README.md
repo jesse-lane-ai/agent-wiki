@@ -20,7 +20,7 @@ Read INITIALIZE.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing
 Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
 ```
 
-Before importing external material, configure `import-note` in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+Before importing external material, configure `_wiki/skills/import-note/config.json` as described in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
 
 ## What This Repo Contains
 
@@ -89,7 +89,7 @@ These outputs are compile artifacts. Do not hand-edit them, and do not treat rep
 Skills live under `_wiki/skills/`:
 
 - `compile-wiki` regenerates caches, indexes, logs, and reports.
-- `import-note` imports external material after local configuration in [[INITIALIZE]].
+- `import-note` imports external material after local configuration in `_wiki/skills/import-note/config.json`.
 - `process-new-notes` triages `_inbox/` pointer files into canonical `source` pages.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, and relations from sources.
 
