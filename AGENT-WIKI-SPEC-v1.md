@@ -242,7 +242,7 @@ MAY be used as an intake or triage surface for new notes, unresolved imports, an
 ### 6.1.1 Optional top-level files
 
 #### `log.md`
-MAY be used as a human-readable operational changelog for meaningful vault changes. It is not a source of canonical knowledge.
+Operational log entries belong in `_system/logs/log.md`.
 
 ### 6.2 Required directories
 
@@ -1363,8 +1363,7 @@ Primary truth sources:
 
 These are views, not truth sources:
 - `reports/`
-- `log.md`
-- `_system/logs/`
+- `_system/logs/log.md`
 - ad hoc dashboard summaries
 - search indexes
 - prompt supplements that do not round-trip back to pages
@@ -1549,23 +1548,37 @@ Logs capture operational history. They do not replace page frontmatter, structur
 
 ### 21.1 Log locations
 
-- `_system/logs/` stores generated compile and runtime logs. These files SHOULD be written by tooling and MUST NOT be hand-edited.
-- `log.md`, if present, is a human-readable changelog for meaningful vault changes.
+- `_system/logs/log.md` is the canonical operational log for generated compile events and meaningful skill runs or change batches.
+- Files in `_system/logs/` SHOULD be written by tooling and MUST NOT be hand-edited.
 
 ### 21.2 Log authority
 
 Logs are non-authoritative operational records. Agents and tooling MUST NOT treat log entries as primary evidence for claims unless the relevant material is promoted into a canonical `source` page.
 
-### 21.3 `log.md` entries
+### 21.3 `_system/logs/log.md` entries
 
-When used, `log.md` entries SHOULD be append-only and concise. Each entry SHOULD include:
+Entries in `_system/logs/log.md` SHOULD be prepended so the most recent entry appears first. Entries SHOULD be concise. Each entry SHOULD include:
 
 - date
 - actor or tool, when known
 - changed area
 - short reason or outcome
 
-Trivial report/cache regeneration does not need a `log.md` entry unless it records a meaningful vault change or operational incident.
+Skills SHOULD write one log entry after each meaningful skill run or change batch. They SHOULD NOT log every individual file write when those writes are part of one coherent operation.
+
+Trivial report/cache regeneration does not need a log entry unless it records a meaningful vault change or operational incident.
+
+### 21.4 Log writer
+
+Operational log entries SHOULD be written through `_system/scripts/log.py`.
+
+The log writer MUST support:
+
+```bash
+python3 _system/scripts/log.py --message "<message>"
+```
+
+The log writer MUST prepend the new entry to `_system/logs/log.md`.
 
 ---
 
@@ -1672,7 +1685,7 @@ Agents MUST:
 - use stable IDs when generating claims or pages
 - update `updatedAt` when meaningfully changing structured content
 - avoid inventing unsupported certainty
-- update `log.md` when making meaningful changes to the vault, if `log.md` is present or requested by the operator
+- update `_system/logs/log.md` through `_system/scripts/log.py` after each meaningful skill run or change batch
 
 Agents SHOULD:
 - create question pages for unresolved important unknowns
