@@ -411,7 +411,7 @@ Examples:
 - `concept.watershed-management`
 - `source.2026-04-12.urban-tree-canopy`
 - `synthesis.overview.coastal-resilience`
-- `question.evacuation-routing.accessibility`
+- `question.accessibility.evacuation-routing`
 
 #### Rationale: Dotted Namespaces vs. UUIDs
 
@@ -777,7 +777,7 @@ They represent known unknowns, unresolved research tasks, or ambiguity the syste
 
 **Schema:**
 ```yaml
-id: question.<questionSlug>
+id: question.<domain>.<questionSlug>
 pageType: question
 title: <title>
 priority: <priority>
@@ -793,7 +793,7 @@ tags: []
 
 **Example:**
 ```yaml
-id: question.evacuation-routing-accessibility
+id: question.accessibility.evacuation-routing
 pageType: question
 title: Which evacuation routes are accessible during high-water events?
 priority: high
@@ -1779,7 +1779,7 @@ Riverside Community Garden is a neighborhood garden that coordinates volunteer p
 
 ```md
 ---
-id: question.flood-sensor-calibration
+id: question.maintenance.flood-sensor-calibration
 pageType: question
 title: Which flood sensors need calibration before storm season?
 priority: high
