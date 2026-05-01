@@ -1,4 +1,5 @@
 ---
+# Convenience skeleton only. Canonical schema and examples: [[AGENT-WIKI-SPEC-v1]].
 id: concept.<conceptType>.<slug>
 pageType: concept
 title: <Concept Name>

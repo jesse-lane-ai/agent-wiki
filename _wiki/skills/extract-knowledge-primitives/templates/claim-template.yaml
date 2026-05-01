@@ -1,4 +1,5 @@
 ---
+# Convenience skeleton only. Canonical schema and examples: [[AGENT-WIKI-SPEC-v1]].
 id: claim.<topic>.<descriptor>
 pageType: claim
 title: <Exact Claim Statement>

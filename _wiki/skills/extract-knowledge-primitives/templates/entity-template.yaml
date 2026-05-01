@@ -1,4 +1,5 @@
 ---
+# Convenience skeleton only. Canonical schema and examples: [[AGENT-WIKI-SPEC-v1]].
 id: entity.<entityType>.<slug>
 pageType: entity
 title: <Official Name>
