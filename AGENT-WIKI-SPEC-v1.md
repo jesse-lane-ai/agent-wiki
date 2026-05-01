@@ -397,12 +397,14 @@ Each page MUST have a stable `id`.
 - `id` SHOULD be stable over time
 - `id` SHOULD NOT depend on the page filename alone
 - `id` SHOULD use dotted lowercase namespace-style format
-  - *Exception for Source Pages:* Source pages use the format `source.<yyyy-mm-dd>.<source-slug>` to balance semantic density with chronological sorting and collision prevention.
+  - *Exception for Source Pages:* Source pages use the format `source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>` to balance semantic density with chronological sorting and collision prevention.
+  - *Exception for attachments:* Attachment IDs are generated using `scripts/uuid.py` and stored in the frontmatter of the source page as the value of the `attachments` field. This allows for easy reference to attachments from the source page and ensures that attachments are properly linked to their sources.
+  - *Exception for evidence blocks:* Evidence block IDs are generated using `scripts/uuid.py` and stored in the frontmatter of the source page as the value of the `evidence` field. This allows for easy reference to evidence blocks from the source page and ensures that evidence blocks are properly linked to their sources.
 
 Examples:
 - `entity.place.riverside-community-garden`
-- `concept.watershed-management`
-- `source.2026-04-12.urban-tree-canopy`
+- `concept.policy.watershed-management`
+- `source.2026-04-12.webpage.urban-tree-canopy`
 - `synthesis.overview.coastal-resilience`
 - `question.accessibility.evacuation-routing`
 
@@ -414,7 +416,7 @@ While UUIDs guarantee mathematical uniqueness without central coordination, the 
 - **Collision Prevention:** Scoping IDs by `<pageType>.<namespace>.<slug>` prevents common naming collisions in a flat namespace.
 
 ### 8.2 Filenames
-Filenames MAY change. IDs SHOULD remain stable.
+Filenames MAY change. IDs SHOULD remain stable. The id is used to generate filenames, dots are replaced with hyphens. filename format: `source-<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` or `<idWithHyphens>.md`.
 
 ### 8.3 Canonical names
 Entities and concepts SHOULD include `canonicalName`.
@@ -557,12 +559,12 @@ attachments: []
 
 **Example:**
 ```yaml
-id: source.2026-04-28.urban-tree-canopy
+id: source.2026-04-28.webpage.urban-tree-canopy
 pageType: source
 title: Urban Tree Canopy Assessment
 status: processed
-sourceType: pdf
-originUrl: https://example.com/reports/urban-tree-canopy.pdf
+sourceType: webpage
+originUrl: https://example.com/reports/urban-tree-canopy
 originPath:
 publishedAt: 2026-04-25
 retrievedAt: 2026-04-28
