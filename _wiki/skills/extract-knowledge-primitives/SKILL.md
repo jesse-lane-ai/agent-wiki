@@ -19,7 +19,6 @@ If this skill conflicts with [[AGENT-WIKI-SPEC-v1]], follow [[AGENT-WIKI-SPEC-v1
 - Keep claims atomic. One proposition per claim.
 - Treat evidence honestly. An excerpt can show that a source made a statement without proving the statement true.
 - Use Obsidian wikilinks for internal vault references.
-- Run the compile pipeline after meaningful extraction work.
 
 ## Step 1: Read the Contract and Spec
 
@@ -216,19 +215,7 @@ At minimum, record:
 
 Do not modify the source body unless the user explicitly asks for prose changes.
 
-## Step 7: Compile and Fix Validation Issues
-
-Run:
-
-```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
-```
-
-The compile pipeline validates pages, detects duplicate IDs and malformed records, and regenerates cache/report artifacts.
-
-If validation errors occur, fix the source page or structured frontmatter and re-run compile.
-
-## Step 8: Report Results
+## Step 7: Report Results
 
 Report a concise summary:
 
@@ -244,9 +231,6 @@ Created or updated:
 - Claims: ...
 - Questions: ...
 - Relations: ...
-
-Validation:
-- Compile passed with 0 validation issues.
 ```
 
 ## Checklist
@@ -261,8 +245,6 @@ Validation:
 - [ ] Add source-grounded evidence without overstating support
 - [ ] Preserve human-authored prose
 - [ ] Update source extraction metadata
-- [ ] Run compile
-- [ ] Fix validation issues
 - [ ] Report results
 
 ## Schema Authority

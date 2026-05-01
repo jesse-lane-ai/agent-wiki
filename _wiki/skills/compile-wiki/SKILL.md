@@ -14,6 +14,7 @@ Run the compile pipeline after:
 - Adding or editing pages with structured frontmatter (claims, relations, timeline entries)
 - Adding new question pages
 - Adding source pages
+- Extracting knowledge primitives from source pages
 - Resolving questions (status changes)
 - Any bulk edit to page metadata
 
@@ -83,6 +84,21 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 ### Logs (`_wiki/logs/`)
 
 A daily compile log (`compile-YYYY-MM-DD.jsonl`) is appended on each run.
+
+---
+
+## Validation Responsibility
+
+This skill owns validation, cache regeneration, report generation, and compile logs.
+
+When running compile:
+
+- validate page frontmatter and generated records
+- detect duplicate IDs and malformed records
+- regenerate cache, index, report, and log artifacts
+- report validation issues clearly
+
+If validation errors occur, fix the affected canonical page or structured frontmatter, then re-run this skill. Do not repair generated cache, index, report, or log files by hand.
 
 ---
 
