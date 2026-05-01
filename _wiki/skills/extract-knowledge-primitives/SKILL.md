@@ -180,7 +180,7 @@ Create pages in the folder required by [[AGENTS]]:
 - `claims/` for `pageType: claim`
 - `questions/` for `pageType: question`
 
-Use the canonical page schemas and examples from [[AGENT-WIKI-SPEC-v1]]. Local files in `templates/` are convenience skeletons only; they are not authoritative.
+Use the canonical page schemas and examples from [[AGENT-WIKI-SPEC-v1#10. Page-Type Specific Frontmatter]]. Do not use local schema templates or copied frontmatter examples.
 
 When updating an existing page:
 
@@ -266,6 +266,6 @@ Validation:
 - [ ] Fix validation issues
 - [ ] Report results
 
-## Non-Canonical Local Aids
+## Schema Authority
 
-The files in this skill's `templates/` and `examples/` folders are convenience aids. They must stay subordinate to [[AGENT-WIKI-SPEC-v1]] and should be updated or ignored whenever the spec changes.
+This skill owns extraction workflow guidance only. Page schemas, allowed enum values, ID formats, and canonical examples live in [[AGENT-WIKI-SPEC-v1#10. Page-Type Specific Frontmatter]].
