@@ -60,6 +60,7 @@ Current top-level vault shape:
     cache/
     indexes/
     logs/
+    scripts/
     skills/
 ```
 
@@ -79,10 +80,10 @@ It reads vault pages and emits generated artifacts such as:
 - `_system/cache/agent-digest.json`
 - `_system/cache/validation-issues.json`
 - `_system/indexes/`
-- `_system/logs/`
+- `_system/logs/log.md`
 - `reports/`
 
-These outputs are compile artifacts. Do not hand-edit them, and do not treat reports as primary truth.
+These outputs are generated artifacts. Do not hand-edit them, and do not treat reports or logs as primary truth.
 
 ## Skills
 

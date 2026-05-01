@@ -52,6 +52,7 @@ Current vault structure:
     cache/
     indexes/
     logs/
+    scripts/
     skills/
 ```
 
@@ -96,8 +97,8 @@ Every authored page has a `pageType` in its frontmatter.
 Every authored page (except purely generated reports) should include:
 
 ```yaml
-id: <type>.<namespace>.<slug>
-pageType: <type>
+id: <pageType>.<primitiveSubtype>.<slug>
+pageType: <pageType>
 title: <title>
 status: <status>
 createdAt: YYYY-MM-DD
@@ -109,7 +110,7 @@ tags: []
 Recommended additional fields:
 
 ```yaml
-canonicalName: <Canonical Name>
+canonicalName: <canonicalName>
 owner:
 summary:
 sourcePages: []
@@ -126,8 +127,8 @@ freshness:
 
 | Status | Meaning |
 |---|---|
-| `active` | Currently maintained and relevant |
-| `draft` | Work in progress, not finalized |
+| `processed` | Page has been processed by an agent |
+| `unprocessed` | Page has not been processed by an agent |
 | `archived` | No longer maintained |
 | `deprecated` | Superseded or no longer valid |
 

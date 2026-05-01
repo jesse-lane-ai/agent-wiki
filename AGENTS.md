@@ -60,9 +60,9 @@ Agents MUST NOT read reports as primary data sources when page frontmatter or ca
 
 ### 2.7 Do not hand-edit cache files
 
-Files in `_system/cache/`, `_system/indexes/`, and `_system/logs/` are compile artifacts.
+Files in `_system/cache/`, `_system/indexes/`, and `_system/logs/` are generated artifacts.
 
-Agents MUST NOT manually patch cache, index, or generated log files except by running the compile pipeline.
+Agents MUST NOT manually patch cache, index, or generated log files. Agents MUST write operational log entries through `_system/scripts/log.py`.
 
 ### 2.8 Respect the inbox boundary
 
@@ -165,29 +165,34 @@ To run the compile pipeline:
 python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
-The compile pipeline MUST be run after meaningful vault changes to keep caches fresh.
+The compile pipeline MUST be run after meaningful vault changes to keep caches fresh. The compile pipeline writes one operational log entry to `_system/logs/log.md`.
 
 ---
 
 ## 7. Logs
 
-There are two log surfaces:
+There is one canonical operational log:
 
-- `_system/logs/` contains generated compile/runtime logs. Agents MUST NOT hand-edit these files.
-- `log.md`, if present, is a human-readable operational changelog.
+- `_system/logs/log.md` contains generated compile/runtime and skill-run entries. Agents MUST NOT hand-edit this file.
 
-Agents SHOULD append to `log.md` after meaningful vault changes, such as schema updates, new workflows, import configuration changes, or significant content migrations.
+Agents MUST use `_system/scripts/log.py` to write one operational log entry after each meaningful skill run or change batch, such as schema updates, new workflows, import configuration changes, or significant content migrations.
 
 Agents SHOULD NOT log trivial report/cache regeneration unless it records a meaningful vault change or operational incident.
 
-Each `log.md` entry SHOULD include:
+Entries are prepended so the most recent entry appears first. Each entry SHOULD include:
 
 - date
 - actor or tool, when known
 - changed area
 - short reason or outcome
 
-Logs are not authoritative truth records. Agents MUST NOT treat `log.md` or `_system/logs/` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.
+Operational log entries SHOULD be written with:
+
+```bash
+python3 _system/scripts/log.py --message "<message>"
+```
+
+Logs are not authoritative truth records. Agents MUST NOT treat `_system/logs/log.md` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.
 
 ---
 
