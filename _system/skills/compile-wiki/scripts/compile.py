@@ -5,9 +5,9 @@ Agentics Wiki v1 Compile Pipeline
 Reads the vault, extracts structured data, and emits machine-facing cache artifacts.
 
 Usage:
-    python3 _wiki/skills/compile-wiki/scripts/compile.py [--vault-root <path>] [--verbose]
+    python3 _system/skills/compile-wiki/scripts/compile.py [--vault-root <path>] [--verbose]
 
-Outputs (under _wiki/cache/):
+Outputs (under _system/cache/):
     pages.json            - normalized page index
     claims.jsonl          - all extracted claims
     relations.jsonl       - all extracted relations
@@ -17,7 +17,7 @@ Outputs (under _wiki/cache/):
     timeline-events.json  - chronological event index
     source-index.json     - source metadata registry
 
-Outputs (under _wiki/indexes/):
+Outputs (under _system/indexes/):
     alias-index.json      - alias -> page id map
     tag-index.json        - tag -> page ids map
     id-to-path.json       - page id -> path map
@@ -46,11 +46,11 @@ from typing import Any
 # Config
 # ---------------------------------------------------------------------------
 
-SKIP_DIRS = {".obsidian", "_wiki", "_archive", "_inbox", "_attachments", "raw", "reports"}
+SKIP_DIRS = {".obsidian", "_system", "_archive", "_inbox", "_attachments", "raw", "reports"}
 SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
-CACHE_DIR = "_wiki/cache"
-INDEX_DIR = "_wiki/indexes"
-LOG_DIR = "_wiki/logs"
+CACHE_DIR = "_system/cache"
+INDEX_DIR = "_system/indexes"
+LOG_DIR = "_system/logs"
 REPORTS_DIR = "reports"
 
 STALE_DAYS = 90  # pages not updated in this many days are flagged

@@ -200,7 +200,7 @@ A v1-compliant vault MUST use the following top-level structure.
   _attachments/
   _archive/
 
-  _wiki/
+  _system/
     cache/
     indexes/
     logs/
@@ -280,7 +280,7 @@ Stores binary assets and attachments referenced by source pages or other pages (
 #### `_archive/`
 Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
 
-#### `_wiki/`
+#### `_system/`
 Stores machine-generated runtime and compile artifacts, and the `skills/` directory for agent skill definitions.
 
 Sub-directories:
@@ -294,7 +294,7 @@ The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, an
 Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
 
 ```text
-_wiki/skills/
+_system/skills/
   compile-wiki/
     instructions.md
     scripts/
@@ -393,7 +393,7 @@ Each page MUST have a stable `id`.
 
 ### 8.1 Requirements
 - `id` MUST be globally unique within the vault.
-  - *Note: Duplicate IDs will not self-repair. The compiler flags collisions in the console and logs the offending file paths in `_wiki/logs/`. In the compiled indexes, the last processed file with the duplicate ID will overwrite previous entries.*
+  - *Note: Duplicate IDs will not self-repair. The compiler flags collisions in the console and logs the offending file paths in `_system/logs/`. In the compiled indexes, the last processed file with the duplicate ID will overwrite previous entries.*
 - `id` SHOULD be stable over time
 - `id` SHOULD NOT depend on the page filename alone
 - `id` SHOULD use dotted lowercase namespace-style format
@@ -1310,7 +1310,7 @@ synthesisType: timeline
 The compile pipeline SHOULD extract timeline entries into:
 
 ```text
-_wiki/cache/timeline-events.json
+_system/cache/timeline-events.json
 ```
 
 This cache is used for chronological queries, filtering, timeline reports, and temporal conflict detection.
@@ -1364,7 +1364,7 @@ Primary truth sources:
 These are views, not truth sources:
 - `reports/`
 - `log.md`
-- `_wiki/logs/`
+- `_system/logs/`
 - ad hoc dashboard summaries
 - search indexes
 - prompt supplements that do not round-trip back to pages
@@ -1395,7 +1395,7 @@ It MUST:
 
 ### 18.2 Minimum v1 compile outputs
 
-The following files MUST be emitted under `_wiki/cache/`:
+The following files MUST be emitted under `_system/cache/`:
 
 - `agent-digest.json`
 - `claims.jsonl`
@@ -1499,7 +1499,7 @@ Implementations MUST NOT silently discard high-value pages due to truncation wit
 
 ## 19. Search and Indexes
 
-The compiler MAY emit additional indexes under `_wiki/indexes/`.
+The compiler MAY emit additional indexes under `_system/indexes/`.
 
 Examples:
 - alias index
@@ -1549,7 +1549,7 @@ Logs capture operational history. They do not replace page frontmatter, structur
 
 ### 21.1 Log locations
 
-- `_wiki/logs/` stores generated compile and runtime logs. These files SHOULD be written by tooling and MUST NOT be hand-edited.
+- `_system/logs/` stores generated compile and runtime logs. These files SHOULD be written by tooling and MUST NOT be hand-edited.
 - `log.md`, if present, is a human-readable changelog for meaningful vault changes.
 
 ### 21.2 Log authority

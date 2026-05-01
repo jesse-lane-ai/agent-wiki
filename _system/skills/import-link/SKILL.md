@@ -6,16 +6,16 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 # Import Link
 
 ## Configuration
-- Before first use, read `INITIALIZE.md` and `_wiki/skills/import-link/config.json`.
+- Before first use, read `INITIALIZE.md` and `_system/skills/import-link/config.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
-- If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_wiki/skills/import-link/config.json`.
+- If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_system/skills/import-link/config.json`.
 - Use the repository root as `vaultRoot` only when the user wants imports written into this checkout.
 - The default `manual_paste` retrieval mode requires no external tools. Other retrieval modes only apply when configured and available.
 
 ## Vault Selection (required)
 - Accept an optional vault name or vault root in user input.
-- Resolve the target vault from `_wiki/skills/import-link/config.json` unless the user explicitly supplies a different path.
+- Resolve the target vault from `_system/skills/import-link/config.json` unless the user explicitly supplies a different path.
 - If no configured vault root exists, stop and ask the user for the target vault root.
 - If the requested vault folder does not exist, stop and report the missing vault instead of guessing.
 - Use the resolved vault for all paths (`sources`, `_attachments`).
@@ -38,7 +38,7 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
 ## Deterministic Workflow
 1. **Deduplication Check:** Before capturing content, check existing source pages in `sources/` for a matching `originUrl`.
    - If a source with the matching URL already exists, stop and inform the user that it has already been imported or update the existing file if requested.
-2. Capture source content using the retrieval modes configured in `_wiki/skills/import-link/config.json`.
+2. Capture source content using the retrieval modes configured in `_system/skills/import-link/config.json`.
    - If direct fetch is available, try it first.
    - If a transcript tool is configured and the source is a video, capture one English transcript when available and use it as the primary source body.
    - If browser automation is configured and direct retrieval is blocked or incomplete, use the configured browser automation.

@@ -27,26 +27,26 @@ The compile pipeline is **safe to run at any time**. It is fully regenerative an
 From the vault root:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
+python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
 With verbose output:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py --verbose
+python3 _system/skills/compile-wiki/scripts/compile.py --verbose
 ```
 
 From a different working directory:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
+python3 _system/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 ```
 
 ---
 
 ## What it produces
 
-### Required cache files (`_wiki/cache/`)
+### Required cache files (`_system/cache/`)
 
 | File | Purpose |
 |---|---|
@@ -59,7 +59,7 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 | `timeline-events.json` | Chronological event index |
 | `source-index.json` | Source metadata registry |
 
-### Indexes (`_wiki/indexes/`)
+### Indexes (`_system/indexes/`)
 
 | File | Purpose |
 |---|---|
@@ -81,7 +81,7 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
 | `orphaned-claims.md` | Claims whose owning page is missing |
 | `evidence-gaps.md` | Claims with no direct evidence |
 
-### Logs (`_wiki/logs/`)
+### Logs (`_system/logs/`)
 
 A daily compile log (`compile-YYYY-MM-DD.jsonl`) is appended on each run.
 
@@ -111,7 +111,7 @@ If validation errors occur, fix the affected canonical page or structured frontm
 
 ## Important rules
 
-- Do NOT hand-edit files in `_wiki/cache/` or `_wiki/indexes/`. They are regenerated on each compile.
+- Do NOT hand-edit files in `_system/cache/` or `_system/indexes/`. They are regenerated on each compile.
 - Reports in `reports/` are views — do not treat them as primary data.
 - The compile pipeline reads `pageType`, `id`, `claims`, `relations`, `timeline` from frontmatter.
 - Pages without frontmatter, or without `id` and `pageType`, are skipped.

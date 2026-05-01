@@ -5,12 +5,12 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_wiki/cache/`, `_wiki/indexes/`, `_wiki/logs/`, and `reports/`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
-5. Configure `_wiki/skills/import-link/config.json` before importing external material.
+4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, and `reports/`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
+5. Configure `_system/skills/import-link/config.json` before importing external material.
 6. Run the compile pipeline and confirm it reports zero validation issues.
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
+python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
 ---
@@ -19,7 +19,7 @@ python3 _wiki/skills/compile-wiki/scripts/compile.py
 
 The `import-link` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
 
-Edit `_wiki/skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
+Edit `_system/skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
 
 Required first-run edits:
 

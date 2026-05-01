@@ -3,7 +3,7 @@
 The `_inbox/` folder is the active drop zone for raw files that still need to be promoted into canonical `source` pages.
 
 **Use the process-inbox skill to process the inbox.**
-`_wiki/skills/process-inbox/SKILL.md`
+`_system/skills/process-inbox/SKILL.md`
 
 ### Folder meaning
 

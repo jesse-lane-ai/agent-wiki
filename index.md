@@ -56,10 +56,10 @@ See [[INBOX]] for the raw intake lifecycle.
 To regenerate the machine-facing cache files and reports:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
+python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
-Cache outputs live in `_wiki/cache/`. Required outputs:
+Cache outputs live in `_system/cache/`. Required outputs:
 
 - `pages.json` — normalized page index
 - `claims.jsonl` — all extracted claims

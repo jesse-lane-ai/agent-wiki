@@ -5,7 +5,7 @@ description: "Process raw files dropped into the Agentics vault inbox. Use this 
 
 # Process Inbox
 
-This skill promotes raw files from `_inbox/` into canonical, schema-compliant `source` pages. It does not extract entities, concepts, claims, questions, or relations; use `_wiki/skills/extract-knowledge-primitives/SKILL.md` after source pages exist.
+This skill promotes raw files from `_inbox/` into canonical, schema-compliant `source` pages. It does not extract entities, concepts, claims, questions, or relations; use `_system/skills/extract-knowledge-primitives/SKILL.md` after source pages exist.
 
 ## Step 1: Read the Vault Contract
 

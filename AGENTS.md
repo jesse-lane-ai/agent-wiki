@@ -60,7 +60,7 @@ Agents MUST NOT read reports as primary data sources when page frontmatter or ca
 
 ### 2.7 Do not hand-edit cache files
 
-Files in `_wiki/cache/`, `_wiki/indexes/`, and `_wiki/logs/` are compile artifacts.
+Files in `_system/cache/`, `_system/indexes/`, and `_system/logs/` are compile artifacts.
 
 Agents MUST NOT manually patch cache, index, or generated log files except by running the compile pipeline.
 
@@ -150,19 +150,19 @@ Agents MUST NOT place entity pages in `concepts/`, etc.
 
 The compile pipeline reads the vault and emits:
 
-- `_wiki/cache/pages.json` — normalized page index
-- `_wiki/cache/claims.jsonl` — all extracted claims
-- `_wiki/cache/relations.jsonl` — all extracted relations
-- `_wiki/cache/agent-digest.json` — high-signal prompt supplement
-- `_wiki/cache/contradictions.json` — contradiction registry
-- `_wiki/cache/questions.json` — open question registry
-- `_wiki/cache/timeline-events.json` — chronological event index
-- `_wiki/cache/source-index.json` — source metadata registry
+- `_system/cache/pages.json` — normalized page index
+- `_system/cache/claims.jsonl` — all extracted claims
+- `_system/cache/relations.jsonl` — all extracted relations
+- `_system/cache/agent-digest.json` — high-signal prompt supplement
+- `_system/cache/contradictions.json` — contradiction registry
+- `_system/cache/questions.json` — open question registry
+- `_system/cache/timeline-events.json` — chronological event index
+- `_system/cache/source-index.json` — source metadata registry
 
 To run the compile pipeline:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
+python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
 The compile pipeline MUST be run after meaningful vault changes to keep caches fresh.
@@ -173,7 +173,7 @@ The compile pipeline MUST be run after meaningful vault changes to keep caches f
 
 There are two log surfaces:
 
-- `_wiki/logs/` contains generated compile/runtime logs. Agents MUST NOT hand-edit these files.
+- `_system/logs/` contains generated compile/runtime logs. Agents MUST NOT hand-edit these files.
 - `log.md`, if present, is a human-readable operational changelog.
 
 Agents SHOULD append to `log.md` after meaningful vault changes, such as schema updates, new workflows, import configuration changes, or significant content migrations.
@@ -187,7 +187,7 @@ Each `log.md` entry SHOULD include:
 - changed area
 - short reason or outcome
 
-Logs are not authoritative truth records. Agents MUST NOT treat `log.md` or `_wiki/logs/` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.
+Logs are not authoritative truth records. Agents MUST NOT treat `log.md` or `_system/logs/` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.
 
 ---
 

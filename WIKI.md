@@ -48,7 +48,7 @@ Current vault structure:
   raw/
   _attachments/
   _archive/
-  _wiki/
+  _system/
     cache/
     indexes/
     logs/
@@ -68,7 +68,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `reports/` | Generated maintenance views and dashboards |
 | `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
-| `_wiki/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
+| `_system/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
@@ -248,12 +248,12 @@ Agents should preserve human-authored page prose unless explicitly asked to rewr
 
 ## 10. Compile outputs
 
-The compile pipeline reads the vault and emits machine-readable caches to `_wiki/cache/`.
+The compile pipeline reads the vault and emits machine-readable caches to `_system/cache/`.
 
 Run with:
 
 ```bash
-python3 _wiki/skills/compile-wiki/scripts/compile.py
+python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
 Required outputs:
