@@ -63,14 +63,28 @@ MAX_DIGEST_CLAIMS = 30           # max top supported claims included in agent di
 MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent digest
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
-VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "procedure", "question", "report", "claim", "index"}
+VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "question", "report", "claim", "index"}
 VALID_GENERAL_STATUSES = {"active", "draft", "archived", "deprecated"}
 VALID_SOURCE_STATUSES = {"unprocessed", "processed", "archived"}
 VALID_SOURCE_TYPES = {"webpage", "article", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
 VALID_ENTITY_TYPES = {"person", "organization", "project", "product", "system", "place", "event", "artifact", "document", "other"}
-VALID_CONCEPT_TYPES = {"definition", "principle", "framework", "method", "policy", "standard", "pattern", "theory", "taxonomy", "other"}
+VALID_CONCEPT_TYPES = {
+    "definition",
+    "principle",
+    "framework",
+    "method",
+    "policy",
+    "standard",
+    "pattern",
+    "workflow",
+    "runbook",
+    "checklist",
+    "playbook",
+    "theory",
+    "taxonomy",
+    "other",
+}
 VALID_SYNTHESIS_TYPES = {"summary", "overview", "analysis", "timeline", "brief", "comparison"}
-VALID_PROCEDURE_TYPES = {"runbook", "workflow", "checklist", "playbook"}
 VALID_CLAIM_STATUSES = {"supported", "weakly_supported", "inferred", "unverified", "contested", "contradicted", "deprecated"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
 VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
@@ -100,7 +114,6 @@ FOLDER_PAGE_TYPES = {
     "concepts": "concept",
     "claims": "claim",
     "syntheses": "synthesis",
-    "procedures": "procedure",
     "questions": "question",
     "reports": "report",
 }
@@ -673,10 +686,6 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
             validate_array_field(meta.get("sourcePages"), "invalid_synthesis_array", path, issues, "sourcePages", page_id)
         if "derivedClaims" in meta:
             validate_array_field(meta.get("derivedClaims"), "invalid_synthesis_array", path, issues, "derivedClaims", page_id)
-    elif page_type == "procedure":
-        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
-        validate_required_fields(meta, {"procedureType"}, path, issues, "procedure", page_id)
-        validate_enum(meta.get("procedureType"), VALID_PROCEDURE_TYPES, "invalid_procedure_type", path, issues, "procedureType", page_id)
     elif page_type == "question":
         validate_required_fields(meta, {"priority", "relatedClaims", "relatedPages", "openedAt"}, path, issues, "question", page_id)
         validate_enum(meta.get("status"), VALID_QUESTION_STATUSES, "invalid_question_status", path, issues, "status", page_id)

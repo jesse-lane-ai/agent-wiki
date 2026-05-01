@@ -11,7 +11,7 @@ Start with the onboarding docs:
 1. [[INITIALIZE]] for first-run setup and local `import-note` configuration.
 2. [[AGENTS]] for the agent behavior contract.
 3. [[WIKI]] for the human-readable schema guide.
-4. [[AGENT-WIKI-SPEC-v1]] for the full v1.1 specification.
+4. [[AGENT-WIKI-SPEC-v1]] for the full v1.2 specification.
 
 For a new agent session, use a prompt like:
 
@@ -24,7 +24,7 @@ Before importing external material, configure `_wiki/skills/import-note/config.j
 
 ## What This Repo Contains
 
-- The v1.1 wiki specification in [[AGENT-WIKI-SPEC-v1]]
+- The v1.2 wiki specification in [[AGENT-WIKI-SPEC-v1]]
 - Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], [[INBOX]], and [[index]]
 - A stdlib-only compile pipeline in `_wiki/skills/compile-wiki/`
 - Agent skills for import, inbox processing, extraction, and compilation under `_wiki/skills/`
@@ -49,7 +49,6 @@ Current top-level vault shape:
   concepts/
   claims/
   syntheses/
-  procedures/
   questions/
   reports/
 
@@ -91,7 +90,7 @@ Skills live under `_wiki/skills/`:
 - `compile-wiki` regenerates caches, indexes, logs, and reports.
 - `import-note` imports external material after local configuration in `_wiki/skills/import-note/config.json`.
 - `process-new-notes` triages `_inbox/` pointer files into canonical `source` pages.
-- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, and relations from sources.
+- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources.
 
 ## Scheduled Work
 

@@ -1,7 +1,7 @@
 
 # Agentic Wiki v1 Specification
 
-Version: 1.1
+Version: 1.2
 Last Updated: 2026-04-30
 
 ---
@@ -113,7 +113,7 @@ Examples:
 - document-as-thing
 
 #### Concept
-An abstract idea, reusable pattern, or definition.
+An abstract idea, reusable pattern, definition, method, workflow, runbook, checklist, or operational playbook.
 
 Examples:
 - principle
@@ -124,6 +124,10 @@ Examples:
 - standard
 - abstraction
 - taxonomy definition
+- runbook
+- checklist
+- workflow
+- playbook
 
 #### Source
 An origin of information.
@@ -161,9 +165,6 @@ An unresolved uncertainty or research gap.
 #### Synthesis
 A maintained summary, overview, comparison, timeline, or analysis derived from other pages or sources.
 
-#### Procedure
-A runbook, how-to, checklist, or operational workflow.
-
 #### Timeline Event
 A dated event record represented inside an entity page, synthesis page, or compiled cache.
 
@@ -191,7 +192,6 @@ A v1-compliant vault MUST use the following top-level structure.
   concepts/
   claims/
   syntheses/
-  procedures/
   questions/
   reports/
 
@@ -251,16 +251,13 @@ Stores raw material and source-backed source pages.
 Stores durable thing pages.
 
 #### `concepts/`
-Stores concept pages.
+Stores concept pages, including workflow, runbook, checklist, and playbook concepts.
 
 #### `claims/`
 Stores standalone claim pages representing atomic propositions with dedicated evidence tracking.
 
 #### `syntheses/`
 Stores maintained rollups, analyses, comparisons, summaries, and timeline-style syntheses.
-
-#### `procedures/`
-Stores workflows, runbooks, playbooks, and checklists.
 
 #### `questions/`
 Stores open question pages.
@@ -332,7 +329,7 @@ A page in `entities/` MUST have `pageType: entity`.
 
 ### 7.3 `concepts/`
 
-A `concept` page represents a definition, method, abstraction, policy, or standard.
+A `concept` page represents a definition, method, abstraction, policy, standard, workflow, runbook, checklist, or operational playbook.
 
 A page in `concepts/` MUST have `pageType: concept`.
 
@@ -350,19 +347,7 @@ Examples:
 
 A page in `syntheses/` MUST have `pageType: synthesis`.
 
-### 7.5 `procedures/`
-
-A `procedure` page represents action-oriented instructions.
-
-Examples:
-- runbook
-- checklist
-- workflow
-- playbook
-
-A page in `procedures/` MUST have `pageType: procedure`.
-
-### 7.6 `questions/`
+### 7.5 `questions/`
 
 A `question` page represents an unresolved issue.
 
@@ -370,13 +355,13 @@ A page in `questions/` MUST have `pageType: question`.
 
 
 
-### 7.7 `claims/`
+### 7.6 `claims/`
 
 A `claim` page represents a standalone atomic proposition that tracks its own evidence independent of any one source.
 
 A page in `claims/` MUST have `pageType: claim`.
 
-### 7.8 `reports/`
+### 7.7 `reports/`
 
 A `report` page is generated and SHOULD NOT be treated as an authoritative source of truth.
 
@@ -384,7 +369,7 @@ A page in `reports/` MUST have `pageType: report` if it includes frontmatter.
 
 Reports are views over compiled or source page data.
 
-### 7.9 `index.md`
+### 7.8 `index.md`
 
 `index.md` is the human-facing landing page for the vault.
 
@@ -493,7 +478,6 @@ Allowed values:
 - `concept`
 - `claim`
 - `synthesis`
-- `procedure`
 - `question`
 - `report`
 - `index`
@@ -681,6 +665,10 @@ Allowed values:
 - `policy`
 - `standard`
 - `pattern`
+- `workflow`
+- `runbook`
+- `checklist`
+- `playbook`
 - `theory`
 - `taxonomy`
 - `other`
@@ -728,42 +716,7 @@ Allowed values:
 - `brief`
 - `comparison`
 
-### 10.5 Procedure pages
-
-**Schema:**
-```yaml
-id: procedure.<procedureType>.<procedureSlug>
-pageType: procedure
-title: <title>
-procedureType: <procedureType>
-status: active
-createdAt: <yyyy-mm-dd>
-updatedAt: <yyyy-mm-dd>
-aliases: []
-tags: []
-```
-
-**Example:**
-```yaml
-id: procedure.runbook.test-emergency-generator
-pageType: procedure
-title: Test Emergency Generator
-procedureType: runbook
-status: active
-createdAt: 2026-04-12
-updatedAt: 2026-04-12
-aliases: []
-tags: [facility-operations]
-```
-
-#### `procedureType`
-Allowed values:
-- `runbook`
-- `workflow`
-- `checklist`
-- `playbook`
-
-### 10.6 Question pages
+### 10.5 Question pages
 
 Questions are first-class authored pages in v1.
 
@@ -994,7 +947,7 @@ Required: yes
 - Claim IDs MUST be unique across the vault.
 - Claims SHOULD be atomic and not overloaded.
 - A claim SHOULD express one proposition, not several glued together.
-- A claim MAY be attached to entity, concept, source, synthesis, procedure, or question pages when appropriate.
+- A claim MAY be attached to entity, concept, source, synthesis, or question pages when appropriate.
 - Pages SHOULD NOT hide all important assertions in prose if those assertions matter for machine use.
 
 ---
@@ -1325,7 +1278,7 @@ timeline:
 
 ### 15.3 Placement and Semantics
 
-Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, and question pages.
+Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, and question pages.
 
 A timeline entry SHALL be authored on the page that most naturally owns the event. It SHOULD reference related claims and source IDs when the event matters for reasoning, retrieval, or contradiction analysis.
   

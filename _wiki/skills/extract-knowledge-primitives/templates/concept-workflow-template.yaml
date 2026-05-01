@@ -1,9 +1,9 @@
 ---
 # Convenience skeleton only. Canonical schema and examples: [[AGENT-WIKI-SPEC-v1]].
-id: procedure.<domain>.<slug>
-pageType: procedure
-title: <Procedure Name>
-procedureType: <runbook|workflow|checklist|playbook>
+id: concept.<workflow|runbook|checklist|playbook>.<slug>
+pageType: concept
+title: <Workflow Name>
+conceptType: <workflow|runbook|checklist|playbook>
 status: active
 createdAt: 2026-04-16
 updatedAt: 2026-04-16
@@ -13,9 +13,9 @@ tags:
 relatedPages: []
 ---
 
-# <Procedure Name>
+# <Workflow Name>
 
-[Brief description of what this procedure accomplishes]
+[Brief source-grounded description of what this reusable instruction accomplishes]
 
 ## Steps
 

@@ -48,39 +48,9 @@ status: UNPROCESSED
 
 ## Source Schema (required, strictly enforced)
 
-Create source files in `sources/` using frontmatter and exactly these fields:
-- `id`: unique source ID, format: `source.<yyyy-mm-dd>.<source-slug>`
-- `pageType`: `source`
-- `title`: `<title>`
-- `status`: `unprocessed`
-- `sourceType`: appropriate source type (allowed values: `webpage`, `article`, `pdf`, `transcript`, `email`, `meeting-notes`, `dataset`, `screenshot`, `bridge`, `import`, `other`)
-- `originUrl`: original URL of the source
-- `publishedAt`: publication date if known, otherwise leave blank
-- `retrievedAt`: `YYYY-MM-DD`
-- `updatedAt`: `YYYY-MM-DD`
-- `createdAt`: `YYYY-MM-DD`
-- `aliases`: `[]`
-- `tags`: `[]`
-- `attachments`: list of attachment wikilinks or empty `[]`
+Create source files in `sources/` using the canonical source page schema and example in [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
 
-Example:
-```yaml
----
-id: source.<yyyy-mm-dd>.<source-slug>
-pageType: source
-title: <title>
-status: unprocessed
-sourceType: webpage
-originUrl: <original URL of the source>
-publishedAt:
-retrievedAt: yyyy-mm-dd
-updatedAt: yyyy-mm-dd
-createdAt: yyyy-mm-dd
-aliases: []
-tags: []
-attachments: []
----
-```
+Use Section 10 of [[AGENT-WIKI-SPEC-v1]] as the source of truth for page-type schemas, allowed enum values, ID formats, and examples. This skill owns the import workflow, not the source frontmatter schema.
 
 ## Deterministic Workflow
 1. **Deduplication Check:** Before capturing content, check all pointer files in `_inbox/` and `_inbox/trash/` for an existing `url`.
@@ -99,7 +69,7 @@ attachments: []
    - Create the uuid using `scripts/uuid.py`
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
 5. Write raw source to:
-   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the frontmatter defined in **Source Schema**.
+   - `sources/<yyyy-mm-dd>-<source-slug>.md` using the source page schema and example in [[AGENT-WIKI-SPEC-v1#10.1 Source pages]].
    - Include the full captured body with inline images + source URLs below the frontmatter.
    - images save to `_attachments`. filename: `yyyy-mm-dd-<source-slug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.

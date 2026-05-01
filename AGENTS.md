@@ -137,7 +137,6 @@ Example: `entities/riverside-community-garden.md`
 | `concepts/` | `concept` |
 | `claims/` | `claim` |
 | `syntheses/` | `synthesis` |
-| `procedures/` | `procedure` |
 | `questions/` | `question` |
 | `reports/` | `report` (if frontmatter present) |
 | `index.md` | `index` |

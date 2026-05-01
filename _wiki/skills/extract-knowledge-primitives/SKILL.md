@@ -1,6 +1,6 @@
 ---
 name: extract-knowledge-primitives
-description: "Extract knowledge primitives (entities, concepts, claims, procedures, questions, and relations) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages and creates appropriate wiki pages after sources have been processed by the process-new-notes skill."
+description: "Extract knowledge primitives (entities, concepts, claims, questions, and relations) from source pages. Use this skill when the user says 'extract primitives', 'extract knowledge', 'process sources for structured data', or 'analyze sources'. This skill reads source pages and creates appropriate wiki pages after sources have been processed by the process-new-notes skill."
 ---
 
 # Extract Knowledge Primitives
@@ -80,7 +80,7 @@ Extract:
 
 ### Concepts
 
-Extract concepts when the source defines or explains reusable abstractions:
+Extract concepts when the source defines or explains reusable abstractions or reusable instructions:
 
 - definitions
 - methods
@@ -91,6 +91,10 @@ Extract concepts when the source defines or explains reusable abstractions:
 - patterns
 - theories
 - taxonomies
+- workflows
+- runbooks
+- checklists
+- playbooks
 
 Do not create concept pages for terms that are only mentioned in passing.
 
@@ -128,9 +132,7 @@ Choose `claimType` by meaning:
 
 New source-extracted claims should normally be `unverified` with `confidence: 0.60`. The evidence excerpt documents where the claim came from; it does not automatically make the claim supported.
 
-### Procedures
-
-Extract procedures when the source contains actionable steps:
+Extract workflow-style concepts when the source contains reusable actionable steps:
 
 - workflows
 - runbooks
@@ -138,7 +140,7 @@ Extract procedures when the source contains actionable steps:
 - playbooks
 - setup or operating instructions
 
-Preserve the operational sequence. Keep the body concise and source-grounded.
+Represent these as `pageType: concept` in `concepts/`, using the canonical concept schema and an appropriate workflow-oriented `conceptType` from [[AGENT-WIKI-SPEC-v1]]. Preserve the operational sequence. Keep the body concise and source-grounded.
 
 ### Questions
 
@@ -176,7 +178,6 @@ Create pages in the folder required by [[AGENTS]]:
 - `entities/` for `pageType: entity`
 - `concepts/` for `pageType: concept`
 - `claims/` for `pageType: claim`
-- `procedures/` for `pageType: procedure`
 - `questions/` for `pageType: question`
 
 Use the canonical page schemas and examples from [[AGENT-WIKI-SPEC-v1]]. Local files in `templates/` are convenience skeletons only; they are not authoritative.
@@ -212,7 +213,7 @@ At minimum, record:
 
 - `extractionStatus: extracted`
 - `extractedAt`
-- IDs of extracted entities, concepts, claims, procedures, and questions where applicable
+- IDs of extracted entities, concepts, claims, and questions where applicable
 
 Do not modify the source body unless the user explicitly asks for prose changes.
 
@@ -242,7 +243,6 @@ Created or updated:
 - Entities: ...
 - Concepts: ...
 - Claims: ...
-- Procedures: ...
 - Questions: ...
 - Relations: ...
 
@@ -255,7 +255,7 @@ Validation:
 - [ ] Read [[AGENTS]] and [[AGENT-WIKI-SPEC-v1]]
 - [ ] Find unprocessed source pages
 - [ ] Read each selected source in full
-- [ ] Identify entities, concepts, claims, procedures, questions, and relations
+- [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Check for duplicates before creating pages
 - [ ] Use canonical schemas and examples from [[AGENT-WIKI-SPEC-v1]]
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`
