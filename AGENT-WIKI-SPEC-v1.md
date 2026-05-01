@@ -547,7 +547,7 @@ This section defines the pure schema templates for each page type, followed by a
 
 **Schema:**
 ```yaml
-id: source.<yyyy-mm-dd>.<source-slug>
+id: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
 pageType: source
 title: <title>
 status: <status>
@@ -605,11 +605,11 @@ Allowed values:
 
 **Schema:**
 ```yaml
-id: entity.<entityType>.<entity-slug>
+id: entity.<entityType>.<entitySlug>
 pageType: entity
 title: <title>
 entityType: <entityType>
-canonicalName: <canonical name>
+canonicalName: <canonicalName>
 status: active
 createdAt: <yyyy-mm-dd>
 updatedAt: <yyyy-mm-dd>
@@ -648,7 +648,7 @@ Allowed values:
 
 **Schema:**
 ```yaml
-id: concept.<conceptType>.<concept-slug>
+id: concept.<conceptType>.<conceptSlug>
 pageType: concept
 title: <title>
 conceptType: <conceptType>
@@ -689,7 +689,7 @@ Allowed values:
 
 **Schema:**
 ```yaml
-id: synthesis.<synthesisType>.<synthesis-slug>
+id: synthesis.<synthesisType>.<synthesisSlug>
 pageType: synthesis
 title: <title>
 synthesisType: <synthesisType>
@@ -711,8 +711,8 @@ title: Coastal Resilience Overview
 synthesisType: overview
 scope: coastal flood mitigation
 status: active
-sourcePages: ["[[source.2026-04-12.tidal-flood-map]]"]
-derivedClaims: ["[[claim.coastal-flooding.high-tide-risk]]"]
+sourcePages: ["[[source.2026-04-12.webpage.tidal-flood-map]]"]
+derivedClaims: ["[[claim.descriptive.high-tide-risk]]"]
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
@@ -732,7 +732,7 @@ Allowed values:
 
 **Schema:**
 ```yaml
-id: procedure.<procedureType>.<procedure-slug>
+id: procedure.<procedureType>.<procedureSlug>
 pageType: procedure
 title: <title>
 procedureType: <procedureType>
@@ -777,7 +777,7 @@ They represent known unknowns, unresolved research tasks, or ambiguity the syste
 
 **Schema:**
 ```yaml
-id: question.<question-slug>
+id: question.<questionSlug>
 pageType: question
 title: <title>
 priority: <priority>
@@ -793,7 +793,7 @@ tags: []
 
 **Example:**
 ```yaml
-id: question.evacuation-routing.accessibility
+id: question.evacuation-routing-accessibility
 pageType: question
 title: Which evacuation routes are accessible during high-water events?
 priority: high
@@ -824,9 +824,11 @@ Allowed values for question pages:
 
 ### 10.7 Claim pages
 
+See also: Section 11. Structured Claims.
+
 **Schema:**
 ```yaml
-id: claim.<claimType>.<claim-slug>
+id: claim.<claimType>.<claimSlug>
 pageType: claim
 title: <title>
 claimType: <claimType>
@@ -874,17 +876,17 @@ For v1, Standalone Claim Pages are the normative shape. However, pages MAY also 
 **Schema:**
 ```yaml
 claims:
-  - id: claim.<claimType>.<claim-slug>
+  - id: claim.<claimType>.<claimSlug>
     text: <text>
     status: <status>
     confidence: <float>
     claimType: <claimType>
     relatedClaimIds: []
     evidence:
-      - id: <evidence-id>
-        sourceId: <source-id>
-        path: <source-path>
-        lines: <line-range>
+      - id: <evidenceId>
+        sourceId: <sourceId>
+        path: <sourcePath>
+        lines: <lineRange>
         kind: <kind>
         relation: <relation>
         weight: <float>
@@ -909,8 +911,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: evidence.quote.supports.a1b2c3d4
-        sourceId: source.2026-04-12.school-energy-audit
-        path: sources/2026-04-12-school-energy-audit.md
+        sourceId: source.2026-04-12.webpage.school-energy-audit
+        path: sources/2026-04-12.webpage.school-energy-audit.md
         lines: 55-79
         kind: quote
         relation: supports
@@ -1023,8 +1025,8 @@ evidence:
 ```yaml
 evidence:
   - id: evidence.quote.supports.a1b2c3d4
-    sourceId: source.2026-04-28.urban-tree-canopy
-    path: sources/2026-04-28-urban-tree-canopy.md
+    sourceId: source.2026-04-28.article.urban-tree-canopy
+    path: sources/2026-04-28.article.urban-tree-canopy.md
     lines: 10-18
     kind: quote
     relation: supports
@@ -1229,11 +1231,11 @@ updatedAt: 2026-04-29
 
 ### 14.3 Allowed contradiction types
 
-- `direct_conflict`
-- `date_conflict`
-- `scope_conflict`
-- `definition_conflict`
-- `interpretation_conflict`
+- `direct-conflict`
+- `date-conflict`
+- `scope-conflict`
+- `definition-conflict`
+- `interpretation-conflict`
 
 ### 14.4 Allowed contradiction status values
 
@@ -1252,8 +1254,8 @@ updatedAt: 2026-04-29
 
 The compiler SHOULD also detect implicit conflicts by comparing claims that share the same `subjectPageId`.
 
-- **Date conflict** (`type: date_conflict`): Two or more `claimType: historical` claims on the same subject that have different `date` field values and are both in an active (non-deprecated, non-contradicted) status.
-- **Scope conflict** (`type: scope_conflict`): Claims with `status: contested` coexisting with claims of `status: supported` or `weakly_supported` on the same subject, indicating active unresolved disagreement.
+- **Date conflict** (`type: date-conflict`): Two or more `claimType: historical` claims on the same subject that have different `date` field values and are both in an active (non-deprecated, non-contradicted) status.
+- **Scope conflict** (`type: scope-conflict`): Claims with `status: contested` coexisting with claims of `status: supported` or `weakly-supported` on the same subject, indicating active unresolved disagreement.
 
 Semantic contradiction detection operates on structured fields only. It does not perform natural-language text comparison.
 
@@ -1272,7 +1274,7 @@ Timeline entries MUST be represented under a `timeline:` field.
 
 ```yaml
 timeline:
-  - id: tl.<namespace>.<index>
+  - id: tl.<slug>.<index>
     date: <yyyy-mm-dd>
     endDate: <yyyy-mm-dd>
     text: <text>
@@ -1298,7 +1300,7 @@ timeline:
     relatedClaims:
       - "[[claim.historical.seedling-exchange-opened]]"
     sourceIds:
-      - source.2026-04-12.garden-newsletter
+      - source.2026-04-12.webpage.garden-newsletter
     updatedAt: 2026-04-12
 ```
 
@@ -1325,11 +1327,11 @@ timeline:
 
 Timeline entries MAY appear on any authored page type when that page is the natural owner of the event, including entity, concept, source, synthesis, procedure, and question pages.
 
-A timeline entry SHOULD be authored on the page that most naturally owns the event. It SHOULD reference related claims and source IDs when the event matters for reasoning, retrieval, or contradiction analysis.
+A timeline entry SHALL be authored on the page that most naturally owns the event. It SHOULD reference related claims and source IDs when the event matters for reasoning, retrieval, or contradiction analysis.
   
 For a single-point event, use `date`. For a bounded range, use both `date` and `endDate`.
 
-A synthesis page that acts as a dedicated chronology MUST use:
+A synthesis page that acts as a dedicated chronology SHALL use:
 
 ```yaml
 pageType: synthesis
@@ -1381,7 +1383,7 @@ Alias support exists to improve:
 
 ## 17. Authoritative Sources of Truth
 
-The system has multiple layers. Their authority is different.
+The system has multiple layers with different authorities.
 
 ### 17.1 Authoritative layers
 
@@ -1401,9 +1403,9 @@ These are views, not truth sources:
 - prompt supplements that do not round-trip back to pages
 
 ### 17.3 Rule
-Compiled outputs MUST reflect page truth.  
-Reports MUST reflect compiled or page truth.  
-Reports MUST NOT silently become the canonical data layer.
+Compiled outputs SHALL reflect page truth.  
+Reports SHALL reflect compiled or page truth.  
+Reports SHALL NOT silently become the canonical data layer.
 
 ---
 
@@ -1744,8 +1746,8 @@ claims:
     relatedClaimIds: []
     evidence:
       - id: evidence.quote.supports.a1b2c3d4
-        sourceId: source.2026-04-12.garden-newsletter
-        path: sources/2026-04-12-garden-newsletter.md
+        sourceId: source.2026-04-12.webpage.garden-newsletter
+        path: sources/2026-04-12.webpage.garden-newsletter.md
         lines: 55-79
         kind: quote
         relation: supports
@@ -1777,7 +1779,7 @@ Riverside Community Garden is a neighborhood garden that coordinates volunteer p
 
 ```md
 ---
-id: question.flood-sensors.calibration-before-storm-season
+id: question.flood-sensor-calibration
 pageType: question
 title: Which flood sensors need calibration before storm season?
 priority: high
