@@ -234,7 +234,9 @@ Typical contents:
 - report meanings
 
 #### `index.md`
-SHOULD be the human-facing landing page.
+SHOULD be the deterministic root-level page catalog.
+
+The file SHOULD be regenerated as a whole by `_system/scripts/index.py` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
 
 #### `INBOX.md`
 MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages.
@@ -281,15 +283,16 @@ Stores binary assets and attachments referenced by source pages or other pages (
 Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
 
 #### `_system/`
-Stores machine-generated runtime and compile artifacts, and the `skills/` directory for agent skill definitions.
+Stores machine-generated runtime and compile artifacts, utility scripts, and the `skills/` directory for agent skill definitions.
 
 Sub-directories:
 - `cache/` — compiled artifact outputs (do not hand-edit)
 - `indexes/` — generated index files (do not hand-edit)
 - `logs/` — compile run logs (do not hand-edit)
+- `scripts/` — deterministic utility scripts for operational logging and generated catalog pages
 - `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
-The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
+The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
 
 Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
 
@@ -379,11 +382,22 @@ Reports are views over compiled or source page data.
 
 ### 7.8 `index.md`
 
-`index.md` is the human-facing landing page for the vault.
+`index.md` is the deterministic root-level page catalog for the vault.
 
-It SHOULD have `pageType: index`. It MUST NOT be typed as `report` — it is not a generated view.
+It SHOULD have `pageType: index`. It MUST NOT be typed as `report`.
 
-The `index` page type is reserved for vault-level navigation and orientation pages. There is typically only one `index` page per vault.
+The `index` page type is reserved for vault-level navigation and page discovery. There is typically only one `index` page per vault.
+
+`index.md` SHOULD be regenerated as a whole by `_system/scripts/index.py` from `_system/cache/pages.json`. The script MUST NOT independently define page truth; it only renders a deterministic catalog from compiled page metadata.
+
+The script SHOULD support:
+
+- `--write` to rewrite `index.md`
+- `--check` to verify that `index.md` matches the deterministic rendered output
+
+The generated page SHOULD include frontmatter and grouped page tables by `pageType`. It MAY include root documentation files as a separate documentation section when those files are intentionally outside the normal page catalog.
+
+Because the whole file is deterministic, agents and humans SHOULD NOT place durable manual prose in `index.md`. Durable orientation content belongs in root documentation files such as `README.md`, `WIKI.md`, `INBOX.md`, and `AGENTS.md`.
 
 ---
 
