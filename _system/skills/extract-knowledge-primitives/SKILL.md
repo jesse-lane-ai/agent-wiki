@@ -215,7 +215,17 @@ At minimum, record:
 
 Do not modify the source body unless the user explicitly asks for prose changes.
 
-## Step 7: Report Results
+## Step 7: Log the Extraction Batch
+
+After successfully extracting primitives and updating source metadata, write one operational log entry for the batch:
+
+```bash
+python3 _system/scripts/log.py --message "extract-knowledge-primitives: processed <sourceCount> sources; entities=<count> concepts=<count> claims=<count> questions=<count> relations=<count>"
+```
+
+Do not write a log entry when no source pages were processed.
+
+## Step 8: Report Results
 
 Report a concise summary:
 
@@ -245,6 +255,7 @@ Created or updated:
 - [ ] Add source-grounded evidence without overstating support
 - [ ] Preserve human-authored prose
 - [ ] Update source extraction metadata
+- [ ] Write one operational log entry for the extraction batch
 - [ ] Report results
 
 ## Schema Authority

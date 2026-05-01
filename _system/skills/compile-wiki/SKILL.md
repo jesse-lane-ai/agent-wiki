@@ -83,7 +83,7 @@ python3 _system/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vau
 
 ### Logs (`_system/logs/`)
 
-A daily compile log (`compile-YYYY-MM-DD.jsonl`) is appended on each run.
+The compile pipeline writes one operational log entry to `_system/logs/log.md` on each run through `_system/scripts/log.py`.
 
 ---
 
@@ -95,7 +95,8 @@ When running compile:
 
 - validate page frontmatter and generated records
 - detect duplicate IDs and malformed records
-- regenerate cache, index, report, and log artifacts
+- regenerate cache, index, and report artifacts
+- write a concise operational log entry through `_system/scripts/log.py`
 - report validation issues clearly
 
 If validation errors occur, fix the affected canonical page or structured frontmatter, then re-run this skill. Do not repair generated cache, index, report, or log files by hand.

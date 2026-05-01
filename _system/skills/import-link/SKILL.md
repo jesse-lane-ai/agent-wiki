@@ -55,6 +55,11 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
    - images save to `_attachments`. filename: `yyyy-mm-dd-<sourceSlug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.
    - inline images uses Obsidian image syntax `![[filename]]`
-6. Confirm in chat with:
+6. Write one operational log entry for the import:
+   ```bash
+   python3 _system/scripts/log.py --message "import-link: imported source <sourceId> to sources/<filename>; attachments=<count>"
+   ```
+   Log only after the source page and any attachments have been written successfully.
+7. Confirm in chat with:
    - source path
    - number of attachments saved

@@ -90,6 +90,14 @@ If a raw file cannot be promoted, leave it in `_inbox/` and report the reason. D
 
 ## Step 4: Report to the User
 
+If one or more raw files were promoted, write one operational log entry for the processed batch:
+
+```bash
+python3 _system/scripts/log.py --message "process-inbox: promoted <count> raw files to sources; skipped=<count> failed=<count>"
+```
+
+Do not write a log entry when no files were promoted.
+
 After processing all items, give a concise summary:
 
 - How many raw files were promoted.
