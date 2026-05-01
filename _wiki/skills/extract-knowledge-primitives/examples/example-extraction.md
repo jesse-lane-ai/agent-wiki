@@ -190,7 +190,7 @@ pageType: claim
 title: Anthropic was founded in 2021
 claimType: historical
 status: unverified
-confidence: 0.70
+confidence: 0.60
 text: Anthropic was founded in 2021
 subjectPageId: entity.organization.anthropic
 sourceIds:
@@ -225,7 +225,7 @@ pageType: claim
 title: Claude 4.5 improves on Claude 4.0 in reasoning speed, code generation accuracy, and safety
 claimType: descriptive
 status: unverified
-confidence: 0.70
+confidence: 0.60
 text: Claude 4.5 improves on Claude 4.0 in reasoning speed, code generation accuracy, and safety
 subjectPageId: entity.product.claude-ai
 sourceIds:
@@ -260,7 +260,7 @@ pageType: claim
 title: Claude 4.5 achieves 95% accuracy on standard benchmarks
 claimType: descriptive
 status: unverified
-confidence: 0.70
+confidence: 0.60
 text: Claude 4.5 achieves 95% accuracy on standard benchmarks
 subjectPageId: entity.product.claude-ai
 sourceIds:
@@ -339,6 +339,6 @@ This example shows:
 4. **Relations:** Ownership, founding, product relationships
 5. **Metadata:** Source page marked as extracted with list of created primitives
 
-All created pages follow the v1 schema, use stable IDs, and have claims marked `unverified` with `confidence: 0.70`. Evidence points back to the source page with exact excerpts.
+All created pages follow the v1 schema, use stable IDs, and have claims marked `unverified` with `confidence: 0.60`. Evidence points back to the source page with exact excerpts.
 
 The compile pipeline would then validate all these pages, extract the claims, and update the caches and reports.

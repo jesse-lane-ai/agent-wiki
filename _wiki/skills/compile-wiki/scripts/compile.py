@@ -709,6 +709,47 @@ def validate_relation_record(record: Any, owner_id: str, owner_path: str, issues
         validate_array_field(record.get("sourceClaimIds"), "invalid_relation_array", owner_path, issues, "sourceClaimIds", relation_id)
 
 
+def validate_timeline_record(record: Any, owner_id: str, owner_path: str, issues: list[dict], index: int) -> None:
+    """Validate one timeline entry against v1 fields."""
+    if not isinstance(record, dict):
+        add_validation_issue(
+            issues,
+            "invalid_timeline_record",
+            owner_path,
+            f"Timeline entry {index} on page {owner_id} must be a mapping.",
+            ownerId=owner_id,
+            index=index,
+        )
+        return
+
+    timeline_id = str(record.get("id", "")).strip() or f"{owner_id}:timeline:{index}"
+    validate_required_fields(record, {"id", "date", "text"}, owner_path, issues, "timeline", timeline_id)
+    validate_date_field(record.get("date"), "invalid_timeline_date", owner_path, issues, "date", timeline_id)
+    validate_date_field(record.get("endDate"), "invalid_timeline_date", owner_path, issues, "endDate", timeline_id)
+    if "confidence" in record and not is_blank(record.get("confidence")):
+        validate_number_range(record.get("confidence"), 0.0, 1.0, "invalid_timeline_confidence", owner_path, issues, "confidence", timeline_id)
+    if "relatedClaims" in record:
+        validate_array_field(record.get("relatedClaims"), "invalid_timeline_array", owner_path, issues, "relatedClaims", timeline_id)
+    if "sourceIds" in record:
+        validate_array_field(record.get("sourceIds"), "invalid_timeline_array", owner_path, issues, "sourceIds", timeline_id)
+    if "relatedPages" in record:
+        validate_array_field(record.get("relatedPages"), "invalid_timeline_array", owner_path, issues, "relatedPages", timeline_id)
+
+    start = record.get("date")
+    end = record.get("endDate")
+    if is_yyyy_mm_dd(start) and is_yyyy_mm_dd(end):
+        if date.fromisoformat(str(end)) < date.fromisoformat(str(start)):
+            add_validation_issue(
+                issues,
+                "invalid_timeline_date_range",
+                owner_path,
+                "Field `endDate` must not be earlier than `date`.",
+                objectId=timeline_id,
+                date=start,
+                endDate=end,
+            )
+
+
 # ---------------------------------------------------------------------------
 # Vault walker
 # ---------------------------------------------------------------------------
@@ -845,7 +886,8 @@ def extract_claims(pages: list[dict], validation_issues: list[dict]) -> list[dic
                     "evidence": page["meta"].get("evidence") or [],
                     "createdAt": page["meta"].get("createdAt", ""),
                     "updatedAt": page["meta"].get("updatedAt", ""),
-                    "_owningPageId": page["meta"].get("subjectPageId", ""),
+                    "subjectPageId": page["meta"].get("subjectPageId", ""),
+                    "_owningPageId": page["id"],
                     "_owningPagePath": page["path"],
                     "_owningPageType": "claim",
                     "_standaloneClaimPage": True,
@@ -901,12 +943,13 @@ def extract_relations(pages: list[dict], validation_issues: list[dict]) -> list[
 # Timeline extraction
 # ---------------------------------------------------------------------------
 
-def extract_timeline_events(pages: list[dict]) -> list[dict]:
+def extract_timeline_events(pages: list[dict], validation_issues: list[dict]) -> list[dict]:
     """Extract all timeline entries from page metadata."""
     all_events = []
     for page in pages:
         raw_events = page["meta"].get("timeline") or []
-        for ev in raw_events:
+        for index, ev in enumerate(raw_events, start=1):
+            validate_timeline_record(ev, page["id"], page["path"], validation_issues, index)
             if not isinstance(ev, dict):
                 continue
             record = dict(ev)
@@ -1481,8 +1524,23 @@ def main():
     print(f"  Found {len(relations)} relations")
 
     print("Extracting timeline events...")
-    timeline_events = extract_timeline_events(pages)
+    timeline_events = extract_timeline_events(pages, validation_issues)
     print(f"  Found {len(timeline_events)} timeline events")
+    timeline_id_paths = {}
+    for event in timeline_events:
+        timeline_id = str(event.get("id", "")).strip()
+        if timeline_id:
+            timeline_id_paths.setdefault(timeline_id, []).append(event.get("_owningPagePath", ""))
+    duplicate_timeline_ids = {k: v for k, v in timeline_id_paths.items() if len(v) > 1}
+    for timeline_id, paths in duplicate_timeline_ids.items():
+        add_validation_issue(
+            validation_issues,
+            "duplicate_timeline_id",
+            paths[0],
+            f"Timeline id {timeline_id!r} appears in multiple timeline records.",
+            timelineId=timeline_id,
+            paths=paths,
+        )
 
     print("Detecting contradictions...")
     contradictions = detect_contradictions(claims)

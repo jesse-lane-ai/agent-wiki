@@ -18,7 +18,7 @@ This skill guides the workflow for extracting structured knowledge primitives (e
 - **Relations** — typed connections between primitives
 
 **Principles:**
-- Do not invent certainty — extracted claims start `unverified` (confidence: 0.70)
+- Do not invent certainty — extracted claims start `unverified` (confidence: 0.60)
 - Preserve source content — extraction adds structure without rewriting
 - Stable IDs — primitives are identified with dotted-namespace IDs that don't change
 - Avoid duplicates — check vault before creating pages
@@ -415,7 +415,7 @@ pageType: claim
 title: <Claim Statement>
 claimType: <type>
 status: unverified
-confidence: 0.70
+confidence: 0.60
 text: <Exact claim text>
 subjectPageId: <entity or concept being claimed about>
 sourceIds:
@@ -456,7 +456,7 @@ This claim is extracted from [[<source page ID>]].
 - **claimType**: One of: descriptive, historical, causal, interpretive, normative, forecast
 
 - **status**: Always `unverified` for extracted claims
-  - Confidence: Always `0.70` (moderate) for extracted claims
+  - Confidence: Always `0.60` for extracted claims
 
 - **subjectPageId**: The entity or concept this claim is about
   - Example: `entity.organization.acme-corp`
@@ -742,7 +742,7 @@ Cache regenerated with 4 new claims, 2 entities, 1 procedure, 1 question
 - ✅ Create stable IDs using dotted-namespace format
 - ✅ Check for duplicates before creating pages
 - ✅ Keep claims atomic (one proposition per claim)
-- ✅ Mark extracted claims as `unverified` with `confidence: 0.70`
+- ✅ Mark extracted claims as `unverified` with `confidence: 0.60`
 - ✅ Reference the source page in evidence
 - ✅ Preserve all human content in source pages
 - ✅ Include exact excerpts in claim evidence
@@ -816,7 +816,7 @@ pageType: claim
 title: Acme Corp was founded in 2010
 claimType: historical
 status: unverified
-confidence: 0.70
+confidence: 0.60
 text: Acme Corp was founded in 2010
 subjectPageId: entity.organization.acme-corp
 sourceIds: [source.2026-04-16.acme-homepage]
