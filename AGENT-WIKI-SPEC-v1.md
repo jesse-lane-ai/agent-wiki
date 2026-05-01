@@ -184,6 +184,7 @@ A v1-compliant vault MUST use the following top-level structure.
 <vault>/
   AGENTS.md
   WIKI.md
+  overview.md
   index.md
   INBOX.md
 
@@ -237,6 +238,13 @@ Typical contents:
 SHOULD be the deterministic root-level page catalog.
 
 The file SHOULD be regenerated as a whole by `_system/scripts/index.py` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
+
+#### `overview.md`
+SHOULD be the human-facing landing page for the vault.
+
+The file SHOULD provide a long-form narrative overview of the vault, including a vault summary and paragraph-form summaries for each active page type. It MAY be AI-authored or AI-maintained, but it is durable orientation prose and SHOULD NOT be regenerated automatically on every compile.
+
+`overview.md` is not evidence, not a generated report, and not a replacement for compiled caches. Claims in `overview.md` SHOULD be treated as orientation unless they are represented in canonical pages, claims, evidence records, or source pages.
 
 #### `INBOX.md`
 MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages.
@@ -399,6 +407,23 @@ The generated page SHOULD include frontmatter and grouped page tables by `pageTy
 
 Because the whole file is deterministic, agents and humans SHOULD NOT place durable manual prose in `index.md`. Durable orientation content belongs in root documentation files such as `README.md`, `WIKI.md`, `INBOX.md`, and `AGENTS.md`.
 
+### 7.9 `overview.md`
+
+`overview.md` is the root-level narrative landing page for the vault.
+
+It SHOULD have `pageType: overview`. It MUST NOT be typed as `report`, `index`, or `synthesis`.
+
+The `overview` page type is reserved for vault-level orientation. There is typically only one `overview` page per vault, and it SHOULD live at root `overview.md`.
+
+The page SHOULD include:
+- a human-facing summary of the vault
+- paragraph-form summaries of each active page type
+- enough context for a new human reader to understand what is in the vault and where to go next
+
+`overview.md` MAY be written or refreshed by an agent, but it SHOULD be updated intentionally after meaningful content changes rather than regenerated as part of every compile run. It is durable orientation prose, not a deterministic artifact.
+
+`overview.md` MUST NOT be treated as primary evidence for claims unless the relevant material has been promoted into canonical source, claim, evidence, or page metadata records.
+
 ---
 
 ## 8. Page Identity and Naming
@@ -505,6 +530,7 @@ Allowed values:
 - `question`
 - `report`
 - `index`
+- `overview`
 
 #### `title`
 Type: string  
