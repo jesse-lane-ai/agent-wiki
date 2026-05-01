@@ -37,6 +37,8 @@ Reports (under reports/):
 import argparse
 import json
 import re
+import subprocess
+import sys
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Any
@@ -1763,21 +1765,36 @@ def main():
     print(f"  Wrote reports/evidence-gaps.md")
 
     # --- Write compile log ---
-    log_entry = {
-        "compiledAt": compiled_at,
-        "vaultRoot": str(vault_root),
-        "stats": agent_digest["vaultStats"],
-        "validationIssues": validation_summary,
-        "duplicateIds": duplicate_ids,
-    }
-    log_path = log_dir / f"compile-{compiled_date}.jsonl"
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(log_entry, default=str) + "\n")
-    print(f"\nWrote compile log: {log_path.name}")
+    open_questions_count = len([
+        p for p in pages
+        if p["pageType"] == "question" and p["status"] in ("open", "researching", "blocked")
+    ])
+    log_message = (
+        "compile-wiki: regenerated cache, indexes, and reports; "
+        f"pages={len(pages)} claims={len(claims)} relations={len(relations)} "
+        f"contradictions={len(contradictions)} openQuestions={open_questions_count} "
+        f"evidenceGaps={len(health['evidence_gap_claims'])} "
+        f"lowConfidence={len(health['low_confidence_claims'])} "
+        f"validationIssues={len(validation_issues)} duplicatePageIds={len(duplicate_ids)}"
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            str(vault_root / "_system/scripts/log.py"),
+            "--vault-root",
+            str(vault_root),
+            "--message",
+            log_message,
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    print(f"\nWrote operational log: {LOG_DIR}/log.md")
 
     print(f"\n✓ Compile complete.")
     print(f"  Pages: {len(pages)} | Claims: {len(claims)} | Relations: {len(relations)} | Contradictions: {len(contradictions)}")
-    print(f"  Open questions: {len([p for p in pages if p['pageType']=='question' and p['status'] in ('open','researching','blocked')])}")
+    print(f"  Open questions: {open_questions_count}")
     print(f"  Evidence gaps: {len(health['evidence_gap_claims'])} | Low confidence: {len(health['low_confidence_claims'])}")
     print(f"  Validation issues: {len(validation_issues)}")
 
