@@ -41,7 +41,7 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
 2. Capture source content using the retrieval modes configured in `_wiki/skills/import-link/config.json`.
    - If direct fetch is available, try it first.
    - If a transcript tool is configured and the source is a video, capture one English transcript when available and use it as the primary source body.
-   - If browser fallback is configured and direct retrieval is blocked or incomplete, use the configured browser automation.
+   - If browser automation is configured and direct retrieval is blocked or incomplete, use the configured browser automation.
    - If no configured retrieval mode works, ask the user to paste the source content or configure another retrieval method.
 3. Ensure vault folders exist:
    - `sources/`
