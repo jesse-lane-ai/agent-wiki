@@ -25,7 +25,8 @@ Before importing external material, configure `_system/skills/import-link/config
 ## What This Repo Contains
 
 - The v1.3 wiki specification in [[AGENT-WIKI-SPEC-v1]]
-- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], [[INBOX]], and [[index]]
+- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], and [[INBOX]]
+- A deterministic root page catalog in [[index]]
 - A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
 - Agent skills for import, inbox processing, extraction, and compilation under `_system/skills/`
 - Gitignored runtime outputs for caches, indexes, logs, and reports
@@ -74,6 +75,7 @@ python3 _system/skills/compile-wiki/scripts/compile.py
 
 It reads vault pages and emits generated artifacts such as:
 
+- `index.md`
 - `_system/cache/pages.json`
 - `_system/cache/claims.jsonl`
 - `_system/cache/relations.jsonl`
@@ -83,13 +85,13 @@ It reads vault pages and emits generated artifacts such as:
 - `_system/logs/log.md`
 - `reports/`
 
-These outputs are generated artifacts. Do not hand-edit them, and do not treat reports or logs as primary truth.
+These outputs are generated artifacts. Do not hand-edit them, and do not treat reports or logs as primary truth. Durable orientation prose belongs in the root documentation files, not `index.md`.
 
 ## Skills
 
 Skills live under `_system/skills/`:
 
-- `compile-wiki` regenerates caches, indexes, logs, and reports.
+- `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
 - `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`.
 - `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources.
@@ -102,7 +104,7 @@ This repo does not ship a scheduler, daemon, or task runner. For recurring maint
 - compile/regeneration via `_system/skills/compile-wiki/`
 - extraction or cleanup via the relevant skill
 
-Re-run compile after meaningful vault changes so caches, indexes, logs, and reports stay current.
+Re-run compile after meaningful vault changes so `index.md`, caches, indexes, logs, and reports stay current.
 
 ## Customization
 

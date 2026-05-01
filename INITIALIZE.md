@@ -5,7 +5,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, and `reports/`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
+4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
 5. Configure `_system/skills/import-link/config.json` before importing external material.
 6. Run the compile pipeline and confirm it reports zero validation issues.
 
@@ -79,8 +79,9 @@ Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unpr
 8. Emit `claims.jsonl`
 9. Emit `relations.jsonl`
 10. Emit `agent-digest.json`
-11. Generate required reports
-12. Add contradiction/question caches
+11. Regenerate root `index.md`
+12. Generate required reports
+13. Add contradiction/question caches
 
 ---
 
@@ -104,6 +105,6 @@ The v1 model has three layers:
 
 - The vault is the container: markdown pages, folders, human notes, and generated artifacts.
 - The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, and syntheses.
-- The compile layer is the bridge: stable machine-facing cache files and generated maintenance reports.
+- The compile layer is the bridge: stable machine-facing cache files, the deterministic root page catalog, and generated maintenance reports.
 
 The wiki should separate what exists, what is claimed, what supports it, what conflicts with it, what is unknown, how things connect, and how agents consume it.

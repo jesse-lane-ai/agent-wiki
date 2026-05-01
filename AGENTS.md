@@ -60,9 +60,9 @@ Agents MUST NOT read reports as primary data sources when page frontmatter or ca
 
 ### 2.7 Do not hand-edit cache files
 
-Files in `_system/cache/`, `_system/indexes/`, and `_system/logs/` are generated artifacts.
+Files in `_system/cache/`, `_system/indexes/`, `_system/logs/`, and root `index.md` are generated artifacts.
 
-Agents MUST NOT manually patch cache, index, or generated log files. Agents MUST write operational log entries through `_system/scripts/log.py`.
+Agents MUST NOT manually patch cache files, generated index files, generated log files, or root `index.md`. Agents MUST write operational log entries through `_system/scripts/log.py`.
 
 ### 2.8 Respect the inbox boundary
 
@@ -82,7 +82,7 @@ Agents SHOULD process inbox items by converting retained raw files into canonica
 - Add or update relations in frontmatter
 - Update page body prose when explicitly instructed
 - Create question pages for unresolved unknowns
-- Run the compile pipeline to regenerate caches and reports
+- Run the compile pipeline to regenerate the root page catalog, caches, and reports
 - Add aliases and tags to existing pages
 
 ---
@@ -150,6 +150,7 @@ Agents MUST NOT place entity pages in `concepts/`, etc.
 
 The compile pipeline reads the vault and emits:
 
+- `index.md` — deterministic root page catalog
 - `_system/cache/pages.json` — normalized page index
 - `_system/cache/claims.jsonl` — all extracted claims
 - `_system/cache/relations.jsonl` — all extracted relations
@@ -165,7 +166,7 @@ To run the compile pipeline:
 python3 _system/skills/compile-wiki/scripts/compile.py
 ```
 
-The compile pipeline MUST be run after meaningful vault changes to keep caches fresh. The compile pipeline writes one operational log entry to `_system/logs/log.md`.
+The compile pipeline MUST be run after meaningful vault changes to keep `index.md` and caches fresh. The compile pipeline writes one operational log entry to `_system/logs/log.md`.
 
 ---
 
@@ -230,7 +231,7 @@ Logs are not authoritative truth records. Agents MUST NOT treat `_system/logs/lo
 - Delete unresolved uncertainty by omission
 - Convert weak evidence to strong support semantics
 - Treat reports as primary truth records
-- Hand-edit cache, index, or generated log files
+- Hand-edit cache files, generated index files, generated log files, or root `index.md`
 - Create duplicate IDs
 - Place pages in the wrong folder for their `pageType`
 - Invent unsupported certainty in claims

@@ -88,13 +88,13 @@ Every authored page has a `pageType` in its frontmatter.
 | `synthesis` | `syntheses/`  | Cross-source rollup or interpretation |
 | `question`  | `questions/`  | Open question or research gap         |
 | `report`    | `reports/`    | Generated view or dashboard           |
-| `index`     | `index.md`    | Vault landing page (not a report)     |
+| `index`     | `index.md`    | Deterministic root page catalog       |
 
 ---
 
 ## 4. Required frontmatter
 
-Every authored page (except purely generated reports) should include:
+Every authored page (except purely generated reports and the generated root catalog) should include:
 
 ```yaml
 id: <pageType>.<primitiveSubtype>.<slug>
@@ -241,15 +241,17 @@ The v1 controlled predicate set:
 
 ## 9. Generated content
 
-Generated structured knowledge should live in frontmatter fields, claim/evidence/relation records, cache files, indexes, or reports.
+Generated structured knowledge should live in frontmatter fields, claim/evidence/relation records, cache files, indexes, reports, or the deterministic root `index.md` catalog.
 
 Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
+
+`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[README]], [[WIKI]], [[INBOX]], or [[AGENTS]] instead.
 
 ---
 
 ## 10. Compile outputs
 
-The compile pipeline reads the vault and emits machine-readable caches to `_system/cache/`.
+The compile pipeline reads the vault, emits machine-readable caches to `_system/cache/`, and regenerates the root `index.md` page catalog.
 
 Run with:
 
@@ -266,6 +268,9 @@ Required outputs:
 Recommended outputs:
 - `contradictions.json`, `questions.json`
 - `timeline-events.json`, `source-index.json`
+
+Catalog output:
+- `index.md` — deterministic root-level page catalog rendered from `_system/cache/pages.json`
 
 ---
 
