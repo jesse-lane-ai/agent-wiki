@@ -95,6 +95,7 @@ Skills live under `_system/skills/`:
 - `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`.
 - `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources.
+- `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
 
 ## Scheduled Work
 
