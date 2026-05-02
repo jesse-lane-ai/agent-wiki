@@ -57,6 +57,10 @@ REPORTS_DIR = "reports"
 
 STALE_DAYS = 90  # pages not updated in this many days are flagged
 LOW_CONFIDENCE_THRESHOLD = 0.50
+LARGE_SOURCE_TARGET_WORD_MIN = 8_000
+LARGE_SOURCE_TARGET_WORD_MAX = 15_000
+LARGE_SOURCE_HARD_WORD_MAX = 20_000
+LARGE_SOURCE_PARTITION_WORD_THRESHOLD = 25_000
 
 # Agent digest limits — named constants so they are easy to tune as the vault grows.
 # Increase if high-value pages are being silently truncated.
@@ -67,8 +71,9 @@ MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent dig
 
 VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "question", "report", "claim", "index", "overview"}
 VALID_GENERAL_STATUSES = {"active", "draft", "archived", "deprecated"}
-VALID_SOURCE_STATUSES = {"unprocessed", "processed", "archived"}
-VALID_SOURCE_TYPES = {"webpage", "article", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
+VALID_SOURCE_STATUSES = {"unprocessed", "partitioned", "processed", "archived"}
+VALID_SOURCE_TYPES = {"webpage", "article", "document", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
+VALID_SOURCE_ROLES = {"whole", "parent", "part"}
 VALID_ENTITY_TYPES = {"person", "organization", "project", "product", "system", "place", "event", "artifact", "document", "other"}
 VALID_CONCEPT_TYPES = {
     "definition",
@@ -525,6 +530,23 @@ def validate_array_field(value: Any, issue_type: str, owner_path: str, issues: l
         )
 
 
+def coerce_int(value: Any) -> int | None:
+    """Convert a value to int when possible, otherwise return None."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, bool):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def word_count(text: str) -> int:
+    """Return a simple deterministic word count for source-size checks."""
+    return len(re.findall(r"\b\w+\b", text))
+
+
 def summarize_validation_issues(issues: list[dict]) -> dict[str, int]:
     """Return a simple count by validation issue type."""
     summary = {}
@@ -678,6 +700,7 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
     if page_type == "source":
         validate_enum(meta.get("status"), VALID_SOURCE_STATUSES, "invalid_source_status", path, issues, "status", page_id)
         validate_enum(meta.get("sourceType"), VALID_SOURCE_TYPES, "invalid_source_type", path, issues, "sourceType", page_id)
+        validate_enum(meta.get("sourceRole"), VALID_SOURCE_ROLES, "invalid_source_role", path, issues, "sourceRole", page_id)
         validate_required_fields(meta, {"sourceType", "retrievedAt", "attachments"}, path, issues, "source", page_id)
         if is_blank(meta.get("originUrl")) and is_blank(meta.get("originPath")):
             add_validation_issue(
@@ -691,6 +714,8 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
         validate_date_field(meta.get("retrievedAt"), "invalid_source_date", path, issues, "retrievedAt", page_id)
         if "attachments" in meta:
             validate_array_field(meta.get("attachments"), "invalid_source_array", path, issues, "attachments", page_id)
+        if "sourceParts" in meta:
+            validate_array_field(meta.get("sourceParts"), "invalid_source_array", path, issues, "sourceParts", page_id)
     elif page_type == "entity":
         validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
         validate_required_fields(meta, {"entityType"}, path, issues, "entity", page_id)
@@ -862,6 +887,12 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
             record["conceptType"] = meta.get("conceptType", "")
         elif page_type == "source":
             record["sourceType"] = meta.get("sourceType", "")
+            record["sourceRole"] = meta.get("sourceRole") or "whole"
+            record["parentSourceId"] = meta.get("parentSourceId", "")
+            record["partIndex"] = meta.get("partIndex", "")
+            record["partCount"] = meta.get("partCount", "")
+            record["locator"] = meta.get("locator", "")
+            record["sourceParts"] = meta.get("sourceParts") or []
             record["originUrl"] = meta.get("originUrl", "")
             record["originPath"] = meta.get("originPath", "")
             record["publishedAt"] = str(meta.get("publishedAt", ""))
@@ -895,6 +926,176 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
             print(f"  [PAGE] {page_id} ({page_type}) — {rel}")
 
     return pages, validation_issues
+
+
+def validate_source_structure(pages: list[dict], validation_issues: list[dict]) -> None:
+    """Validate parent/part source relationships introduced for large sources."""
+    sources = [page for page in pages if page.get("pageType") == "source"]
+    by_id = {str(page.get("id", "")): page for page in sources}
+    by_path = {str(page.get("path", "")): page for page in sources}
+
+    for source in sources:
+        page_id = str(source.get("id", ""))
+        path = str(source.get("path", ""))
+        role = str(source.get("sourceRole") or "whole")
+        status = str(source.get("status") or "")
+        body_words = word_count(str(source.get("body") or ""))
+
+        if role == "whole" and body_words > LARGE_SOURCE_PARTITION_WORD_THRESHOLD:
+            add_validation_issue(
+                validation_issues,
+                "large_source_not_partitioned",
+                path,
+                (
+                    "Source body exceeds the large-source partition threshold; "
+                    "create a parent source page and child source parts."
+                ),
+                pageId=page_id,
+                wordCount=body_words,
+                threshold=LARGE_SOURCE_PARTITION_WORD_THRESHOLD,
+            )
+
+        if role == "parent":
+            source_parts = source.get("sourceParts") or []
+            if not isinstance(source_parts, list) or not source_parts:
+                add_validation_issue(
+                    validation_issues,
+                    "missing_source_parts",
+                    path,
+                    "`sourceRole: parent` requires ordered `sourceParts` paths.",
+                    pageId=page_id,
+                )
+                continue
+
+            part_records = []
+            for part_path in source_parts:
+                part_path_text = str(part_path)
+                part = by_path.get(part_path_text)
+                if part is None:
+                    add_validation_issue(
+                        validation_issues,
+                        "missing_source_part_path",
+                        path,
+                        f"`sourceParts` references missing source part path {part_path_text!r}.",
+                        pageId=page_id,
+                        partPath=part_path_text,
+                    )
+                    continue
+                if part.get("sourceRole") != "part":
+                    add_validation_issue(
+                        validation_issues,
+                        "invalid_source_part_role",
+                        part.get("path", part_path_text),
+                        "Source listed in `sourceParts` should use `sourceRole: part`.",
+                        pageId=part.get("id", ""),
+                        parentSourceId=page_id,
+                    )
+                if part.get("parentSourceId") != page_id:
+                    add_validation_issue(
+                        validation_issues,
+                        "invalid_source_parent_reference",
+                        part.get("path", part_path_text),
+                        "Source part `parentSourceId` does not match the parent source.",
+                        pageId=part.get("id", ""),
+                        expectedParentSourceId=page_id,
+                        actualParentSourceId=part.get("parentSourceId", ""),
+                    )
+                part_records.append(part)
+
+            if status != "partitioned":
+                unprocessed_parts = [part for part in part_records if part.get("status") == "unprocessed"]
+                if unprocessed_parts:
+                    add_validation_issue(
+                        validation_issues,
+                        "invalid_partitioned_source_status",
+                        path,
+                        "Parent source should use `status: partitioned` while child source parts remain unprocessed.",
+                        pageId=page_id,
+                        unprocessedPartCount=len(unprocessed_parts),
+                    )
+
+            if body_words > LARGE_SOURCE_TARGET_WORD_MIN:
+                add_validation_issue(
+                    validation_issues,
+                    "large_parent_source_body",
+                    path,
+                    "Parent source pages should stay short and should not contain the full source body.",
+                    pageId=page_id,
+                    wordCount=body_words,
+                    targetMax=LARGE_SOURCE_TARGET_WORD_MIN,
+                )
+
+        if role == "part":
+            parent_source_id = str(source.get("parentSourceId") or "")
+            parent = by_id.get(parent_source_id)
+            if not parent_source_id or parent is None:
+                add_validation_issue(
+                    validation_issues,
+                    "missing_parent_source",
+                    path,
+                    "`sourceRole: part` requires a valid `parentSourceId`.",
+                    pageId=page_id,
+                    parentSourceId=parent_source_id,
+                )
+            elif parent.get("sourceRole") != "parent":
+                add_validation_issue(
+                    validation_issues,
+                    "invalid_parent_source_role",
+                    path,
+                    "A source part's parent should use `sourceRole: parent`.",
+                    pageId=page_id,
+                    parentSourceId=parent_source_id,
+                    parentSourceRole=parent.get("sourceRole", ""),
+                )
+
+            part_index = coerce_int(source.get("partIndex"))
+            part_count = coerce_int(source.get("partCount"))
+            if part_index is None or part_index < 1:
+                add_validation_issue(
+                    validation_issues,
+                    "invalid_source_part_index",
+                    path,
+                    "`sourceRole: part` requires a positive one-based `partIndex`.",
+                    pageId=page_id,
+                    partIndex=source.get("partIndex"),
+                )
+            if part_count is None or part_count < 1:
+                add_validation_issue(
+                    validation_issues,
+                    "invalid_source_part_count",
+                    path,
+                    "`sourceRole: part` requires a positive `partCount`.",
+                    pageId=page_id,
+                    partCount=source.get("partCount"),
+                )
+            if part_index is not None and part_count is not None and part_index > part_count:
+                add_validation_issue(
+                    validation_issues,
+                    "invalid_source_part_range",
+                    path,
+                    "`partIndex` must not exceed `partCount`.",
+                    pageId=page_id,
+                    partIndex=part_index,
+                    partCount=part_count,
+                )
+            if is_blank(source.get("locator")):
+                add_validation_issue(
+                    validation_issues,
+                    "missing_source_part_locator",
+                    path,
+                    "`sourceRole: part` requires a stable `locator`.",
+                    pageId=page_id,
+                )
+            if body_words > LARGE_SOURCE_HARD_WORD_MAX:
+                add_validation_issue(
+                    validation_issues,
+                    "large_source_part_body",
+                    path,
+                    "Source part body exceeds the hard large-source part size.",
+                    pageId=page_id,
+                    wordCount=body_words,
+                    hardMax=LARGE_SOURCE_HARD_WORD_MAX,
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -1530,6 +1731,8 @@ def main():
                 paths=paths,
             )
 
+    validate_source_structure(pages, validation_issues)
+
     # --- Extract structured data ---
     print("Extracting claims...")
     claims = extract_claims(pages, validation_issues)
@@ -1614,6 +1817,12 @@ def main():
             "path": p["path"],
             "status": p["status"],
             "sourceType": p.get("sourceType", ""),
+            "sourceRole": p.get("sourceRole", "whole"),
+            "parentSourceId": p.get("parentSourceId", ""),
+            "partIndex": p.get("partIndex", ""),
+            "partCount": p.get("partCount", ""),
+            "locator": p.get("locator", ""),
+            "sourceParts": p.get("sourceParts", []),
             "originUrl": p.get("originUrl", ""),
             "originPath": p.get("originPath", ""),
             "publishedAt": p.get("publishedAt", ""),
