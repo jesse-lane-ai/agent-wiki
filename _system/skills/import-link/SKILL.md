@@ -6,7 +6,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 # Import Link
 
 ## Configuration
-- Before first use, read `INITIALIZE.md` and `_system/skills/import-link/config.json`.
+- Before first use, read `ONBOARD.md` and `_system/skills/import-link/config.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
 - If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_system/skills/import-link/config.json`.

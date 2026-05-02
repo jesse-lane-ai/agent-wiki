@@ -1,14 +1,24 @@
-## First-Run Initialization
+## First-Run Onboarding
 
 Use this file when setting up a fresh checkout or when a new agent needs to orient itself before editing the vault.
 
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
-5. Configure `_system/skills/import-link/config.json` before importing external material.
-6. Run the compile pipeline and confirm it reports zero validation issues.
-7. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
+4. Confirm the local Python command. The checked-in examples use `python3`, but some systems expose Python 3 as `python`.
+5. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
+6. Configure `_system/skills/import-link/config.json` before importing external material.
+7. Run the compile pipeline and confirm it reports zero validation issues.
+8. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
+
+Check Python before running scripts:
+
+```bash
+python3 --version
+python --version
+```
+
+Use whichever command resolves to Python 3.8 or newer. If neither command is available, warn the user that Python 3 must be installed and available on the agent's path before running the vault scripts. If only `python` works, substitute `python` anywhere this repo shows `python3`.
 
 ```bash
 python3 _system/skills/compile-wiki/scripts/compile.py

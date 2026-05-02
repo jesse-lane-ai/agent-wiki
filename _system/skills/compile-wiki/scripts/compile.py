@@ -49,7 +49,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 SKIP_DIRS = {".obsidian", "_system", "_archive", "_inbox", "_attachments", "raw", "reports"}
-SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "INITIALIZE.md", "AGENT-WIKI-SPEC-v1.md"}
+SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "ONBOARD.md", "AGENT-WIKI-SPEC-v1.md"}
 CACHE_DIR = "_system/cache"
 INDEX_DIR = "_system/indexes"
 LOG_DIR = "_system/logs"

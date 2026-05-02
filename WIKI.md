@@ -31,7 +31,7 @@ Current vault structure:
   AGENTS.md
   AGENT-WIKI-SPEC-v1.md
   INBOX.md
-  INITIALIZE.md
+  ONBOARD.md
   README.md
   WIKI.md
   index.md

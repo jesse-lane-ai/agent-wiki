@@ -8,7 +8,7 @@ The vault keeps human-authored pages, structured frontmatter, claims, evidence, 
 
 Start with the onboarding docs:
 
-1. [[INITIALIZE]] for first-run setup and local `import-link` configuration.
+1. [[ONBOARD]] for first-run setup and local `import-link` configuration.
 2. [[AGENTS]] for the agent behavior contract.
 3. [[WIKI]] for the human-readable schema guide.
 4. [[AGENT-WIKI-SPEC-v1]] for the full v1.3 specification.
@@ -16,16 +16,16 @@ Start with the onboarding docs:
 For a new agent session, use a prompt like:
 
 ```text
-Read INITIALIZE.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing.
+Read ONBOARD.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing.
 Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
 ```
 
-Before importing external material, configure `_system/skills/import-link/config.json` as described in [[INITIALIZE]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+Before importing external material, configure `_system/skills/import-link/config.json` as described in [[ONBOARD]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
 
 ## What This Repo Contains
 
 - The v1.3 wiki specification in [[AGENT-WIKI-SPEC-v1]]
-- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], and [[INBOX]]
+- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[ONBOARD]], and [[INBOX]]
 - A deterministic root page catalog in [[index]]
 - An optional human-facing vault landing page in [[overview]]
 - A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
@@ -41,7 +41,7 @@ Current top-level vault shape:
   AGENTS.md
   AGENT-WIKI-SPEC-v1.md
   INBOX.md
-  INITIALIZE.md
+  ONBOARD.md
   README.md
   WIKI.md
   index.md
