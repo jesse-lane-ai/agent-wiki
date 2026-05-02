@@ -20,6 +20,15 @@ Key rules for this workflow:
 - Do not invent metadata.
 - Use Section 10 of `AGENT-WIKI-SPEC-v1.md` for the source page schema and examples.
 - Use Section 7.1.1 of `AGENT-WIKI-SPEC-v1.md` for large-source parent and part handling.
+- Use Section 7.1.2 of `AGENT-WIKI-SPEC-v1.md` for conversion policy and provenance.
+
+If local Python or converter availability is unknown, run the read-only onboarding probe before processing binary or non-markdown files:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work.
 
 ## Step 2: Check the Inbox
 
@@ -35,7 +44,19 @@ For each raw file, work through files one at a time.
 
 Read the file fully. Preserve the original content exactly when writing the source body.
 
-If the raw file is a binary or non-markdown document, use configured local conversion tools only when they are available. Do not install dependencies during this skill run. If no configured conversion path exists, leave the file in `_inbox/` and report that text extraction is required.
+If the raw file is a binary or non-markdown document, use configured local conversion tools only when they are available. Read conversion policy from `_system/config.json` if it exists. Missing config means use conservative local-only defaults.
+
+Do not install dependencies during this skill run. Do not call network, cloud OCR, LLM, transcription, or hosted document-intelligence services unless the operator explicitly configured or requested that behavior.
+
+If no configured conversion path exists, leave the file in `_inbox/` and report that text extraction is required.
+
+When conversion is used, record conversion provenance in the source frontmatter when available:
+
+- `convertedAt`
+- `conversionTool`
+- `conversionToolVersion`
+- `conversionBackend`
+- `conversionWarnings`
 
 ### 3b. Infer source metadata
 
