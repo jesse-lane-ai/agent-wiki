@@ -2,7 +2,7 @@
 # Agentic Wiki v1 Specification
 
 Version: 1.3
-Last Updated: 2026-05-01
+Last Updated: 2026-05-02
 
 ---
 
@@ -410,6 +410,20 @@ Recommended setup questions include:
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 - whether missing runtime folders should be created
 - whether `_system/config.json` should be written
+
+### 6.5 Project development workflow
+
+Changes to this project SHOULD move from contract to implementation in a consistent order.
+
+When adding a feature or changing project behavior, the recommended workflow is:
+
+1. Update this specification.
+2. Update configuration files or configuration templates when the change affects operator policy, defaults, or local setup.
+3. Update deterministic scripts.
+4. Update skill instructions and skill-local support files.
+5. Update root-level Markdown documentation other than this specification.
+
+Each step SHOULD be skipped when the change does not affect that surface. The specification SHOULD be reviewed first because it defines the contract that configuration, scripts, skills, and root-level documentation implement.
 
 ---
 
@@ -1661,6 +1675,22 @@ These are views, not truth sources:
 Compiled outputs SHALL reflect page truth.  
 Reports SHALL reflect compiled or page truth.  
 Reports SHALL NOT silently become the canonical data layer.
+
+### 17.4 Documentation layers
+
+The project documentation has separate audiences. Agents SHOULD load the smallest authoritative document that can answer the current task.
+
+Documentation layers:
+
+- `AGENTS.md` — agent behavior contract for editing, compiling, linking, logging, and preserving human content.
+- `WIKI.md` — compact runtime schema, editorial guide, page type summary, ID formats, status enums, and examples for ordinary vault operations.
+- `INBOX.md` — raw inbox workflow and raw-to-source lifecycle.
+- `ONBOARD.md` — first-run setup and local environment configuration workflow.
+- `AGENT-WIKI-SPEC-v1.md` — full project and development contract for maintainers, system changes, script behavior, validation rules, compatibility rules, and unresolved ambiguity.
+
+Skills and ordinary vault operations SHOULD prefer `WIKI.md` for schema, allowed enums, ID formats, and examples. They SHOULD consult `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, updating scripts, updating skills, modifying configuration policy, resolving ambiguity, or when `WIKI.md` does not contain enough detail.
+
+If `WIKI.md` conflicts with `AGENT-WIKI-SPEC-v1.md`, the full specification remains canonical until the conflict is resolved.
 
 ---
 
