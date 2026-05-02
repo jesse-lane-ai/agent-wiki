@@ -366,6 +366,31 @@ Extraction workflows SHOULD process child source part pages, not the parent sour
 
 The parent source page SHOULD use `status: partitioned` while one or more child parts remain `status: unprocessed`. It SHOULD use `status: processed` only after all child parts have been processed or intentionally archived.
 
+#### 7.1.2 Source conversion
+
+Raw inbox files MAY be converted to Markdown before source page creation. Conversion is an intake step that produces the text used for canonical `source` pages or source part pages.
+
+Original raw files SHOULD be retained in `raw/` after successful promotion. Raw files in `_inbox/` or `raw/` are not canonical evidence. The converted source page or source part page is the canonical evidence surface.
+
+Conversion tools SHOULD preserve document structure and stable locators when available, including headings, page ranges, slide numbers, table boundaries, timestamps, and section paths. When a source is partitioned, partition locators SHOULD use the most specific stable locator available from the conversion output.
+
+Conversion behavior SHOULD be deterministic:
+
+1. Tools SHOULD use a stable backend order for automatic conversion.
+2. Tools MUST NOT install converters, model dependencies, or system packages during a skill run.
+3. Tools MUST NOT call network, cloud OCR, LLM, transcription, or hosted document-intelligence services unless the operator explicitly requests or configures that behavior.
+4. If no configured local conversion path exists, the raw file MUST remain in `_inbox/` and the failure reason SHOULD be reported to the operator.
+5. If conversion succeeds but produces warnings or degraded output, those warnings SHOULD be recorded in source metadata.
+
+Common local converter backends MAY include:
+
+- `pymupdf4llm` for fast local extraction from native-text PDFs
+- `markitdown` for general document-to-Markdown conversion
+- `arxiv2md` for arXiv or academic sources where a structured arXiv source can be identified
+- `marker` for complex PDFs where higher-fidelity local extraction is needed
+
+These backend names are examples, not required dependencies. The vault schema MUST remain stable regardless of the converter used.
+
 ### 7.2 `entities/`
 
 An `entity` page represents a durable thing.
@@ -630,6 +655,11 @@ locator: <locator>
 sourceParts: []
 originUrl: <url>
 originPath: <path>
+convertedAt: <yyyy-mm-dd>
+conversionTool: <tool>
+conversionToolVersion: <version>
+conversionBackend: <backend>
+conversionWarnings: []
 publishedAt: <yyyy-mm-dd>
 retrievedAt: <yyyy-mm-dd>
 updatedAt: <yyyy-mm-dd>
@@ -654,6 +684,11 @@ locator:
 sourceParts: []
 originUrl: https://example.com/reports/urban-tree-canopy
 originPath:
+convertedAt:
+conversionTool:
+conversionToolVersion:
+conversionBackend:
+conversionWarnings: []
 publishedAt: 2026-04-25
 retrievedAt: 2026-04-28
 updatedAt: 2026-04-28
@@ -721,6 +756,20 @@ Total number of source parts for the parent source. This field SHOULD be present
 A stable locator for the part within the parent source, such as page range, heading path, timestamp range, slide range, or section range.
 
 Source pages SHOULD include `originUrl` for externally retrieved material. Source pages promoted from local raw inbox files MAY use `originPath` instead. At least one of `originUrl` or `originPath` SHOULD be present.
+
+#### Conversion provenance
+
+Source pages SHOULD include conversion provenance when the canonical source body was produced by converting a raw file or external asset into Markdown.
+
+Recommended fields:
+
+- `convertedAt` - date the conversion was performed
+- `conversionTool` - converter or wrapper used
+- `conversionToolVersion` - converter version when available
+- `conversionBackend` - selected backend when the tool supports multiple backends
+- `conversionWarnings` - ordered list of warnings, quality notes, skipped content, or degraded extraction notices
+
+For partitioned sources, conversion provenance SHOULD appear on the parent source page and MAY also appear on child source part pages when part-level conversion details differ. Child source parts SHOULD still include locators that let evidence point back to the relevant portion of the converted source.
 
 Large source parent IDs SHOULD use the ordinary source ID format:
 
@@ -1810,6 +1859,9 @@ A v1 validator SHOULD check the following.
 - source part pages have valid `parentSourceId`, `partIndex`, `partCount`, and `locator` when `sourceRole: part`
 - parent source pages have ordered, existing `sourceParts` when `sourceRole: parent`
 - partitioned parent source pages do not contain the full long-form source body
+- source pages promoted from non-Markdown raw files include conversion provenance when available
+- conversion warnings are preserved when conversion output is degraded, incomplete, or produced with fallback behavior
+- large converted sources preserve stable locators on source part pages
 
 ---
 
