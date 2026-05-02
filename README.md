@@ -1,10 +1,28 @@
-# Agentics Vault
+# Agent Wiki
 
-Agentics Vault is a structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
+An Obsidian-compatible knowledge vault that AI agents can safely maintain.
 
-The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is the compact runtime schema reference; [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) is the full project and development contract.
+Drop notes, PDFs, transcripts, or research into `_inbox/`.
+Agents promote them into source pages, extract claims and evidence, link entities and concepts, track open questions, flag contradictions, and compile everything into machine-readable caches.
+
+Other llm wikis focus on generating and maintaining wiki pages.
+
+Agent Wiki focuses on evidence-aware structured knowledge:
+claims, evidence, relations, questions, contradictions, timelines, and compiled agent caches.
+
+**What is it?** A structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
+
+The vault keeps human-authored and agent-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is the compact runtime schema reference; [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) is the full project and development contract.
+
+Inspired by Karpathy’s [Karpath's LLM Wiki gist][karpathy-wiki].
+
+[karpathy-wiki]: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
 
 ## Quick Start
+
+```text
+Read ONBOARD.md then onboard me.
+```
 
 Start with the onboarding docs:
 
