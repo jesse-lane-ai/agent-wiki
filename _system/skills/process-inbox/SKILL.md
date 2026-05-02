@@ -12,15 +12,17 @@ This skill promotes raw files from `_inbox/` into canonical, schema-compliant `s
 Before touching anything, read the vault's agent contract in this order:
 
 1. `AGENTS.md` - the behavioral contract.
-2. `AGENT-WIKI-SPEC-v1.md` - the canonical schema.
+2. `WIKI.md` Sections 4.1, 5, 12, and 13 - the runtime source schema, status/source type enums, ID formats, examples, and large-source rules.
+3. `INBOX.md` - the raw inbox lifecycle.
 
 Key rules for this workflow:
 - Preserve raw content.
 - Use stable source IDs.
 - Do not invent metadata.
-- Use Section 10 of `AGENT-WIKI-SPEC-v1.md` for the source page schema and examples.
-- Use Section 7.1.1 of `AGENT-WIKI-SPEC-v1.md` for large-source parent and part handling.
-- Use Section 7.1.2 of `AGENT-WIKI-SPEC-v1.md` for conversion policy and provenance.
+- Use `WIKI.md` Section 4.1 for source page schema, examples, and conversion provenance fields.
+- Use `WIKI.md` Sections 5 and 12 for status values and source types.
+- Use `WIKI.md` Section 13 for large-source parent and part handling.
+- Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
 
 If local Python or converter availability is unknown, run the read-only onboarding probe before processing binary or non-markdown files:
 
@@ -60,7 +62,7 @@ When conversion is used, record conversion provenance in the source frontmatter 
 
 ### 3b. Infer source metadata
 
-Create a source page using the canonical source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+Create a source page using the source page schema and examples in `WIKI.md` Section 4.1.
 
 Newly promoted ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -73,7 +75,7 @@ source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
 ```
 
 - `yyyy-mm-dd`: processing date unless the raw file clearly includes a retrieval date.
-- `sourceType`: the inferred source type from `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+- `sourceType`: the inferred source type from `WIKI.md` Section 12.
 - `sourceSlug`: short kebab-case descriptor, preferably four words.
 
 Infer `sourceType` conservatively:
@@ -87,13 +89,13 @@ Infer `sourceType` conservatively:
 - Screenshot -> `screenshot`
 - Unknown or plain notes -> `other`
 
-If a field such as `publishedAt`, `author`, or `originUrl` cannot be inferred, omit optional fields rather than guessing. For local raw files with no external URL, use `originPath` to record the retained raw file path after promotion. Required source fields must still follow `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+If a field such as `publishedAt`, `author`, or `originUrl` cannot be inferred, omit optional fields rather than guessing. For local raw files with no external URL, use `originPath` to record the retained raw file path after promotion. Required source fields must still follow `WIKI.md` Section 4.1.
 
 ### 3c. Decide whether to partition
 
 If the captured or converted text is larger than roughly 25,000 words, or if an agent cannot reliably process it in one extraction pass, create a large source instead of one giant markdown body.
 
-Use deterministic split rules from `AGENT-WIKI-SPEC-v1.md` Section 7.1.1:
+Use deterministic split rules from `WIKI.md` Section 13:
 
 - prefer semantic boundaries such as chapters, headings, appendices, transcript topics, or slide boundaries
 - fall back to page ranges, timestamps, or other stable locators

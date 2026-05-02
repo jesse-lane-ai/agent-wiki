@@ -3,8 +3,8 @@
 Use this file when setting up a fresh checkout or when a new agent needs to orient itself before editing the vault.
 
 1. Read [[AGENTS]] for the agent behavior contract.
-2. Read [[WIKI]] for the human-facing schema guide.
-3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
+2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
+3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run the read-only onboarding probe.
 5. Ask the user setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
 6. Configure `_system/config.json` if local tool policy or conversion backend preferences are needed.
@@ -120,7 +120,7 @@ For binary or non-markdown inbox files, `process-inbox` may use configured local
 
 Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
 
-Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unprocessed`, `partitioned`, `processed`, and `archived`.
+Source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]]: `unprocessed`, `partitioned`, `processed`, and `archived`.
 
 ---
 

@@ -31,11 +31,11 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Source Schema (required, strictly enforced)
 
-Create source files in `sources/` using the canonical source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+Create source files in `sources/` using the source page schema and examples in `WIKI.md` Section 4.1.
 
-Use Section 10 of `AGENT-WIKI-SPEC-v1.md` as the source of truth for page-type schemas, allowed enum values, ID formats, and examples. This skill owns the import workflow, not the source frontmatter schema.
+Use `WIKI.md` Section 4.1 as the routine source of truth for page-type schemas, ID formats, and examples. Use `WIKI.md` Sections 5 and 12 for status and source type enums. This skill owns the import workflow, not the source frontmatter schema.
 
-Use Section 7.1.1 of `AGENT-WIKI-SPEC-v1.md` for large-source parent and part handling.
+Use `WIKI.md` Section 13 for large-source parent and part handling. Consult `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
 
 Newly imported ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -63,7 +63,7 @@ Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status
    - Do not exceed 20,000 words per part unless preserving an indivisible structure requires it.
    - Avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible.
 6. Write ordinary raw source to:
-   - `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` using the source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
+   - `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` using the source page schema and examples in `WIKI.md` Section 4.1.
    - Set `status: unprocessed`.
    - Set `sourceRole: whole`.
    - Include the full captured verbatim body with inline images + source URLs below the frontmatter.

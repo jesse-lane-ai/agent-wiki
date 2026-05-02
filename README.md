@@ -2,7 +2,7 @@
 
 Agentics Vault is a structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
 
-The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [[AGENT-WIKI-SPEC-v1]] is the canonical technical contract.
+The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [[WIKI#4.1 Common runtime schemas]] is the compact runtime schema reference; [[AGENT-WIKI-SPEC-v1]] is the full project and development contract.
 
 ## Quick Start
 
@@ -10,14 +10,14 @@ Start with the onboarding docs:
 
 1. [[ONBOARD]] for first-run setup, the onboarding probe, local system configuration, and `import-link` configuration.
 2. [[AGENTS]] for the agent behavior contract.
-3. [[WIKI]] for the human-readable schema guide.
-4. [[AGENT-WIKI-SPEC-v1]] for the full v1.3 specification.
+3. [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
+4. [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, scripts, skills, configuration policy, validation behavior, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 
 For a new agent session, use a prompt like:
 
 ```text
-Read ONBOARD.md, AGENTS.md, WIKI.md, and AGENT-WIKI-SPEC-v1.md before editing.
-Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
+Read ONBOARD.md, AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 before ordinary vault work.
+Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtime detail.
 ```
 
 Before importing external material, configure `_system/skills/import-link/config.json` as described in [[ONBOARD]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
@@ -32,8 +32,9 @@ Use the probe output to choose Python, optional `.venv/` setup, inbox conversion
 
 ## What This Repo Contains
 
-- The v1.3 wiki specification in [[AGENT-WIKI-SPEC-v1]]
-- Human and agent operating docs in [[WIKI]], [[AGENTS]], [[ONBOARD]], and [[INBOX]]
+- The compact runtime schema in [[WIKI#4.1 Common runtime schemas]]
+- The v1.3 project/development specification in [[AGENT-WIKI-SPEC-v1]]
+- Human and agent operating docs in [[WIKI#1.1 Documentation layers]], [[AGENTS]], [[ONBOARD]], and [[INBOX]]
 - A deterministic root page catalog in [[index]]
 - An optional human-facing vault landing page in [[overview]]
 - A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
@@ -131,4 +132,4 @@ You will likely customize:
 - maintenance schedules
 - ontology and relationship vocabularies
 
-Keep [[AGENT-WIKI-SPEC-v1]] as the source of truth when changing schema behavior.
+Use [[WIKI#4.1 Common runtime schemas]] for ordinary vault work. Keep [[AGENT-WIKI-SPEC-v1]] as the source of truth when changing schema, script, skill, configuration, or validation behavior.

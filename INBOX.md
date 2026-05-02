@@ -30,7 +30,7 @@ Use the probe output to choose a local conversion policy with the user. Do not i
 
 ### Source status
 
-Newly promoted source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]:
+Newly promoted source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]]:
 
 - `unprocessed` = captured as a source page, not yet extracted into knowledge primitives
 - `partitioned` = parent source has child source parts that still need extraction

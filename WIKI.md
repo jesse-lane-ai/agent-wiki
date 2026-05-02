@@ -2,7 +2,7 @@
 
 Human-readable schema and editorial guide for the Agentics vault.  
 Spec version: v1  
-Last updated: 2026-05-01
+Last updated: 2026-05-02
 
 ---
 
@@ -10,7 +10,9 @@ Last updated: 2026-05-01
 
 This vault is a structured knowledge base designed to be useful for both humans and AI agents.
 
-This file is a quick editorial guide. The canonical technical schema lives in [[AGENT-WIKI-SPEC-v1]].
+This file is the compact runtime schema and editorial guide for ordinary vault operations. User agents should prefer this file for page schemas, status enums, ID formats, evidence rules, and common examples.
+
+The full project and development contract lives in [[AGENT-WIKI-SPEC-v1]]. Use the full spec when changing project behavior, scripts, skills, configuration policy, validation behavior, or when this file is insufficient. If this file conflicts with the full spec, the full spec remains canonical until the conflict is resolved.
 
 It separates:
 - **things** from **ideas**
@@ -19,6 +21,20 @@ It separates:
 - **facts** from **interpretations**
 - **human-edited content** from **compiled/generated artifacts**
 - **page structure** from **compiled machine caches**
+
+---
+
+## 1.1 Documentation layers
+
+| File | Use |
+|---|---|
+| [[AGENTS]] | Agent behavior contract: preservation, logging, linking, generated files, and editing boundaries |
+| [[WIKI#4.1 Common runtime schemas]] | Compact runtime schema and editorial reference for ordinary vault work |
+| [[INBOX]] | Raw inbox lifecycle |
+| [[ONBOARD]] | First-run setup and local environment workflow |
+| [[AGENT-WIKI-SPEC-v1]] | Full project/development contract and detailed implementation reference |
+
+Agents should load the smallest document that answers the task. Routine source import, inbox processing, extraction, overview, and compile work should not require loading the full spec unless there is ambiguity.
 
 ---
 
@@ -126,6 +142,201 @@ sourcePages: []
 relatedPages: []
 confidence:
 freshness:
+```
+
+---
+
+## 4.1 Common runtime schemas
+
+These compact templates cover routine agent work. Omit optional fields only when they do not apply or cannot be inferred without guessing.
+
+### Source
+
+```yaml
+id: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
+pageType: source
+title: <title>
+status: unprocessed
+sourceType: <sourceType>
+sourceRole: whole
+originUrl:
+originPath:
+publishedAt:
+retrievedAt: YYYY-MM-DD
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+attachments: []
+```
+
+For large sources, use a short parent source and child part pages:
+
+```yaml
+id: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
+pageType: source
+title: <title>
+status: partitioned
+sourceType: <sourceType>
+sourceRole: parent
+sourceParts:
+  - sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part001.md
+originUrl:
+originPath:
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+```yaml
+id: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>.part001
+pageType: source
+title: <title> - Part 1
+status: unprocessed
+sourceType: <sourceType>
+sourceRole: part
+parentSourceId: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
+partIndex: 1
+partCount: <count>
+locator: <page range, heading path, timestamp range, slide range, or section range>
+originUrl:
+originPath:
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+When conversion produced the Markdown source body, add available provenance:
+
+```yaml
+convertedAt: YYYY-MM-DD
+conversionTool: <tool>
+conversionToolVersion: <version>
+conversionBackend: <backend>
+conversionWarnings: []
+```
+
+### Entity
+
+```yaml
+id: entity.<entityType>.<entitySlug>
+pageType: entity
+title: <title>
+entityType: <entityType>
+canonicalName: <canonicalName>
+status: active
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+### Concept
+
+```yaml
+id: concept.<conceptType>.<conceptSlug>
+pageType: concept
+title: <title>
+conceptType: <conceptType>
+status: active
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+### Claim Page
+
+```yaml
+id: claim.<claimType>.<claimSlug>
+pageType: claim
+title: <title>
+claimType: <claimType>
+status: unverified
+confidence: 0.60
+text: <one atomic proposition>
+subjectPageId:
+sourceIds: []
+evidence: []
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+### Embedded Claim
+
+```yaml
+claims:
+  - id: claim.<claimType>.<claimSlug>
+    text: <one atomic proposition>
+    status: unverified
+    confidence: 0.60
+    claimType: <claimType>
+    relatedClaimIds: []
+    evidence: []
+    createdAt: YYYY-MM-DD
+    updatedAt: YYYY-MM-DD
+```
+
+### Evidence Entry
+
+```yaml
+evidence:
+  - id: evidence.<kind>.<relation>.<stable-suffix>
+    sourceId: source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
+    path: sources/<source-file>.md
+    lines:
+    kind: quote
+    relation: context_only
+    weight: 0.60
+    note:
+    excerpt:
+    retrievedAt: YYYY-MM-DD
+    updatedAt: YYYY-MM-DD
+```
+
+### Question
+
+```yaml
+id: question.<domain>.<questionSlug>
+pageType: question
+title: <question>
+priority: medium
+status: open
+relatedClaims: []
+relatedPages: []
+openedAt: YYYY-MM-DD
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+### Relation
+
+```yaml
+relations:
+  - subject: <subject-id>
+    predicate: <predicate>
+    object: <object-id>
+    confidence: 0.60
+    sourceClaimIds: []
+```
+
+### Overview
+
+```yaml
+id: meta.overview
+pageType: overview
+title: Vault Overview
+status: active
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
 ```
 
 ---
@@ -263,7 +474,7 @@ Generated structured knowledge should live in frontmatter fields, claim/evidence
 
 Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
 
-`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI]], [[INBOX]], or [[AGENTS]] instead.
+`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI#1.1 Documentation layers]], [[INBOX]], or [[AGENTS]] instead.
 
 `overview.md` is durable AI-maintained orientation prose. It should summarize the vault for a human reader, but it is not primary evidence and should not replace canonical source, claim, evidence, or page metadata records.
 
@@ -329,6 +540,44 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 
 ---
 
+## 12.1 Entity and concept types
+
+### Entity types
+
+| Type | Meaning |
+|---|---|
+| `person` | Person |
+| `organization` | Organization |
+| `project` | Project |
+| `product` | Product |
+| `system` | System |
+| `place` | Place |
+| `event` | Event |
+| `artifact` | Artifact |
+| `document` | Document as a thing |
+| `other` | Other entity |
+
+### Concept types
+
+| Type | Meaning |
+|---|---|
+| `definition` | Definition |
+| `principle` | Principle |
+| `framework` | Framework |
+| `method` | Method |
+| `policy` | Policy |
+| `standard` | Standard |
+| `pattern` | Pattern |
+| `workflow` | Workflow |
+| `runbook` | Runbook |
+| `checklist` | Checklist |
+| `playbook` | Playbook |
+| `theory` | Theory |
+| `taxonomy` | Taxonomy |
+| `other` | Other concept |
+
+---
+
 ## 13. Large sources
 
 Large sources should not become one giant markdown file when that would make extraction or evidence citation unreliable.
@@ -381,6 +630,7 @@ All internal links within the vault use Obsidian-style wikilinks.
 | `[[page-slug#section]]` | Link to a section |
 
 Standard markdown links are only used for external URLs.
+
 ---
 
 ## 16. Editorial principles

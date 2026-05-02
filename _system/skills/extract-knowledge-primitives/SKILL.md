@@ -7,9 +7,9 @@ description: "Extract knowledge primitives (entities, concepts, claims, question
 
 This skill defines the extraction workflow. It does not own the vault schema.
 
-Canonical schema, allowed enums, ID formats, confidence semantics, and canonical examples live in `AGENT-WIKI-SPEC-v1.md`. The vault behavior contract lives in `AGENTS.md`. The quick editorial guide lives in `WIKI.md`.
+Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums live in `WIKI.md` Sections 5 and 6. Evidence rules live in `WIKI.md` Section 7. Relationship predicates live in `WIKI.md` Section 8. Entity and concept type enums live in `WIKI.md` Section 12.1. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v1.md`.
 
-If this skill conflicts with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
+Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
 
 ## Core Principles
 
@@ -20,15 +20,16 @@ If this skill conflicts with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1
 - Treat evidence honestly. An excerpt can show that a source made a statement without proving the statement true.
 - Use Obsidian wikilinks for internal vault references.
 
-## Step 1: Read the Contract and Spec
+## Step 1: Read the Contract and Runtime Reference
 
 Before extracting anything, read:
 
 1. `AGENTS.md` for behavior rules.
-2. `AGENT-WIKI-SPEC-v1.md` for canonical schema, field requirements, ID formats, enums, and canonical examples.
-3. `WIKI.md` only as a quick editorial reference.
+2. `WIKI.md` Sections 4.1, 5, 6, 7, 8, and 12.1 for runtime schema, field requirements, ID formats, enums, and common examples.
 
-Do not copy schemas from this skill when creating pages. Use `AGENT-WIKI-SPEC-v1.md` as the source of truth.
+Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 are insufficient.
+
+Do not copy schemas from this skill when creating pages. Use `WIKI.md` Section 4.1 as the routine source of truth for ordinary vault schemas.
 
 ## Step 2: Find Source Pages Needing Extraction
 
@@ -143,7 +144,7 @@ Extract workflow-style concepts when the source contains reusable actionable ste
 - playbooks
 - setup or operating instructions
 
-Represent these as `pageType: concept` in `concepts/`, using the canonical concept schema and an appropriate workflow-oriented `conceptType` from `AGENT-WIKI-SPEC-v1.md`. Preserve the operational sequence. Keep the body concise and source-grounded.
+Represent these as `pageType: concept` in `concepts/`, using the concept schema in `WIKI.md` Section 4.1 and an appropriate workflow-oriented `conceptType` from `WIKI.md` Section 12.1. Preserve the operational sequence. Keep the body concise and source-grounded.
 
 ### Questions
 
@@ -170,7 +171,7 @@ Extract relations when the source establishes a typed connection between primiti
 - logical support or contradiction
 - general association
 
-Use predicates from `AGENT-WIKI-SPEC-v1.md`. Relations are directional; record the direction actually supported by the source.
+Use predicates from `WIKI.md` Section 8. Relations are directional; record the direction actually supported by the source.
 
 ## Step 4: Create or Update Pages
 
@@ -183,7 +184,7 @@ Create pages in the folder required by `AGENTS.md`:
 - `claims/` for `pageType: claim`
 - `questions/` for `pageType: question`
 
-Use the canonical page schemas and examples from `AGENT-WIKI-SPEC-v1.md` Section 10, "Page-Type Specific Frontmatter". Do not use local schema templates or copied frontmatter examples.
+Use the runtime page schemas and examples from `WIKI.md` Section 4.1. Do not use local schema templates or copied frontmatter examples.
 
 When updating an existing page:
 
@@ -211,7 +212,7 @@ Use `relation: supports` only when the evidence directly supports the claim. Use
 
 ## Step 6: Update Source Extraction Metadata
 
-After extracting primitives from a source page, update that source page's frontmatter using the fields defined in `AGENT-WIKI-SPEC-v1.md`.
+After extracting primitives from a source page, update that source page's frontmatter using the fields defined in `WIKI.md` Section 4.1 and source statuses from `WIKI.md` Section 5.
 
 At minimum, record:
 
@@ -253,13 +254,13 @@ Created or updated:
 
 ## Checklist
 
-- [ ] Read `AGENTS.md` and `AGENT-WIKI-SPEC-v1.md`
+- [ ] Read `AGENTS.md` and `WIKI.md` Sections 4.1, 5, 6, 7, 8, and 12.1
 - [ ] Find unprocessed source pages and source parts
 - [ ] Skip `sourceRole: parent` pages during extraction
 - [ ] Read each selected source in full
 - [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Check for duplicates before creating pages
-- [ ] Use canonical schemas and examples from `AGENT-WIKI-SPEC-v1.md`
+- [ ] Use runtime schemas and examples from `WIKI.md` Section 4.1
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`
 - [ ] Add source-grounded evidence without overstating support
 - [ ] Include source part locators in evidence when available
@@ -270,4 +271,4 @@ Created or updated:
 
 ## Schema Authority
 
-This skill owns extraction workflow guidance only. Page schemas, allowed enum values, ID formats, and canonical examples live in `AGENT-WIKI-SPEC-v1.md` Section 10, "Page-Type Specific Frontmatter".
+This skill owns extraction workflow guidance only. Runtime page schemas, ID formats, and common examples live in `WIKI.md` Section 4.1. Allowed enum values live in `WIKI.md` Sections 5, 6, 7, 8, 12, and 12.1. Use `AGENT-WIKI-SPEC-v1.md` only for project changes, ambiguity, or missing detail.

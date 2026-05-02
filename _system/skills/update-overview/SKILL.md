@@ -7,7 +7,9 @@ description: "Create or refresh the root overview.md landing page for the vault.
 
 This skill creates or refreshes root `overview.md`, the human-facing narrative landing page for the vault. It does not own the schema.
 
-Canonical schema, page type rules, authority rules, and examples live in `AGENT-WIKI-SPEC-v1.md`. The vault behavior contract lives in `AGENTS.md`. If this skill conflicts with `AGENT-WIKI-SPEC-v1.md`, follow the spec.
+Runtime overview schema lives in `WIKI.md` Section 4.1. Page type rules live in `WIKI.md` Section 3. Authority rules live in `WIKI.md` Sections 1.1, 9, and 11. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v1.md`.
+
+Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
 
 ## When to Use
 
@@ -18,15 +20,14 @@ Use this skill when:
 
 Do not run this skill automatically as part of compile. `overview.md` is durable AI-maintained prose, not a deterministic compile artifact.
 
-## Step 1: Read the Contract and Spec
+## Step 1: Read the Contract and Runtime Reference
 
 Before updating `overview.md`, read:
 
 1. `AGENTS.md` for behavior rules.
-2. `AGENT-WIKI-SPEC-v1.md` for the `overview.md` contract, page type rules, and schema.
-3. `WIKI.md` as a quick editorial reference when needed.
+2. `WIKI.md` Sections 3, 4.1, 9, and 11 for the `overview.md` page type, runtime schema, generated-content authority, and report authority.
 
-Use `AGENT-WIKI-SPEC-v1.md` Section 7.9 for the root overview page behavior.
+Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 are insufficient.
 
 ## Step 2: Compile First
 
@@ -45,7 +46,7 @@ Use compiled and canonical inputs, in this order:
 1. `_system/cache/pages.json` for page inventory, page types, titles, statuses, paths, and metadata.
 2. `_system/cache/agent-digest.json` for compact high-signal context.
 3. Canonical pages in content folders when the overview needs richer context than the cache provides.
-4. Root docs such as `README.md`, `WIKI.md`, and `INBOX.md` for project and workflow orientation.
+4. Root docs such as `README.md`, `WIKI.md` Sections 1.1 and 2, and `INBOX.md` for project and workflow orientation.
 
 Do not use reports or logs as primary truth. Reports may help identify maintenance concerns, but the overview should be grounded in canonical pages and compiled cache data.
 
@@ -53,7 +54,7 @@ Do not use reports or logs as primary truth. Reports may help identify maintenan
 
 Write `overview.md` at the vault root.
 
-If the file does not exist, create it with frontmatter using the canonical universal fields from `AGENT-WIKI-SPEC-v1.md` and:
+If the file does not exist, create it with frontmatter using the universal and overview fields from `WIKI.md` Section 4.1:
 
 ```yaml
 id: meta.overview
