@@ -51,6 +51,7 @@ Current vault structure:
   _attachments/
   _archive/
   _system/
+    config.json
     cache/
     indexes/
     logs/
@@ -75,6 +76,10 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_system/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
+
+`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge and should not contain secrets.
+
+Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain.
 
 ---
 

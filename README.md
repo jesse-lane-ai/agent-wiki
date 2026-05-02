@@ -8,7 +8,7 @@ The vault keeps human-authored pages, structured frontmatter, claims, evidence, 
 
 Start with the onboarding docs:
 
-1. [[ONBOARD]] for first-run setup and local `import-link` configuration.
+1. [[ONBOARD]] for first-run setup, the onboarding probe, local system configuration, and `import-link` configuration.
 2. [[AGENTS]] for the agent behavior contract.
 3. [[WIKI]] for the human-readable schema guide.
 4. [[AGENT-WIKI-SPEC-v1]] for the full v1.3 specification.
@@ -21,6 +21,14 @@ Treat AGENT-WIKI-SPEC-v1.md as the canonical schema.
 ```
 
 Before importing external material, configure `_system/skills/import-link/config.json` as described in [[ONBOARD]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+
+For fresh checkouts or uncertain local setup, run the read-only onboarding probe:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+Use the probe output to choose Python, optional `.venv/` setup, inbox conversion policy, and `_system/config.json` values with the user.
 
 ## What This Repo Contains
 
@@ -61,6 +69,7 @@ Current top-level vault shape:
   _attachments/
   _archive/
   _system/
+    config.json
     cache/
     indexes/
     logs/

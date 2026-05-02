@@ -5,6 +5,14 @@ The `_inbox/` folder is the active drop zone for raw files that still need to be
 **Use the process-inbox skill to process the inbox.**
 `_system/skills/process-inbox/SKILL.md`
 
+If inbox files are binary or non-markdown documents and local converter availability is unknown, run the read-only onboarding probe before processing:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+Use the probe output to choose a local conversion policy with the user. Do not install packages, create `.venv/`, write `_system/config.json`, or call network/OCR/LLM/cloud conversion services unless the user explicitly approves that setup.
+
 ### Folder meaning
 
 - `_inbox/` = active raw file queue

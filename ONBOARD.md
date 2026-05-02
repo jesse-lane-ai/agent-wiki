@@ -5,13 +5,23 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
-4. Confirm the local Python command. The checked-in examples use `python3`, but some systems expose Python 3 as `python`.
-5. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
-6. Configure `_system/skills/import-link/config.json` before importing external material.
-7. Run the compile pipeline and confirm it reports zero validation issues.
-8. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
+4. Run the read-only onboarding probe.
+5. Ask the user setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
+6. Configure `_system/config.json` if local tool policy or conversion backend preferences are needed.
+7. Configure `_system/skills/import-link/config.json` before importing external material.
+8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
+9. Run the compile pipeline and confirm it reports zero validation issues.
+10. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
 
-Check Python before running scripts:
+Run the onboarding probe from the vault root:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+The probe is read-only. It reports local Python commands, `.venv/` status, `_system/config.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+
+If the probe cannot run, check Python manually:
 
 ```bash
 python3 --version
@@ -23,6 +33,38 @@ Use whichever command resolves to Python 3.8 or newer. If neither command is ava
 ```bash
 python3 _system/skills/compile-wiki/scripts/compile.py
 ```
+
+---
+
+## Local System Configuration
+
+`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge and should not contain secrets.
+
+Use it when the user wants persistent local preferences such as:
+
+- which Python command to use
+- whether inbox conversion is enabled
+- automatic conversion backend order
+- backend command names
+- whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
+
+Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults.
+
+---
+
+## Optional Virtual Environment
+
+The compile pipeline does not need third-party Python packages. Optional inbox conversion backends may need Python packages.
+
+If optional packages are installed, prefer a project-local virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install markitdown pymupdf4llm
+```
+
+Agents must not create `.venv/` or install packages unless the user explicitly asks. If Python or optional packages are missing, warn the user and explain what is needed.
 
 ---
 
@@ -73,6 +115,8 @@ Config fields:
 If any required value is unknown, the agent should ask the user before running `import-link`.
 
 The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
+
+For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `_system/scripts/onboard.py --check` first when converter availability is unknown, then ask the user which conversion policy to use before writing `_system/config.json` or installing anything.
 
 Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
 

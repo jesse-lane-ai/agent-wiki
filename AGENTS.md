@@ -76,6 +76,14 @@ Agents SHOULD process inbox items by converting retained raw files into canonica
 
 Large retained sources SHOULD be converted into a short parent source page under `sources/` and child source part pages under `sources/parts/`. Agents SHOULD extract knowledge primitives from source part pages, not from the parent source manifest.
 
+When local setup or converter availability is uncertain, agents SHOULD run the read-only onboarding probe:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, or enable network/OCR/LLM/cloud conversion behavior unless explicitly instructed by the human operator.
+
 ---
 
 ## 3. What agents may do
