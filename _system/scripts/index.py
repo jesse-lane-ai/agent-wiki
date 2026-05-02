@@ -19,8 +19,9 @@ from typing import Any
 PAGES_CACHE = Path("_system/cache/pages.json")
 INDEX_PATH = Path("index.md")
 LOG_SCRIPT = Path("_system/scripts/log.py")
-PAGE_TYPE_ORDER = ["source", "entity", "concept", "claim", "synthesis", "question", "index", "report"]
+PAGE_TYPE_ORDER = ["overview", "source", "entity", "concept", "claim", "synthesis", "question", "index", "report"]
 PAGE_TYPE_LABELS = {
+    "overview": "Overview",
     "source": "Sources",
     "entity": "Entities",
     "concept": "Concepts",

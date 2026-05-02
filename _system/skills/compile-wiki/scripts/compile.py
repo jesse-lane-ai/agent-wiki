@@ -65,7 +65,7 @@ MAX_DIGEST_CLAIMS = 30           # max top supported claims included in agent di
 MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent digest
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
-VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "question", "report", "claim", "index"}
+VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "question", "report", "claim", "index", "overview"}
 VALID_GENERAL_STATUSES = {"active", "draft", "archived", "deprecated"}
 VALID_SOURCE_STATUSES = {"unprocessed", "processed", "archived"}
 VALID_SOURCE_TYPES = {"webpage", "article", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
@@ -648,6 +648,17 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
                 "invalid_page_location",
                 path,
                 "`pageType: index` is reserved for index.md.",
+                pageId=page_id,
+                pageType=page_type,
+            )
+    elif page_type == "overview":
+        validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
+        if path != "overview.md":
+            add_validation_issue(
+                issues,
+                "invalid_page_location",
+                path,
+                "`pageType: overview` is reserved for overview.md.",
                 pageId=page_id,
                 pageType=page_type,
             )
