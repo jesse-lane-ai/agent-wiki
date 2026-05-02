@@ -654,7 +654,7 @@ Entities and concepts SHOULD include `canonicalName`.
 
 ### 8.4 Internal linking convention
 
-All internal references within the vault MUST use Obsidian-style wikilinks.
+Internal references in vault-native pages and vault-native documentation MUST use Obsidian-style wikilinks.
 
 ```md
 [[page-slug]]
@@ -662,15 +662,18 @@ All internal references within the vault MUST use Obsidian-style wikilinks.
 [[page-slug#section-heading]]
 ```
 
-Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs only.
+Standard markdown links (`[text](path)`) MUST NOT be used for internal vault-page references. They MAY be used for external URLs.
 
 This convention applies to:
 - page body content
-- skill instruction files
-- root-level docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `CLAUDE.md`, etc.)
+- vault-native root docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `ONBOARD.md`, `CLAUDE.md`, etc.)
 - `relatedPages`, `relatedClaims`, and similar string reference fields in frontmatter
 
-Rationale: wikilinks decouple references from file system paths, survive renames, and are resolved natively by Obsidian and compatible tooling.
+Public repository documentation MAY use standard markdown links for repository readability, especially `README.md` when it is intended to render cleanly on GitHub.
+
+Skill instruction files SHOULD use explicit relative paths when directing agents to project files, schemas, scripts, or examples. Skills MAY mention wikilinks only when the desired output is vault-native content that should contain wikilinks.
+
+Rationale: wikilinks decouple vault references from file system paths, survive renames, and are resolved natively by Obsidian and compatible tooling. Public repository docs have a different audience and SHOULD remain readable in standard markdown renderers.
 
 ### 8.5 Attachment IDs
 
