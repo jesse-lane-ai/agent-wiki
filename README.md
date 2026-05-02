@@ -27,6 +27,7 @@ Before importing external material, configure `_system/skills/import-link/config
 - The v1.3 wiki specification in [[AGENT-WIKI-SPEC-v1]]
 - Human and agent operating docs in [[WIKI]], [[AGENTS]], [[INITIALIZE]], and [[INBOX]]
 - A deterministic root page catalog in [[index]]
+- An optional human-facing vault landing page in [[overview]]
 - A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
 - Agent skills for import, inbox processing, extraction, and compilation under `_system/skills/`
 - Gitignored runtime outputs for caches, indexes, logs, and reports
@@ -44,6 +45,7 @@ Current top-level vault shape:
   README.md
   WIKI.md
   index.md
+  overview.md
 
   sources/
   entities/
@@ -85,7 +87,7 @@ It reads vault pages and emits generated artifacts such as:
 - `_system/logs/log.md`
 - `reports/`
 
-These outputs are generated artifacts. Do not hand-edit them, and do not treat reports or logs as primary truth. Durable orientation prose belongs in the root documentation files, not `index.md`.
+These outputs are generated artifacts. Do not hand-edit them, and do not treat reports or logs as primary truth. Durable orientation prose belongs in root documentation files such as `overview.md`, not `index.md`.
 
 ## Skills
 

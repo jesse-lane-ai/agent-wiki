@@ -35,6 +35,7 @@ Current vault structure:
   README.md
   WIKI.md
   index.md
+  overview.md
 
   sources/
   entities/
@@ -89,6 +90,7 @@ Every authored page has a `pageType` in its frontmatter.
 | `question`  | `questions/`  | Open question or research gap         |
 | `report`    | `reports/`    | Generated view or dashboard           |
 | `index`     | `index.md`    | Deterministic root page catalog       |
+| `overview`  | `overview.md` | Human-facing vault landing page       |
 
 ---
 
@@ -245,7 +247,9 @@ Generated structured knowledge should live in frontmatter fields, claim/evidence
 
 Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
 
-`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[README]], [[WIKI]], [[INBOX]], or [[AGENTS]] instead.
+`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI]], [[INBOX]], or [[AGENTS]] instead.
+
+`overview.md` is durable AI-maintained orientation prose. It should summarize the vault for a human reader, but it is not primary evidence and should not replace canonical source, claim, evidence, or page metadata records.
 
 ---
 

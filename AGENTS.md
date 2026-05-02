@@ -58,6 +58,8 @@ Files in `reports/` are generated views. They are NOT authoritative.
 
 Agents MUST NOT read reports as primary data sources when page frontmatter or cache files are available.
 
+Root `overview.md`, if present, is human-facing orientation prose. It is NOT primary evidence for claims unless the relevant material has also been promoted into canonical source, claim, evidence, or page metadata records.
+
 ### 2.7 Do not hand-edit cache files
 
 Files in `_system/cache/`, `_system/indexes/`, `_system/logs/`, and root `index.md` are generated artifacts.
@@ -83,6 +85,7 @@ Agents SHOULD process inbox items by converting retained raw files into canonica
 - Update page body prose when explicitly instructed
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate the root page catalog, caches, and reports
+- Create or refresh root `overview.md` when explicitly asked for a human-facing vault overview
 - Add aliases and tags to existing pages
 
 ---
@@ -140,6 +143,7 @@ Example: `entities/riverside-community-garden.md`
 | `questions/` | `question` |
 | `reports/` | `report` (if frontmatter present) |
 | `index.md` | `index` |
+| `overview.md` | `overview` |
 
 Agents MUST place pages in the folder that matches their `pageType`.  
 Agents MUST NOT place entity pages in `concepts/`, etc.
@@ -235,6 +239,7 @@ Logs are not authoritative truth records. Agents MUST NOT treat `_system/logs/lo
 - Create duplicate IDs
 - Place pages in the wrong folder for their `pageType`
 - Invent unsupported certainty in claims
+- Treat root `overview.md` as primary evidence
 - Use standard markdown links for internal vault references (use wikilinks instead)
 
 ---

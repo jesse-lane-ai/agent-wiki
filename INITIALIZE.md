@@ -8,6 +8,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 4. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
 5. Configure `_system/skills/import-link/config.json` before importing external material.
 6. Run the compile pipeline and confirm it reports zero validation issues.
+7. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
 
 ```bash
 python3 _system/skills/compile-wiki/scripts/compile.py
@@ -82,6 +83,7 @@ Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unpr
 11. Regenerate root `index.md`
 12. Generate required reports
 13. Add contradiction/question caches
+14. Add or refresh root `overview.md` when the vault needs a human-facing landing page
 
 ---
 
@@ -106,5 +108,6 @@ The v1 model has three layers:
 - The vault is the container: markdown pages, folders, human notes, and generated artifacts.
 - The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, and syntheses.
 - The compile layer is the bridge: stable machine-facing cache files, the deterministic root page catalog, and generated maintenance reports.
+- The overview layer is the human landing page: durable prose that orients readers without replacing canonical evidence or compiled data.
 
 The wiki should separate what exists, what is claimed, what supports it, what conflicts with it, what is unknown, how things connect, and how agents consume it.
