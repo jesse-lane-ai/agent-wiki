@@ -2,103 +2,172 @@
 
 An Obsidian-compatible knowledge vault that AI agents can safely maintain.
 
-Drop notes, PDFs, transcripts, or research into `_inbox/`.
-Agents promote them into source pages, extract claims and evidence, link entities and concepts, track open questions, flag contradictions, and compile everything into machine-readable caches.
+Drop notes, PDFs, transcripts, links, or research into `_inbox/`. Agents promote them into source pages, extract claims and evidence, link entities and concepts, track open questions, flag contradictions, and compile the vault into machine-readable caches.
 
-Other llm wikis focus on generating and maintaining wiki pages.
+Most LLM wiki projects focus on generating and maintaining wiki pages.
 
 Agent Wiki focuses on evidence-aware structured knowledge:
-claims, evidence, relations, questions, contradictions, timelines, and compiled agent caches.
 
-**What is it?** A structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
+- claims
+- evidence
+- relations
+- questions
+- contradictions
+- timelines
+- compiled agent caches
 
-The vault keeps human-authored and agent-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is the compact runtime schema reference; [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) is the full project and development contract.
+It is markdown-first, Git-friendly, Obsidian-compatible, and designed for both humans and agents.
 
-Inspired by Karpathy’s [Karpath's LLM Wiki gist][karpathy-wiki].
+Inspired by Karpathy’s [LLM Wiki gist][karpathy-wiki].
 
 [karpathy-wiki]: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
 
-## Quick Start
+## Why Agent Wiki exists
+
+LLMs are useful when they have reliable context. They are unreliable when every task starts from a pile of raw files, old notes, chat logs, and half-remembered summaries.
+
+Agent Wiki gives agents a maintained knowledge layer:
+
+- sources stay separate from summaries
+- claims stay separate from prose
+- evidence stays attached to claims
+- contradictions are tracked instead of hidden
+- open questions remain visible
+- generated caches can be rebuilt instead of hand-edited
+
+The result is a vault humans can read and agents can compile into compact runtime context.
+
+## How it works
 
 ```text
-Read ONBOARD.md then onboard me.
+_inbox/
+  raw notes, PDFs, links, transcripts
+        ↓
+sources/
+  canonical source pages
+        ↓
+claims/       entities/       concepts/       questions/
+  structured knowledge primitives with evidence and relations
+        ↓
+_system/cache/
+  compact agent-facing indexes and reports
+        ↓
+index.md      overview.md      reports/
+  human-facing generated views
 ```
 
-Start with the onboarding docs:
+Structured evidence, relations, contradictions, and timeline events are stored in page frontmatter and compiled cache files rather than separate root folders.
 
-1. [ONBOARD.md](ONBOARD.md) for first-run setup, the onboarding probe, local system configuration, and `import-link` configuration.
-2. [AGENTS.md](AGENTS.md) for the agent behavior contract.
-3. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for the runtime schema and examples; [section 5](WIKI.md#5-status-vocabularies) for status enums; [section 3](WIKI.md#3-page-types) for page types.
-4. [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) only when changing project behavior, scripts, skills, configuration policy, validation behavior, or when [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is insufficient.
+## Quick Start
 
-For a new agent session, use a prompt like:
+Clone the repo and ask your agent:
 
 ```text
-Read ONBOARD.md, AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 before ordinary vault work.
+Read ONBOARD.md, then onboard me.
+```
+
+Ingest text or markdown from `_inbox/` via a new agent session:
+
+```text
+Read AGENTS.md, then run the process-inbox skill.
+```
+
+*Text and markdown ingest works out of the box.*
+
+Then run the `extract-knowledge-primitives` skill to extract claims, evidence, relations, questions, and contradictions.
+
+```text
+Run the extract-knowledge-primitives skill
+```
+
+Then compile the wiki:
+
+```text
+Run the compile-wiki skill
+```
+
+Generate the overview landing page:
+
+```text
+Run the update-overview skill
+```
+
+For daily vault work, start a new agent session with:
+
+```text
+Read AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 before ordinary vault work.
 Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtime detail.
 ```
 
-Before importing external material, configure `_system/skills/import-link/config.json` as described in [ONBOARD.md](ONBOARD.md). Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+## Core documents
 
-For fresh checkouts or uncertain local setup, run the read-only onboarding probe:
+- [ONBOARD.md](ONBOARD.md) — first-run setup, onboarding probe, local configuration, and import-link setup.
+- [AGENTS.md](AGENTS.md) — the agent behavior contract.
+- [WIKI.md](WIKI.md) — page types, schemas, status enums, runtime examples, and vault rules.
+- [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) — full project contract for changing behavior, scripts, skills, configuration, or validation.
 
-```bash
-python3 _system/scripts/onboard.py --check
-```
+## How Agent Wiki differs from other LLM wiki projects
 
-Use the probe output to choose Python, optional `.venv/` setup, inbox conversion policy, and `_system/config.json` values with the user. For compact setup prompts, run:
+Other LLM wiki projects focus on generating and maintaining wiki pages.
 
-```bash
-python3 _system/scripts/onboard.py --check --questions
-```
+Agent Wiki focuses on evidence-aware structured knowledge. The wiki is not just prose; it is a vault of linked primitives that agents can safely maintain and compile.
 
-## What This Repo Contains
+| Area | Typical LLM wiki | Agent Wiki |
+|---|---|---|
+| Main output | Wiki pages | Wiki pages + structured knowledge primitives |
+| Truth model | Summaries and links | Claims backed by evidence |
+| Contradictions | Usually prose-level | First-class tracked objects |
+| Runtime use | Read pages as context | Compile compact machine-facing caches |
+| Human editing | Often mixed with generated content | Human and generated lanes stay separate |
+| Agent safety | Prompt conventions | Explicit behavior contract and schemas |
 
-- The compact runtime schema in [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas)
-- The v1.3 project/development specification in [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md)
-- Human and agent operating docs in [WIKI.md section 1.1](WIKI.md#11-documentation-layers), [AGENTS.md](AGENTS.md), [ONBOARD.md](ONBOARD.md), and [INBOX.md](INBOX.md)
-- A deterministic root page catalog in [index.md](index.md)
-- An optional human-facing vault landing page in [overview.md](overview.md)
-- A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
-- Agent skills for import, inbox processing, extraction, and compilation under `_system/skills/`
-- Gitignored runtime outputs for caches, indexes, logs, and reports
+## What Agent Wiki produces
 
-Fresh checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders when needed.
-
-Current top-level vault shape:
+A maintained vault can produce human-readable pages and machine-facing artifacts such as:
 
 ```text
-<vault>/
-  AGENTS.md
-  AGENT-WIKI-SPEC-v1.md
-  INBOX.md
-  ONBOARD.md
-  README.md
-  WIKI.md
-  index.md
-  overview.md
+sources/
+  canonical source pages
 
-  sources/
-    parts/
-  entities/
-  concepts/
-  claims/
-  syntheses/
-  questions/
-  reports/
+entities/
+  people, companies, projects, tools, locations, and other named things
 
-  _inbox/
-  raw/
-  _attachments/
-  _archive/
-  _system/
-    config.json
-    cache/
-    indexes/
-    logs/
-    scripts/
-    skills/
+concepts/
+  reusable ideas, patterns, methods, and definitions
+
+claims/
+  atomic statements with source-backed evidence
+
+questions/
+  unresolved issues, unknowns, and research targets
+
+syntheses/
+  higher-level summaries and interpretations
+
+reports/
+  generated human-readable views
+
+_system/cache/
+  agent-digest.json
+  claims.jsonl
+  relations.jsonl
+  pages.json
+
+_system/indexes/
+  generated machine-readable indexes
 ```
+
+## Design principles
+
+Agent Wiki is built around a few strict rules:
+
+- Human-authored notes and agent-authored material should stay distinguishable.
+- Sources are not the same thing as summaries.
+- Claims should be traceable to evidence.
+- Contradictions should be tracked, not hidden.
+- Generated reports are views, not canonical truth.
+- Compiled caches should be rebuilt by tools, not hand-edited.
+- Agents should follow explicit schemas and behavior contracts.
 
 ## Compile
 
