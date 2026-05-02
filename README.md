@@ -2,16 +2,16 @@
 
 Agentics Vault is a structured, markdown-first wiki for building an Obsidian knowledge base that humans can read and agents can safely maintain.
 
-The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [[WIKI#4.1 Common runtime schemas]] is the compact runtime schema reference; [[AGENT-WIKI-SPEC-v1]] is the full project and development contract.
+The vault keeps human-authored pages, structured frontmatter, claims, evidence, relations, and generated machine-facing caches in separate lanes. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is the compact runtime schema reference; [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) is the full project and development contract.
 
 ## Quick Start
 
 Start with the onboarding docs:
 
-1. [[ONBOARD]] for first-run setup, the onboarding probe, local system configuration, and `import-link` configuration.
-2. [[AGENTS]] for the agent behavior contract.
-3. [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
-4. [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, scripts, skills, configuration policy, validation behavior, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
+1. [ONBOARD.md](ONBOARD.md) for first-run setup, the onboarding probe, local system configuration, and `import-link` configuration.
+2. [AGENTS.md](AGENTS.md) for the agent behavior contract.
+3. [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for the runtime schema and examples; [section 5](WIKI.md#5-status-vocabularies) for status enums; [section 3](WIKI.md#3-page-types) for page types.
+4. [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) only when changing project behavior, scripts, skills, configuration policy, validation behavior, or when [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) is insufficient.
 
 For a new agent session, use a prompt like:
 
@@ -20,7 +20,7 @@ Read ONBOARD.md, AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 bef
 Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtime detail.
 ```
 
-Before importing external material, configure `_system/skills/import-link/config.json` as described in [[ONBOARD]]. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
+Before importing external material, configure `_system/skills/import-link/config.json` as described in [ONBOARD.md](ONBOARD.md). Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid.
 
 For fresh checkouts or uncertain local setup, run the read-only onboarding probe:
 
@@ -36,11 +36,11 @@ python3 _system/scripts/onboard.py --check --questions
 
 ## What This Repo Contains
 
-- The compact runtime schema in [[WIKI#4.1 Common runtime schemas]]
-- The v1.3 project/development specification in [[AGENT-WIKI-SPEC-v1]]
-- Human and agent operating docs in [[WIKI#1.1 Documentation layers]], [[AGENTS]], [[ONBOARD]], and [[INBOX]]
-- A deterministic root page catalog in [[index]]
-- An optional human-facing vault landing page in [[overview]]
+- The compact runtime schema in [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas)
+- The v1.3 project/development specification in [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md)
+- Human and agent operating docs in [WIKI.md section 1.1](WIKI.md#11-documentation-layers), [AGENTS.md](AGENTS.md), [ONBOARD.md](ONBOARD.md), and [INBOX.md](INBOX.md)
+- A deterministic root page catalog in [index.md](index.md)
+- An optional human-facing vault landing page in [overview.md](overview.md)
 - A stdlib-only compile pipeline in `_system/skills/compile-wiki/`
 - Agent skills for import, inbox processing, extraction, and compilation under `_system/skills/`
 - Gitignored runtime outputs for caches, indexes, logs, and reports
@@ -136,4 +136,4 @@ You will likely customize:
 - maintenance schedules
 - ontology and relationship vocabularies
 
-Use [[WIKI#4.1 Common runtime schemas]] for ordinary vault work. Keep [[AGENT-WIKI-SPEC-v1]] as the source of truth when changing schema, script, skill, configuration, or validation behavior.
+Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary vault work. Keep [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
