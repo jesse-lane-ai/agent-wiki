@@ -1,4 +1,7 @@
 .obsidian/
+.venv/
+__pycache__/
+*.pyc
 _system/cache/
 _system/indexes/
 _system/logs/
