@@ -202,9 +202,11 @@ A v1-compliant vault MUST use the following top-level structure.
   _archive/
 
   _system/
+    config.json
     cache/
     indexes/
     logs/
+    scripts/
     skills/
 ```
 
@@ -302,7 +304,12 @@ Sub-directories:
 - `scripts/` — deterministic utility scripts for operational logging and generated catalog pages
 - `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
+Files:
+- `config.json` — optional local system configuration for tool policy, command preferences, and non-secret environment settings
+
 The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
+
+`_system/config.json` is local operational configuration, not canonical vault knowledge. It SHOULD NOT contain secrets, API keys, access tokens, private credentials, or machine-specific state that changes on every run. Detection results such as whether a converter is currently installed SHOULD be checked at runtime rather than stored as durable truth.
 
 Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
 
@@ -315,6 +322,57 @@ _system/skills/
   process-inbox/
     instructions.md
 ```
+
+### 6.3 Local system configuration
+
+`_system/config.json` MAY define local tool policy and command preferences used by deterministic scripts and skills. The file is optional. Tools SHOULD use conservative defaults when it is absent.
+
+Recommended shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "pythonCommand": null,
+  "conversion": {
+    "enabled": true,
+    "defaultBackend": "auto",
+    "backendOrder": ["pymupdf4llm", "markitdown"],
+    "allowNetwork": false,
+    "allowOcr": false,
+    "allowLlm": false,
+    "allowTranscription": false,
+    "allowHostedDocumentIntelligence": false,
+    "backends": {
+      "pymupdf4llm": {
+        "enabled": true,
+        "command": null,
+        "formats": ["pdf"]
+      },
+      "markitdown": {
+        "enabled": true,
+        "command": "markitdown",
+        "formats": ["pdf", "docx", "pptx", "xlsx", "html", "csv", "json", "xml", "epub"]
+      },
+      "arxiv2md": {
+        "enabled": false,
+        "command": null,
+        "formats": ["pdf"]
+      },
+      "marker": {
+        "enabled": false,
+        "command": null,
+        "formats": ["pdf"]
+      }
+    }
+  }
+}
+```
+
+`pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
+
+Configuration SHOULD express operator policy and preferences, not transient detection state. For example, a backend can be enabled in config but still unavailable at runtime if the command or Python package is not installed. Tools SHOULD detect that condition during execution and report it clearly.
+
+If `.venv/` is used, it SHOULD be project-local and ignored by version control. Shared template repositories SHOULD NOT require it to exist.
 
 ---
 
@@ -381,6 +439,10 @@ Conversion behavior SHOULD be deterministic:
 3. Tools MUST NOT call network, cloud OCR, LLM, transcription, or hosted document-intelligence services unless the operator explicitly requests or configures that behavior.
 4. If no configured local conversion path exists, the raw file MUST remain in `_inbox/` and the failure reason SHOULD be reported to the operator.
 5. If conversion succeeds but produces warnings or degraded output, those warnings SHOULD be recorded in source metadata.
+
+Automatic conversion tools SHOULD read local policy from `_system/config.json` when that file exists. The config MAY define the preferred Python command, whether conversion is enabled, the automatic backend order, backend-specific command names, and whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed. Missing config SHOULD fall back to conservative local-only defaults.
+
+When optional Python converter packages are installed, they SHOULD be installed in a project-local virtual environment such as `.venv/`. Agents MUST NOT create virtual environments or install packages unless the operator explicitly asks them to do so. `.venv/` is local environment state and MUST NOT be treated as vault content.
 
 Common local converter backends MAY include:
 
