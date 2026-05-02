@@ -6,7 +6,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run the read-only onboarding probe.
-5. Ask the user setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
+5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
 6. Configure `_system/config.json` if local tool policy or conversion backend preferences are needed.
 7. Configure `_system/skills/import-link/config.json` before importing external material.
 8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
@@ -20,6 +20,14 @@ python3 _system/scripts/onboard.py --check
 ```
 
 The probe is read-only. It reports local Python commands, `.venv/` status, `_system/config.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+
+To generate user-friendly setup prompts, run:
+
+```bash
+python3 _system/scripts/onboard.py --check --questions
+```
+
+Use those prompts when asking the user for setup decisions. The user should be able to reply with compact letter choices such as `1A 2B 3A 4C 5A`. Do not ask long open-ended setup questions unless the user needs to provide a specific path or command.
 
 If the probe cannot run, check Python manually:
 

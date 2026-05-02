@@ -82,6 +82,14 @@ When local setup or converter availability is uncertain, agents SHOULD run the r
 python3 _system/scripts/onboard.py --check
 ```
 
+For first-run setup questions, agents SHOULD use:
+
+```bash
+python3 _system/scripts/onboard.py --check --questions
+```
+
+Agents SHOULD ask setup questions as compact multiple-choice prompts so the user can reply with letter choices.
+
 Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, or enable network/OCR/LLM/cloud conversion behavior unless explicitly instructed by the human operator.
 
 ---

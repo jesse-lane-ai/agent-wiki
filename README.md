@@ -28,7 +28,11 @@ For fresh checkouts or uncertain local setup, run the read-only onboarding probe
 python3 _system/scripts/onboard.py --check
 ```
 
-Use the probe output to choose Python, optional `.venv/` setup, inbox conversion policy, and `_system/config.json` values with the user.
+Use the probe output to choose Python, optional `.venv/` setup, inbox conversion policy, and `_system/config.json` values with the user. For compact setup prompts, run:
+
+```bash
+python3 _system/scripts/onboard.py --check --questions
+```
 
 ## What This Repo Contains
 

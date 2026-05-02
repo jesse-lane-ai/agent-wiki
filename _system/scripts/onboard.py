@@ -4,6 +4,7 @@ Read-only onboarding probe for the Agentics vault.
 
 Usage:
     python3 _system/scripts/onboard.py --check
+    python3 _system/scripts/onboard.py --check --questions
 """
 
 import argparse
@@ -192,15 +193,127 @@ def build_report(vault_root: Path) -> dict[str, Any]:
     }
 
 
+def available_python_commands(report: dict[str, Any]) -> list[str]:
+    return [
+        command
+        for command, data in report["python"].items()
+        if data.get("available")
+    ]
+
+
+def preferred_python_command(report: dict[str, Any]) -> str | None:
+    for command in (".venv/bin/python", "python3", "python"):
+        if report["python"].get(command, {}).get("available"):
+            return command
+    return None
+
+
+def any_converter_available(report: dict[str, Any]) -> bool:
+    if any(data.get("available") for data in report["conversion"]["cli"].values()):
+        return True
+    for python_data in report["python"].values():
+        packages = python_data.get("packages", {})
+        if any(package.get("available") for package in packages.values()):
+            return True
+    return False
+
+
+def missing_folder_names(report: dict[str, Any]) -> list[str]:
+    return [
+        folder
+        for folder, data in report["folders"].items()
+        if not data.get("exists")
+    ]
+
+
+def build_setup_questions(report: dict[str, Any]) -> str:
+    missing_folders = missing_folder_names(report)
+    python_commands = available_python_commands(report)
+    preferred_python = preferred_python_command(report)
+    has_config = bool(report["config"].get("exists"))
+    has_venv = bool(report["virtualenv"].get("exists"))
+    has_converters = any_converter_available(report)
+    import_link_configured = bool(report["importLink"].get("configured"))
+    vault_root = report["vaultRoot"]
+
+    lines = [
+        "Setup questions",
+        "",
+        "Reply with letters, for example: 1A 2B 3A 4A 5B",
+        "",
+    ]
+
+    if missing_folders:
+        folder_summary = f"{len(missing_folders)} missing"
+    else:
+        folder_summary = "all present"
+    lines.extend([
+        f"1. Folders ({folder_summary})",
+        "   A. Create missing folders now. Recommended when you want the vault ready for imports and compile runs.",
+        "   B. Leave them for workflows to create later. Use this for a minimal checkout.",
+        "   C. Skip folder setup for now.",
+        "",
+    ])
+
+    if preferred_python:
+        python_label = preferred_python
+    elif python_commands:
+        python_label = python_commands[0]
+    else:
+        python_label = "not found"
+    lines.extend([
+        f"2. Python and _system/config.json ({python_label})",
+        "   A. Write _system/config.json with the detected Python command. Recommended when you want repeatable local runs.",
+        "   B. Leave _system/config.json absent. Tools will use conservative defaults.",
+        "   C. Use a different Python command. Reply with the command after the choice.",
+        "",
+    ])
+
+    venv_status = "present" if has_venv else "not present"
+    converter_status = "available" if has_converters else "not installed"
+    lines.extend([
+        f"3. Inbox conversion (.venv {venv_status}, converters {converter_status})",
+        "   A. Keep conversion disabled for now. Recommended when you only use markdown or pasted text.",
+        "   B. Enable only converters already available on this machine.",
+        "   C. Create .venv and install optional converters. This requires explicit install approval.",
+        "",
+    ])
+
+    import_status = "configured" if import_link_configured else "not configured"
+    lines.extend([
+        f"4. import-link ({import_status})",
+        f"   A. Configure import-link for this vault root: {vault_root}.",
+        "   B. Configure only manual_paste for now. Use this when links will be pasted by the user.",
+        "   C. Skip import-link setup for now.",
+        "",
+    ])
+
+    config_status = "present" if has_config else "absent"
+    lines.extend([
+        f"5. Compile after setup (_system/config.json {config_status})",
+        "   A. Run compile after approved setup changes. Recommended if files were created or config changed.",
+        "   B. Do not run compile now.",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a read-only onboarding probe.")
     parser.add_argument("--check", action="store_true", required=True, help="Inspect local setup without mutating files")
     parser.add_argument("--vault-root", default=".", help="Path to vault root (default: current directory)")
     parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+    parser.add_argument("--questions", action="store_true", help="Print human-friendly setup questions instead of JSON")
     args = parser.parse_args()
 
     vault_root = Path(args.vault_root).resolve()
     report = build_report(vault_root)
+    if args.questions:
+        sys.stdout.write(build_setup_questions(report))
+        sys.stdout.write("\n")
+        return
+
     indent = None if args.compact else 2
     json.dump(report, sys.stdout, indent=indent, sort_keys=True)
     sys.stdout.write("\n")

@@ -384,6 +384,12 @@ The probe SHOULD support:
 python3 _system/scripts/onboard.py --check
 ```
 
+It MAY also support a read-only human question helper:
+
+```bash
+python3 _system/scripts/onboard.py --check --questions
+```
+
 `onboard.py --check` SHOULD inspect local environment capabilities and print a structured report. The report SHOULD be suitable for both human review and agent-guided setup.
 
 The probe SHOULD check:
@@ -400,6 +406,18 @@ The probe SHOULD check:
 The probe MUST NOT install packages, create virtual environments, write `_system/config.json`, create folders, modify skill config, or mutate vault content when run with `--check`.
 
 Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then write `_system/config.json` or create missing folders only after the operator has approved those actions.
+
+Onboarding questions SHOULD be compact multiple-choice prompts. The operator should be able to answer quickly with letter choices such as `1A 2B 3A`. Agents SHOULD avoid long open-ended setup questions unless a path, command, or credential must be supplied by the operator.
+
+Each setup question SHOULD include:
+
+- a short label
+- two to four lettered choices
+- a clear recommended choice when one exists
+- a one-sentence consequence for each choice
+- a short answer format, such as `Reply with: 1A 2B 3A 4C`
+
+Question text SHOULD be friendly and operational. It SHOULD describe what the choice will do, not narrate internal implementation details.
 
 Recommended setup questions include:
 

@@ -8,6 +8,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 ## Configuration
 - Before first use, read `ONBOARD.md` and `_system/skills/import-link/config.json`.
 - If local setup is uncertain, run `python3 _system/scripts/onboard.py --check` and use the read-only probe output to guide setup questions.
+- For first-run setup, prefer `python3 _system/scripts/onboard.py --check --questions` so the user can answer with compact letter choices.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
 - If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_system/skills/import-link/config.json`.

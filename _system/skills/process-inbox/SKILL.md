@@ -30,6 +30,14 @@ If local Python or converter availability is unknown, run the read-only onboardi
 python3 _system/scripts/onboard.py --check
 ```
 
+For first-run setup decisions, prefer:
+
+```bash
+python3 _system/scripts/onboard.py --check --questions
+```
+
+Use the generated multiple-choice prompts so the user can answer with compact letter choices.
+
 Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work.
 
 ## Step 2: Check the Inbox
