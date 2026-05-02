@@ -374,6 +374,43 @@ Configuration SHOULD express operator policy and preferences, not transient dete
 
 If `.venv/` is used, it SHOULD be project-local and ignored by version control. Shared template repositories SHOULD NOT require it to exist.
 
+### 6.4 Onboarding probe
+
+The system SHOULD provide a deterministic onboarding probe at `_system/scripts/onboard.py`.
+
+The probe SHOULD support:
+
+```bash
+python3 _system/scripts/onboard.py --check
+```
+
+`onboard.py --check` SHOULD inspect local environment capabilities and print a structured report. The report SHOULD be suitable for both human review and agent-guided setup.
+
+The probe SHOULD check:
+
+- available Python commands, including `python3`, `python`, and `.venv/bin/python`
+- Python versions for available commands
+- whether `.venv/` exists
+- whether `_system/config.json` exists
+- whether required runtime/content folders exist
+- whether `import-link` has a local config file and whether it appears configured
+- available local conversion CLI commands, such as `markitdown`, `marker`, and `arxiv2md`
+- importable Python conversion packages under each available Python command, such as `pymupdf4llm`, `markitdown`, and `marker`
+
+The probe MUST NOT install packages, create virtual environments, write `_system/config.json`, create folders, modify skill config, or mutate vault content when run with `--check`.
+
+Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then write `_system/config.json` or create missing folders only after the operator has approved those actions.
+
+Recommended setup questions include:
+
+- which Python command to use
+- whether to use or create a project-local `.venv/`
+- whether inbox conversion should be enabled
+- which conversion backend policy to use
+- whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
+- whether missing runtime folders should be created
+- whether `_system/config.json` should be written
+
 ---
 
 ## 7. Folder Semantics
