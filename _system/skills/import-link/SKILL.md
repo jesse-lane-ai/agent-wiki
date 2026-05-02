@@ -33,7 +33,11 @@ Create source files in `sources/` using the canonical source page schema and exa
 
 Use Section 10 of `AGENT-WIKI-SPEC-v1.md` as the source of truth for page-type schemas, allowed enum values, ID formats, and examples. This skill owns the import workflow, not the source frontmatter schema.
 
-Newly imported source pages MUST use `status: unprocessed`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
+Use Section 7.1.1 of `AGENT-WIKI-SPEC-v1.md` for large-source parent and part handling.
+
+Newly imported ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
+
+Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status: partitioned` while one or more child source parts remain unprocessed. Child source part pages MUST use `sourceRole: part` and `status: unprocessed`.
 
 ## Deterministic Workflow
 1. **Deduplication Check:** Before capturing content, check existing source pages in `sources/` for a matching `originUrl`.
@@ -45,21 +49,37 @@ Newly imported source pages MUST use `status: unprocessed`. The extraction workf
    - If no configured retrieval mode works, ask the user to paste the source content or configure another retrieval method.
 3. Ensure vault folders exist:
    - `sources/`
+   - `sources/parts/` when the capture needs partitioning
    - `_attachments/`
 4. Build a deterministic ID:
    - Create the source slug in 4 words by summarizing the content of the source note. (This is done using the raw source note, after the content has been captured in Steps 2 & 3).
-5. Write raw source to:
+5. Decide whether to partition:
+   - If captured text is larger than roughly 25,000 words, or if an agent cannot reliably process the full source in one extraction pass, create a large source.
+   - Prefer semantic boundaries such as chapters, headings, appendices, transcript topics, or slide boundaries.
+   - Fall back to page ranges, timestamps, or other stable locators.
+   - Target 8,000-15,000 words per source part.
+   - Do not exceed 20,000 words per part unless preserving an indivisible structure requires it.
+   - Avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible.
+6. Write ordinary raw source to:
    - `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` using the source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
    - Set `status: unprocessed`.
+   - Set `sourceRole: whole`.
    - Include the full captured verbatim body with inline images + source URLs below the frontmatter.
    - images save to `_attachments`. filename: `yyyy-mm-dd-<sourceSlug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
    - if a video, capture thumbnail and place it at the top of the transcript.
    - inline images uses Obsidian image syntax `![[filename]]`
-6. Write one operational log entry for the import:
+7. Write large sources as:
+   - parent: `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md`
+   - parts: `sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md`
+   - The parent body should stay short and should not contain the full long-form source text.
+   - The parent frontmatter should include ordered `sourceParts`.
+   - Each part should include verbatim text for its segment, `sourceRole: part`, `parentSourceId`, `partIndex`, `partCount`, and `locator`.
+8. Write one operational log entry for the import:
    ```bash
    python3 _system/scripts/log.py --message "import-link: imported source <sourceId> to sources/<filename>; attachments=<count>"
    ```
    Log only after the source page and any attachments have been written successfully.
-7. Confirm in chat with:
+9. Confirm in chat with:
    - source path
+   - source part paths when a large source was partitioned
    - number of attachments saved

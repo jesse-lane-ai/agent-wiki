@@ -37,10 +37,13 @@ Scan `sources/` for source pages that have not yet been processed for extraction
 A source page needs extraction when:
 
 - `status: unprocessed`.
+- `sourceRole` is absent, `whole`, or `part`.
 
 A source page has already been extracted when:
 
 - `status: processed`.
+
+Large source parent pages are manifests and metadata records. Do not extract primitives from pages with `sourceRole: parent`; extract from their child source part pages instead.
 
 Read frontmatter first. Do not reprocess already extracted source pages unless the user explicitly asks for re-extraction.
 
@@ -49,6 +52,8 @@ If no unprocessed source pages are found, report that and stop.
 ## Step 3: Analyze Each Source
 
 Read each selected source page in full and identify durable primitives worth adding to the vault.
+
+For source parts, preserve the parent source context. Evidence should cite the source part page and include the part's `locator` when available.
 
 ### Entities
 
@@ -195,6 +200,7 @@ Evidence should include:
 
 - source page ID
 - source path
+- source locator when available, especially for source parts
 - evidence kind
 - evidence relation
 - concise note
@@ -212,6 +218,8 @@ At minimum, record:
 - `status: processed`
 - `updatedAt`
 - IDs of extracted entities, concepts, claims, and questions where applicable
+
+When processing source parts, update each processed part to `status: processed`. After all parts for a parent source are processed, update the parent source from `status: partitioned` to `status: processed` and update its `updatedAt`.
 
 Do not modify the source body unless the user explicitly asks for prose changes.
 
@@ -246,13 +254,15 @@ Created or updated:
 ## Checklist
 
 - [ ] Read `AGENTS.md` and `AGENT-WIKI-SPEC-v1.md`
-- [ ] Find unprocessed source pages
+- [ ] Find unprocessed source pages and source parts
+- [ ] Skip `sourceRole: parent` pages during extraction
 - [ ] Read each selected source in full
 - [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Check for duplicates before creating pages
 - [ ] Use canonical schemas and examples from `AGENT-WIKI-SPEC-v1.md`
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`
 - [ ] Add source-grounded evidence without overstating support
+- [ ] Include source part locators in evidence when available
 - [ ] Preserve human-authored prose
 - [ ] Update source extraction metadata
 - [ ] Write one operational log entry for the extraction batch

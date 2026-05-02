@@ -19,6 +19,7 @@ Key rules for this workflow:
 - Use stable source IDs.
 - Do not invent metadata.
 - Use Section 10 of `AGENT-WIKI-SPEC-v1.md` for the source page schema and examples.
+- Use Section 7.1.1 of `AGENT-WIKI-SPEC-v1.md` for large-source parent and part handling.
 
 ## Step 2: Check the Inbox
 
@@ -34,11 +35,15 @@ For each raw file, work through files one at a time.
 
 Read the file fully. Preserve the original content exactly when writing the source body.
 
+If the raw file is a binary or non-markdown document, use configured local conversion tools only when they are available. Do not install dependencies during this skill run. If no configured conversion path exists, leave the file in `_inbox/` and report that text extraction is required.
+
 ### 3b. Infer source metadata
 
 Create a source page using the canonical source page schema and example in `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 
-Newly promoted source pages MUST use `status: unprocessed`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
+Newly promoted ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
+
+Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status: partitioned` while one or more child source parts remain unprocessed. Child source part pages MUST use `sourceRole: part` and `status: unprocessed`.
 
 Use this ID pattern:
 
@@ -54,6 +59,7 @@ Infer `sourceType` conservatively:
 - YouTube transcript -> `transcript`
 - Article or blog post -> `article`
 - PDF -> `pdf`
+- Long generic document -> `document`
 - Email -> `email`
 - Meeting notes -> `meeting-notes`
 - Raw data -> `dataset`
@@ -62,17 +68,52 @@ Infer `sourceType` conservatively:
 
 If a field such as `publishedAt`, `author`, or `originUrl` cannot be inferred, omit optional fields rather than guessing. For local raw files with no external URL, use `originPath` to record the retained raw file path after promotion. Required source fields must still follow `AGENT-WIKI-SPEC-v1.md` Section 10.1, "Source pages".
 
-### 3c. Write the source page
+### 3c. Decide whether to partition
 
-Write the canonical source page to:
+If the captured or converted text is larger than roughly 25,000 words, or if an agent cannot reliably process it in one extraction pass, create a large source instead of one giant markdown body.
+
+Use deterministic split rules from `AGENT-WIKI-SPEC-v1.md` Section 7.1.1:
+
+- prefer semantic boundaries such as chapters, headings, appendices, transcript topics, or slide boundaries
+- fall back to page ranges, timestamps, or other stable locators
+- target 8,000-15,000 words per source part
+- do not exceed 20,000 words per part unless preserving an indivisible structure requires it
+- avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible
+
+For ordinary sources, write one canonical source page.
+
+For large sources, write:
+
+- one parent source page under `sources/`
+- child source part pages under `sources/parts/`
+
+### 3d. Write the source page or source parts
+
+For an ordinary source, write the canonical source page to:
 
 ```text
 sources/<yyyy-mm-dd>-<source-slug>.md
 ```
 
-The body must contain the full verbatim raw content below the frontmatter. Preserve user context, annotations, and formatting.
+The body must contain the full verbatim raw content below the frontmatter. Preserve user context, annotations, and formatting. Set `sourceRole: whole`.
 
-### 3d. Move the raw file
+For a large source, write the parent source page to:
+
+```text
+sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md
+```
+
+The parent body should stay short and should not contain the full long-form source text. Include metadata, import notes, attachment references, retained raw path, and an ordered `sourceParts` manifest.
+
+Write child source parts to:
+
+```text
+sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md
+```
+
+Each part must contain the verbatim text for that segment, `sourceRole: part`, `parentSourceId`, `partIndex`, `partCount`, and a stable `locator`.
+
+### 3e. Move the raw file
 
 After the source page is created successfully, move the original raw file to `raw/`.
 
@@ -84,7 +125,7 @@ raw/<yyyy-mm-dd>-<source-slug>-original<extension>
 
 If a filename already exists, append a short unique suffix before the extension.
 
-The source page's `originPath` should match the final retained raw file path.
+The source page's `originPath` should match the final retained raw file path. For large sources, the parent and all child source parts should use the retained raw path as `originPath`.
 
 If a raw file cannot be promoted, leave it in `_inbox/` and report the reason. Do not silently move failed items.
 
@@ -102,6 +143,7 @@ After processing all items, give a concise summary:
 
 - How many raw files were promoted.
 - The source path and ID for each promoted file.
+- For large sources, the parent source path and each child part path.
 - The retained raw path for each original.
 - Any files skipped or failed and why.
 
@@ -110,6 +152,7 @@ After processing all items, give a concise summary:
 - `_inbox/` is an active raw drop zone, not canonical knowledge.
 - `raw/` retains original raw captures after promotion and is not canonical knowledge.
 - `sources/` contains the canonical verbatim source pages.
+- Large source parent pages are metadata and manifests; extraction should operate on source parts.
 - Do not create separate intake tracking files.
 - Do not extract knowledge primitives in this skill.
 - Do not touch human prose except to preserve it verbatim in the new source page body.

@@ -14,6 +14,7 @@ Run the compile pipeline after:
 - Adding or editing pages with structured frontmatter (claims, relations, timeline entries)
 - Adding new question pages
 - Adding source pages
+- Adding source parent or source part pages for large documents
 - Extracting knowledge primitives from source pages
 - Resolving questions (status changes)
 - Any bulk edit to page metadata
@@ -112,6 +113,7 @@ This skill owns validation, cache regeneration, root catalog generation, report 
 When running compile:
 
 - validate page frontmatter and generated records
+- validate large-source parent and source-part structure
 - detect duplicate IDs and malformed records
 - regenerate cache files, `_system/indexes/`, root `index.md`, and report artifacts
 - write a concise operational log entry through `_system/scripts/log.py`
@@ -134,5 +136,6 @@ If validation errors occur, fix the affected canonical page or structured frontm
 - Do NOT hand-edit `index.md` for durable prose. It is regenerated as the deterministic root page catalog.
 - Reports in `reports/` are views — do not treat them as primary data.
 - The compile pipeline reads `pageType`, `id`, `claims`, `relations`, `timeline` from frontmatter.
+- For source pages, the compile pipeline also preserves `sourceRole`, `parentSourceId`, `sourceParts`, `partIndex`, `partCount`, and `locator` in `pages.json` and `source-index.json`.
 - Pages without frontmatter, or without `id` and `pageType`, are skipped.
 - The compile only modifies generated artifacts and the deterministic root `index.md` catalog.
