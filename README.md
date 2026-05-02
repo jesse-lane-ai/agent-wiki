@@ -48,6 +48,7 @@ Current top-level vault shape:
   overview.md
 
   sources/
+    parts/
   entities/
   concepts/
   claims/
@@ -94,9 +95,9 @@ These outputs are generated artifacts. Do not hand-edit them, and do not treat r
 Skills live under `_system/skills/`:
 
 - `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
-- `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`.
-- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`.
-- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources.
+- `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. Large captures are partitioned into parent source pages and source parts.
+- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
+- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. For large sources, extraction operates on source parts rather than the parent manifest.
 - `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
 
 ## Scheduled Work

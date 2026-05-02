@@ -38,6 +38,7 @@ Current vault structure:
   overview.md
 
   sources/
+    parts/
   entities/
   concepts/
   claims/
@@ -61,7 +62,8 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 
 | Folder | What goes here |
 |---|---|
-| `sources/` | Raw material and source-backed pages: webpages, PDFs, articles, transcripts, meeting notes, datasets |
+| `sources/` | Canonical source pages: webpages, PDFs, articles, transcripts, meeting notes, datasets |
+| `sources/parts/` | Source part pages for large partitioned sources |
 | `entities/` | Durable things: people, orgs, projects, products, systems, places, events, artifacts |
 | `concepts/` | Abstract ideas and reusable instructions: definitions, methods, frameworks, workflows, runbooks, checklists |
 | `claims/` | Standalone claim pages: individual atomic propositions with their own evidence and provenance |
@@ -129,10 +131,19 @@ freshness:
 
 | Status | Meaning |
 |---|---|
-| `processed` | Page has been processed by an agent |
-| `unprocessed` | Page has not been processed by an agent |
+| `active` | Maintained page |
+| `draft` | Incomplete page |
 | `archived` | No longer maintained |
 | `deprecated` | Superseded or no longer valid |
+
+### Source status
+
+| Status | Meaning |
+|---|---|
+| `unprocessed` | Captured as a source page, not yet extracted into knowledge primitives |
+| `partitioned` | Parent source has child source parts that still need extraction |
+| `processed` | Extraction completed |
+| `archived` | Retained but inactive |
 
 ### Question status
 
@@ -300,6 +311,7 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 |---|---|
 | `webpage` | Web page |
 | `article` | Published article |
+| `document` | Generic long-form document |
 | `pdf` | PDF document |
 | `transcript` | Conversation or meeting transcript |
 | `email` | Email thread |
@@ -312,7 +324,25 @@ Do not treat reports as primary data — they derive from page frontmatter and c
 
 ---
 
-## 13. Inbox intake strategy
+## 13. Large sources
+
+Large sources should not become one giant markdown file when that would make extraction or evidence citation unreliable.
+
+For long documents, transcripts, or captures, use:
+
+- a short parent source page in `sources/`
+- source part pages in `sources/parts/`
+- a retained original file in `raw/` when the material came through `_inbox/`
+
+The parent source is the document-level record and manifest. It should use `sourceRole: parent`, usually `status: partitioned`, and an ordered `sourceParts` list. The parent body should stay short.
+
+Each source part is a canonical source page for a bounded segment. It should use `sourceRole: part`, `parentSourceId`, `partIndex`, `partCount`, and a stable `locator` such as a page range, section path, timestamp range, or slide range.
+
+Extraction should run against source parts, not the parent source page. Evidence should cite the most specific source part and locator available.
+
+---
+
+## 14. Inbox intake strategy
 
 The `_inbox/` folder is the raw item intake queue. New unprocessed material should land here first.
 
@@ -322,7 +352,7 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 
 1. Raw item arrives in `_inbox/`
 2. `process-inbox` reads the raw item
-3. If retained: item becomes a canonical `source` page under `sources/` with `status: unprocessed`
+3. If retained: item becomes a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
 4. The original raw file moves to `raw/`
 5. If discarded: the raw file moves to `_inbox/trash/`
 
@@ -335,7 +365,7 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 
 ---
 
-## 14. Internal linking convention
+## 15. Internal linking convention
 
 All internal links within the vault use Obsidian-style wikilinks.
 
@@ -348,7 +378,7 @@ All internal links within the vault use Obsidian-style wikilinks.
 Standard markdown links are only used for external URLs.
 ---
 
-## 15. Editorial principles
+## 16. Editorial principles
 
 - Claims should be atomic — one proposition per claim.
 - Important assertions should be in frontmatter, not buried in prose, if they matter for agents.

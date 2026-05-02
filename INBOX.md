@@ -16,16 +16,32 @@ The `_inbox/` folder is the active drop zone for raw files that still need to be
 1. A user or tool drops a raw file into `_inbox/`.
 2. `process-inbox` reads the raw file.
 3. If retained, `process-inbox` creates a canonical source page in `sources/` with `status: unprocessed`.
-4. After successful promotion, `process-inbox` moves the original raw file to `raw/`.
-5. If a raw file cannot be processed or should be discarded, leave it in `_inbox/` for operator review or move it to `_inbox/trash/` when explicitly discarded.
+4. If the retained file is large, `process-inbox` creates a short parent source page in `sources/` and source part pages in `sources/parts/` instead of one giant markdown file.
+5. After successful promotion, `process-inbox` moves the original raw file to `raw/`.
+6. If a raw file cannot be processed or should be discarded, leave it in `_inbox/` for operator review or move it to `_inbox/trash/` when explicitly discarded.
 
 ### Source status
 
 Newly promoted source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]:
 
 - `unprocessed` = captured as a source page, not yet extracted into knowledge primitives
+- `partitioned` = parent source has child source parts that still need extraction
 - `processed` = extraction completed
 - `archived` = retained but inactive
+
+### Large raw files
+
+Large documents, long transcripts, and other oversized raw files should not be promoted into one huge source body.
+
+Use this shape:
+
+- parent source page: `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md`
+- source part pages: `sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md`
+- retained original: `raw/<yyyy-mm-dd>-<sourceSlug>-original<extension>`
+
+The parent source is the document-level record and manifest. Its body should stay short. Source parts contain the verbatim extracted text for bounded segments and should include stable locators such as page ranges, headings, timestamps, or slide ranges.
+
+Extraction should process source part pages, not the parent source page.
 
 ### Boundaries
 
@@ -33,4 +49,5 @@ Newly promoted source pages use the source status vocabulary from [[AGENT-WIKI-S
 - `raw/` files are retained originals, not canonical `source` pages.
 - Agents MUST NOT treat `_inbox/` or `raw/` files as evidence for claims.
 - Canonical source material lives in `sources/`.
+- Large-source verbatim text lives in `sources/parts/`.
 - Pointer files are not part of the v1.3 intake workflow.

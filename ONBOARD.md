@@ -6,7 +6,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 2. Read [[WIKI]] for the human-facing schema guide.
 3. Read [[AGENT-WIKI-SPEC-v1]] for the canonical technical specification.
 4. Confirm the local Python command. The checked-in examples use `python3`, but some systems expose Python 3 as `python`.
-5. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, and `_attachments/`.
+5. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 6. Configure `_system/skills/import-link/config.json` before importing external material.
 7. Run the compile pipeline and confirm it reports zero validation issues.
 8. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
@@ -74,7 +74,9 @@ If any required value is unknown, the agent should ask the user before running `
 
 The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
 
-Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unprocessed`, `processed`, and `archived`.
+Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
+
+Source pages use the source status vocabulary from [[AGENT-WIKI-SPEC-v1]]: `unprocessed`, `partitioned`, `processed`, and `archived`.
 
 ---
 

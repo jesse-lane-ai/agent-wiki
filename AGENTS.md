@@ -74,6 +74,8 @@ Agents MUST NOT read `_inbox/` or `raw/` files as primary data sources or treat 
 
 Agents SHOULD process inbox items by converting retained raw files into canonical `source` pages under `sources/`. See [[INBOX]] for the raw intake lifecycle rules.
 
+Large retained sources SHOULD be converted into a short parent source page under `sources/` and child source part pages under `sources/parts/`. Agents SHOULD extract knowledge primitives from source part pages, not from the parent source manifest.
+
 ---
 
 ## 3. What agents may do
@@ -101,7 +103,8 @@ Pattern: `<pageType>.<namespace>.<slug>`
 Examples:
 - `entity.place.riverside-community-garden`
 - `concept.watershed-management`
-- `source.2026-04-12.urban-tree-canopy`
+- `source.2026-04-12.webpage.urban-tree-canopy`
+- `source.2026-04-12.document.community-plan.part001`
 - `synthesis.overview.coastal-resilience`
 - `question.evacuation-routing.accessibility`
 
@@ -136,6 +139,7 @@ Example: `entities/riverside-community-garden.md`
 | Folder | Required `pageType` |
 |---|---|
 | `sources/` | `source` |
+| `sources/parts/` | `source` |
 | `entities/` | `entity` |
 | `concepts/` | `concept` |
 | `claims/` | `claim` |
