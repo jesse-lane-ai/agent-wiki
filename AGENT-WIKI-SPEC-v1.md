@@ -259,6 +259,8 @@ Operational log entries belong in `_system/logs/log.md`.
 #### `sources/`
 Stores canonical verbatim source pages.
 
+Large sources MAY be represented by one parent source page and multiple source part pages under `sources/parts/`.
+
 #### `entities/`
 Stores durable thing pages.
 
@@ -329,6 +331,40 @@ A `source` page SHOULD include:
 - retrieval information
 
 A page in `sources/` MUST have `pageType: source`.
+
+#### 7.1.1 Large sources
+
+Large sources SHOULD NOT be stored as one giant markdown body when doing so would make extraction, review, or evidence citation unreliable.
+
+When captured or converted source text exceeds the large-source threshold, agents SHOULD create:
+
+- one parent source page for the whole source
+- multiple child source part pages for bounded verbatim text segments
+
+The parent source page represents the document, transcript, webpage capture, or other source as a whole. It SHOULD include bibliographic metadata, retrieval metadata, attachment references, the retained raw file path when applicable, and a manifest of child source part paths. Its body SHOULD stay short and SHOULD NOT contain the full long-form source text.
+
+Source part pages are canonical source pages scoped to a deterministic segment of the parent source. They SHOULD contain the verbatim extracted text for that segment, preserve available locators, and point back to the parent source.
+
+Source part pages SHOULD live under:
+
+```text
+sources/parts/
+```
+
+Large-source partitioning SHOULD use deterministic split rules:
+
+1. Prefer semantic boundaries such as chapters, sections, headings, appendix boundaries, transcript topic blocks, or slide boundaries.
+2. Fall back to page ranges, timestamps, or other stable locators when semantic structure is unavailable.
+3. Keep each part near a target size of 8,000-15,000 words.
+4. Do not exceed 20,000 words in one part unless preserving an indivisible structure requires it.
+5. Merge very small adjacent sections when that preserves meaning and stays within the target size.
+6. Avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible.
+
+A source SHOULD be partitioned when converted text is larger than roughly 25,000 words or when an agent cannot reliably process the full source in one extraction pass. Tools MAY use token estimates instead of word counts, but the chosen threshold SHOULD be stable and documented.
+
+Extraction workflows SHOULD process child source part pages, not the parent source body. Evidence SHOULD cite the most specific available source part and locator.
+
+The parent source page SHOULD use `status: partitioned` while one or more child parts remain `status: unprocessed`. It SHOULD use `status: processed` only after all child parts have been processed or intentionally archived.
 
 ### 7.2 `entities/`
 
@@ -586,6 +622,12 @@ pageType: source
 title: <title>
 status: <status>
 sourceType: <sourceType>
+sourceRole: <sourceRole>
+parentSourceId: <sourceId>
+partIndex: <number>
+partCount: <number>
+locator: <locator>
+sourceParts: []
 originUrl: <url>
 originPath: <path>
 publishedAt: <yyyy-mm-dd>
@@ -604,6 +646,12 @@ pageType: source
 title: Urban Tree Canopy Assessment
 status: processed
 sourceType: webpage
+sourceRole: whole
+parentSourceId:
+partIndex:
+partCount:
+locator:
+sourceParts: []
 originUrl: https://example.com/reports/urban-tree-canopy
 originPath:
 publishedAt: 2026-04-25
@@ -619,6 +667,7 @@ attachments: []
 
 Allowed values:
 - `unprocessed`
+- `partitioned`
 - `processed`
 - `archived`
 
@@ -627,6 +676,7 @@ Allowed values:
 Allowed values:
 - `webpage`
 - `article`
+- `document`
 - `pdf`
 - `transcript`
 - `email`
@@ -637,7 +687,58 @@ Allowed values:
 - `import`
 - `other`
 
+#### `sourceRole`
+
+Allowed values:
+- `whole`
+- `parent`
+- `part`
+
+Use `whole` for ordinary source pages that contain the complete captured source body in one page.
+
+Use `parent` for the parent page of a large partitioned source. Parent source pages SHOULD include `sourceParts` and SHOULD NOT include the full long-form verbatim source body.
+
+Use `part` for child source part pages. Part source pages SHOULD include `parentSourceId`, `partIndex`, `partCount`, and `locator` when available.
+
+#### `sourceParts`
+
+Ordered relative paths to child source part pages. This field SHOULD be present on parent source pages and empty or omitted on ordinary source pages and part pages.
+
+#### `parentSourceId`
+
+The source ID of the parent source page. This field SHOULD be present on part source pages and empty or omitted on ordinary source pages and parent source pages.
+
+#### `partIndex`
+
+One-based ordinal for a source part within its parent source. This field SHOULD be present on part source pages.
+
+#### `partCount`
+
+Total number of source parts for the parent source. This field SHOULD be present on part source pages and MAY be present on parent source pages.
+
+#### `locator`
+
+A stable locator for the part within the parent source, such as page range, heading path, timestamp range, slide range, or section range.
+
 Source pages SHOULD include `originUrl` for externally retrieved material. Source pages promoted from local raw inbox files MAY use `originPath` instead. At least one of `originUrl` or `originPath` SHOULD be present.
+
+Large source parent IDs SHOULD use the ordinary source ID format:
+
+```text
+source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>
+```
+
+Large source part IDs SHOULD append a stable part suffix:
+
+```text
+source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>.part<nnn>
+```
+
+Large source part filenames SHOULD preserve the same ordering:
+
+```text
+sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md
+```
 
 ### 10.2 Entity pages
 
@@ -1521,6 +1622,15 @@ Chronological event index.
 #### `source-index.json`
 Source metadata registry.
 
+The source index SHOULD preserve large-source structure when present. Source records SHOULD include `sourceRole`, `parentSourceId`, `sourceParts`, `partIndex`, `partCount`, and `locator` when those fields exist on source pages.
+
+Tools SHOULD be able to answer:
+
+- which source parts belong to a parent source
+- which parent source owns a source part
+- which source parts remain `status: unprocessed`
+- which locator should be used for evidence citation
+
 ### 18.5 Agent digest limits
 
 The `agent-digest.json` output truncates content to keep the file compact for use as a prompt supplement. Implementations SHOULD define these as named constants so they can be tuned as vault size grows.
@@ -1697,6 +1807,9 @@ A v1 validator SHOULD check the following.
 - related page references exist
 - claim IDs referenced by relationships exist when provided
 - aliases do not duplicate canonical title unnecessarily
+- source part pages have valid `parentSourceId`, `partIndex`, `partCount`, and `locator` when `sourceRole: part`
+- parent source pages have ordered, existing `sourceParts` when `sourceRole: parent`
+- partitioned parent source pages do not contain the full long-form source body
 
 ---
 
