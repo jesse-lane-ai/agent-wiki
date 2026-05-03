@@ -609,6 +609,8 @@ The parent source page SHOULD use `status: partitioned` while one or more child 
 
 Raw inbox files MAY be converted to Markdown before source page creation. Conversion is an intake step that produces the text used for canonical `source` pages or source part pages.
 
+Plain text and Markdown inbox files SHOULD be treated as already prepared source body files. `process-inbox` SHOULD pass those files, or prepared source-part files derived from them, to `_system/scripts/create-page.py` with `--body-file` rather than copying the body into `--body`. This preserves formatting, avoids shell quoting failures, and lets the scaffolder validate canonical `source` pages from file-backed body content.
+
 Original raw files SHOULD be retained in `raw/` after successful promotion. Raw files in `_inbox/` or `raw/` are not canonical evidence. The converted source page or source part page is the canonical evidence surface.
 
 Conversion tools SHOULD preserve document structure and stable locators when available, including headings, page ranges, slide numbers, table boundaries, timestamps, and section paths. When a source is partitioned, partition locators SHOULD use the most specific stable locator available from the conversion output.
