@@ -301,13 +301,13 @@ Sub-directories:
 - `cache/` — compiled artifact outputs (do not hand-edit)
 - `indexes/` — generated index files (do not hand-edit)
 - `logs/` — compile run logs (do not hand-edit)
-- `scripts/` — deterministic utility scripts for operational logging and generated catalog pages
+- `scripts/` — deterministic utility scripts for operational logging, generated catalog pages, onboarding checks, and page scaffolding
 - `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
 Files:
 - `config.example.json` — tracked example for optional local system configuration
 
-The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
+The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages or scaffold new authored pages when explicitly invoked. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
 
 `_system/config.json`, when present, is local operational configuration, not canonical vault knowledge. It SHOULD be ignored by version control and SHOULD NOT be committed to shared template repositories. `_system/config.example.json` SHOULD be tracked when the project wants to document the supported shape of local configuration.
 
@@ -492,6 +492,68 @@ When adding a feature or changing project behavior, the recommended workflow is:
 5. Update root-level Markdown documentation other than this specification.
 
 Each step SHOULD be skipped when the change does not affect that surface. The specification SHOULD be reviewed first because it defines the contract that configuration, scripts, skills, and root-level documentation implement.
+
+### 6.6 Deterministic page scaffolding
+
+The system SHOULD provide a deterministic page scaffolding utility at `_system/scripts/create-page.py`.
+
+The page scaffolder exists to reduce schema drift when agents create new authored knowledge pages. It is an operational helper, not an authorship engine. It MUST NOT decide what a page means, invent claims, write interpretations, choose evidence, or synthesize source material on its own. The caller remains responsible for supplying the title, page type, subtype where applicable, body prose, source references, claim references, and other semantic fields.
+
+The scaffolder SHOULD support canonical page types:
+
+- `source`
+- `entity`
+- `concept`
+- `claim`
+- `question`
+- `synthesis`
+
+The scaffolder MUST NOT create generated page types such as `index` or `report`.
+
+For `source` pages, the scaffolder is only a deterministic source-page writer. It MUST support ordinary whole source pages, large-source parent manifest pages, and large-source part pages. It MUST NOT fetch links, capture web pages, convert binary files, move raw files, decide split points, perform OCR, call LLMs, or determine whether a large source should be partitioned. Source-oriented workflows such as `import-link` and `process-inbox` own acquisition, conversion, raw-file lifecycle, large-source partitioning decisions, source segment preparation, and provenance gathering. Those workflows MAY call the scaffolder to write validated canonical source pages once they have prepared the verbatim Markdown body and required source metadata.
+
+The scaffolder SHOULD provide a command-line interface shaped like:
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type synthesis \
+  --subtype analysis \
+  --slug large-document-ingestion \
+  --title "Large Document Ingestion" \
+  --body-file /tmp/body.md
+```
+
+The exact option set MAY evolve, but the script SHOULD support:
+
+- `--type <pageType>` for the page type.
+- `--subtype <subtype>` for the page-type-specific subtype when applicable, such as `sourceType`, `entityType`, `conceptType`, `claimType`, or `synthesisType`.
+- `--slug <slug>` for the stable filename and ID suffix.
+- `--title <title>` for the page title.
+- `--body-file <path>` for substantive Markdown body prose.
+- `--body <text>` for short body text when shell quoting is safe.
+- repeated reference flags where useful, such as `--source-page <id>`, `--derived-claim <id>`, `--related-page <id>`, or `--tag <tag>`.
+- source-specific flags where useful, such as `--source-url <url>`, `--origin-path <path>`, `--retrieved-at <date>`, `--source-role <whole|parent|part>`, `--source-part <id>`, `--parent-source-id <id>`, `--part-index <n>`, `--part-count <n>`, or `--locator <locator>`.
+- `--dry-run` to print the resolved path and frontmatter without writing.
+- `--no-log` so skills can create several pages and then write one batch log entry.
+
+For each created page, the scaffolder MUST:
+
+- resolve all paths relative to the repository root
+- select the correct folder for the requested `pageType`
+- construct the stable `id` using this specification's naming rules
+- create the required frontmatter for the page type using the current date for `createdAt` and `updatedAt`
+- map `--subtype` to the correct page-type-specific field
+- derive the filename from the stable ID using the filename rules in Section 8.2
+- refuse to overwrite an existing file unless a future explicit update mode is specified
+- check for duplicate IDs in existing vault pages before writing
+- require verbatim Markdown body content for `source` pages
+- validate source role requirements: `whole` source pages stand alone; `parent` source pages carry ordered `sourceParts`; `part` source pages carry `parentSourceId`, `partIndex`, `partCount`, and a stable `locator`
+- require substantive Markdown body prose for `entity`, `concept`, `claim`, `question`, and `synthesis` pages
+- write valid Markdown with YAML frontmatter followed by the supplied body prose
+
+The scaffolder SHOULD produce predictable, machine-readable console output for success and failure so skills can report results clearly. It SHOULD return a non-zero exit code when validation fails, when the target path already exists, or when the requested ID already exists elsewhere in the vault.
+
+Skills that use the scaffolder SHOULD still write one operational log entry after the meaningful skill run or change batch through `_system/scripts/log.py`. They SHOULD NOT rely on the scaffolder to log every individual page when multiple pages are created as part of one operation.
 
 ---
 
