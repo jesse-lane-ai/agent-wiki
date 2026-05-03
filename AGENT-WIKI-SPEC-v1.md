@@ -374,7 +374,7 @@ Recommended shape:
 
 `pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
 
-This project is scoped to one wiki per checkout. The repository root is the wiki root. Skills, scripts, and config files MUST read and write paths relative to that root. They MUST NOT route content to another vault or persist alternate wiki roots in config.
+This project is scoped to one wiki per checkout. The repository root is the wiki root. Skills, scripts, and config files MUST read and write paths relative to that root.
 
 Multiple wikis are outside the scope of this project. Operators who want multiple independent wikis SHOULD clone this repository into multiple folders, onboard each checkout separately, and handle any cross-wiki routing or selection outside this project.
 
@@ -442,7 +442,7 @@ The config writer SHOULD require explicit flags for choices that materially chan
 - `--conversion available-local` to enable conversion using only already installed local backends
 - `--conversion custom` when explicit backend choices or policy flags are supplied
 
-The config writer MUST NOT support wiki routing flags such as `--vault-root`, `--config-vault-root`, or `--obsidian-vault-root`. The only supported wiki root is the current repository root.
+The only supported wiki root is the current repository root.
 
 Network, OCR, LLM, transcription, and hosted document-intelligence conversion behavior MUST remain disabled unless explicitly enabled by dedicated flags. The writer SHOULD report exactly which fields were written.
 
@@ -467,8 +467,6 @@ Recommended setup questions include:
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 - whether missing runtime folders should be created
 - whether `_system/config.json` should be written
-
-Onboarding MUST NOT ask the operator to choose a target vault, alternate wiki root, external vault path, or multi-wiki routing mode. The repository root is always the working markdown wiki for local operations.
 
 After core onboarding, agents SHOULD recommend optional Obsidian setup when the operator wants an Obsidian workflow. The recommendation SHOULD be concise and operational:
 
