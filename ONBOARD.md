@@ -6,8 +6,8 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run the read-only onboarding probe.
-5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
-6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy or conversion backend preferences are needed.
+5. Ask compact multiple-choice setup questions based on the probe output before writing config, choosing vault placement, creating folders, creating a virtual environment, or installing packages.
+6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy, vault placement, or conversion backend preferences are needed.
 7. Configure `_system/skills/import-link/config.json` before importing external material.
 8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 9. Run the compile pipeline and confirm it reports zero validation issues.
@@ -19,7 +19,7 @@ Run the onboarding probe from the vault root:
 python3 _system/scripts/onboard.py --check
 ```
 
-The probe is read-only. It reports local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at or above the current root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
 
 To generate user-friendly setup prompts, run:
 
@@ -51,6 +51,7 @@ python3 _system/skills/compile-wiki/scripts/compile.py
 Use it when the user wants persistent local preferences such as:
 
 - which Python command to use
+- vault placement, including whether this wiki is standalone, an Obsidian vault root, inside an existing Obsidian vault, external, or undecided
 - whether inbox conversion is enabled
 - automatic conversion backend order
 - backend command names
@@ -63,6 +64,33 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 ```
 
 Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
+
+Vault placement can be persisted with:
+
+```bash
+python3 _system/scripts/onboard.py --write-config --vault-mode undecided
+```
+
+Use `--vault-mode obsidian-root` when this repository root should be opened as the Obsidian vault. Use `--vault-mode obsidian-subfolder --obsidian-vault-root <path>` when this checkout is inside an existing Obsidian vault. Use `--vault-mode external-vault --config-vault-root <path>` when system files live here but content should be written elsewhere.
+
+Vault placement may stay undecided. In that case, use this repository root as the working markdown wiki unless the user supplies another path.
+
+---
+
+## Optional Obsidian Setup
+
+Obsidian is optional. The wiki can be used as a plain Markdown repository, and onboarding does not require an Obsidian vault to already exist.
+
+After onboarding, if the user wants to use this wiki in Obsidian, recommend opening the repository root as an Obsidian vault:
+
+1. Open Obsidian.
+2. Click the current vault name at the bottom of the file explorer pane, or use Obsidian's vault switcher if the control is not visible.
+3. Click "Manage vaults..."
+4. Click "Open folder as vault".
+5. Navigate to the root of this wiki.
+6. Click "Select Folder".
+
+Obsidian may create a local `.obsidian/` folder. That folder is local application state and should not be committed.
 
 ---
 

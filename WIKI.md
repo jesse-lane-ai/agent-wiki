@@ -97,6 +97,8 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
 
+Vault placement can be `undecided`, `standalone`, `obsidian-root`, `obsidian-subfolder`, or `external-vault`. Obsidian setup is optional; when placement is undecided, treat the repository root as the working markdown wiki unless the user supplies another path.
+
 ---
 
 ## 3. Page types

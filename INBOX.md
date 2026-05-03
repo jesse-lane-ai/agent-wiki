@@ -11,13 +11,15 @@ If inbox files are binary or non-markdown documents and local converter availabi
 python3 _system/scripts/onboard.py --check
 ```
 
-Use the probe output to choose a local conversion policy with the user. If the user approves persisting local policy, write `_system/config.json` through the onboarding config writer:
+Use the probe output to choose a local conversion policy and vault placement with the user. If the user approves persisting local policy, write `_system/config.json` through the onboarding config writer:
 
 ```bash
 python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
 ```
 
 Do not install packages, create `.venv/`, hand-edit `_system/config.json`, or call network/OCR/LLM/cloud conversion services unless the user explicitly approves that setup.
+
+If vault placement is undecided, process `_inbox/` relative to the current repository root unless the user supplies another path.
 
 ### Folder meaning
 
