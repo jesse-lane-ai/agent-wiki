@@ -38,15 +38,15 @@ python3 _system/scripts/onboard.py --check --questions
 
 Use the generated multiple-choice prompts so the user can answer with compact letter choices.
 
-Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Also use the probe output to understand OS/platform and whether the current root appears to be an Obsidian vault or inside one. `_system/config.example.json` is the tracked example shape; `_system/config.json` is local-only policy.
+Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Also use the probe output to understand OS/platform and whether the repository root has local Obsidian settings. `_system/config.example.json` is the tracked example shape; `_system/config.json` is local-only policy.
 
-If the user approves persisting local Python, conversion, or vault placement policy, write local config with explicit approved flags:
+If the user approves persisting local Python or conversion policy, write local config with explicit approved flags:
 
 ```bash
 python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
 ```
 
-Use `--vault-mode`, `--config-vault-root`, or `--obsidian-vault-root` only after the user approves those placement choices. If vault placement is undecided, process inbox files relative to the current repository root unless the user supplies another path.
+This checkout is the only wiki root. Process `_inbox/`, write `sources/`, and move retained raw files to `raw/` relative to the repository root. Do not accept an alternate vault root or external destination for this workflow.
 
 Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
 

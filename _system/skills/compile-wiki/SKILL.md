@@ -25,7 +25,7 @@ The compile pipeline is **safe to run at any time**. It is fully regenerative. I
 
 ## How to run
 
-From the vault root:
+From the wiki root:
 
 ```bash
 python3 _system/skills/compile-wiki/scripts/compile.py
@@ -37,11 +37,7 @@ With verbose output:
 python3 _system/skills/compile-wiki/scripts/compile.py --verbose
 ```
 
-From a different working directory:
-
-```bash
-python3 _system/skills/compile-wiki/scripts/compile.py --vault-root /path/to/vault
-```
+Run this command from the repository root. The compile pipeline does not accept an alternate vault or wiki root.
 
 ---
 
