@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Read-only onboarding probe for the Agentics vault.
+Onboarding probe and local config writer for the Agentics vault.
 
 Usage:
     python3 _system/scripts/onboard.py --check
     python3 _system/scripts/onboard.py --check --questions
+    python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
 """
 
 import argparse
+import copy
 import json
 import shutil
 import subprocess
@@ -22,6 +24,13 @@ IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
 CLI_CONVERTERS = ["markitdown", "marker", "arxiv2md"]
 PYTHON_PACKAGES = ["pymupdf4llm", "markitdown", "marker"]
+SAFETY_FLAGS = {
+    "allow_network": "allowNetwork",
+    "allow_ocr": "allowOcr",
+    "allow_llm": "allowLlm",
+    "allow_transcription": "allowTranscription",
+    "allow_hosted_document_intelligence": "allowHostedDocumentIntelligence",
+}
 REQUIRED_FOLDERS = [
     "sources",
     "sources/parts",
@@ -42,6 +51,45 @@ REQUIRED_FOLDERS = [
     "_system/scripts",
     "_system/skills",
 ]
+
+
+def default_config() -> dict[str, Any]:
+    return {
+        "schemaVersion": 1,
+        "pythonCommand": None,
+        "conversion": {
+            "enabled": False,
+            "defaultBackend": "auto",
+            "backendOrder": ["pymupdf4llm", "markitdown"],
+            "allowNetwork": False,
+            "allowOcr": False,
+            "allowLlm": False,
+            "allowTranscription": False,
+            "allowHostedDocumentIntelligence": False,
+            "backends": {
+                "pymupdf4llm": {
+                    "enabled": True,
+                    "command": None,
+                    "formats": ["pdf"],
+                },
+                "markitdown": {
+                    "enabled": True,
+                    "command": "markitdown",
+                    "formats": ["pdf", "docx", "pptx", "xlsx", "html", "csv", "json", "xml", "epub"],
+                },
+                "arxiv2md": {
+                    "enabled": False,
+                    "command": None,
+                    "formats": ["pdf"],
+                },
+                "marker": {
+                    "enabled": False,
+                    "command": None,
+                    "formats": ["pdf"],
+                },
+            },
+        },
+    }
 
 
 def run_command(args: list[str], timeout: float = 5.0) -> subprocess.CompletedProcess[str] | None:
@@ -133,6 +181,18 @@ def read_json(path: Path) -> dict[str, Any] | None:
     except (OSError, json.JSONDecodeError):
         return None
     return data if isinstance(data, dict) else None
+
+
+def load_config_base(vault_root: Path) -> dict[str, Any]:
+    config_path = vault_root / SYSTEM_CONFIG
+    example_path = vault_root / SYSTEM_CONFIG_EXAMPLE
+    for path in (config_path, example_path):
+        if path.exists():
+            data = read_json(path)
+            if data is None:
+                raise SystemExit(f"Cannot read JSON config base: {path}")
+            return copy.deepcopy(data)
+    return default_config()
 
 
 def probe_config(vault_root: Path) -> dict[str, Any]:
@@ -305,13 +365,107 @@ def build_setup_questions(report: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def parse_backend_order(raw_values: list[str] | None) -> list[str] | None:
+    if not raw_values:
+        return None
+    values: list[str] = []
+    for raw_value in raw_values:
+        for value in raw_value.split(","):
+            stripped = value.strip()
+            if stripped:
+                values.append(stripped)
+    return values or None
+
+
+def write_config(args: argparse.Namespace) -> dict[str, Any]:
+    vault_root = Path(args.vault_root).resolve()
+    config_path = vault_root / SYSTEM_CONFIG
+    config = load_config_base(vault_root)
+    written_fields: list[str] = []
+
+    config["schemaVersion"] = config.get("schemaVersion") or 1
+
+    if args.python_command is not None:
+        config["pythonCommand"] = args.python_command
+        written_fields.append("pythonCommand")
+
+    conversion = config.setdefault("conversion", {})
+    if not isinstance(conversion, dict):
+        conversion = {}
+        config["conversion"] = conversion
+
+    if args.conversion == "disabled":
+        conversion["enabled"] = False
+        written_fields.append("conversion.enabled")
+    elif args.conversion in {"available-local", "custom"}:
+        conversion["enabled"] = True
+        written_fields.append("conversion.enabled")
+
+    if args.default_backend is not None:
+        conversion["defaultBackend"] = args.default_backend
+        written_fields.append("conversion.defaultBackend")
+
+    backend_order = parse_backend_order(args.backend_order)
+    if backend_order is not None:
+        conversion["backendOrder"] = backend_order
+        written_fields.append("conversion.backendOrder")
+
+    for arg_name, field_name in SAFETY_FLAGS.items():
+        approved_value = bool(getattr(args, arg_name))
+        if conversion.get(field_name) != approved_value:
+            conversion[field_name] = approved_value
+            written_fields.append(f"conversion.{field_name}")
+
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(json.dumps(config, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+
+    return {
+        "schemaVersion": 1,
+        "mode": "write-config",
+        "mutating": True,
+        "path": str(SYSTEM_CONFIG),
+        "written": True,
+        "writtenFields": written_fields,
+    }
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a read-only onboarding probe.")
-    parser.add_argument("--check", action="store_true", required=True, help="Inspect local setup without mutating files")
+    parser = argparse.ArgumentParser(description="Run onboarding checks or write approved local config.")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--check", action="store_true", help="Inspect local setup without mutating files")
+    mode.add_argument("--write-config", action="store_true", help="Create or update local _system/config.json")
     parser.add_argument("--vault-root", default=".", help="Path to vault root (default: current directory)")
     parser.add_argument("--compact", action="store_true", help="Print compact JSON")
     parser.add_argument("--questions", action="store_true", help="Print human-friendly setup questions instead of JSON")
+    parser.add_argument("--python-command", help="Preferred Python command to persist in local config")
+    parser.add_argument("--conversion", choices=["disabled", "available-local", "custom"], help="Inbox conversion policy")
+    parser.add_argument("--default-backend", help="Default conversion backend")
+    parser.add_argument("--backend-order", nargs="+", help="Conversion backend order as space-separated or comma-separated values")
+    parser.add_argument("--allow-network", action="store_true", help="Allow network behavior for conversion")
+    parser.add_argument("--allow-ocr", action="store_true", help="Allow OCR behavior for conversion")
+    parser.add_argument("--allow-llm", action="store_true", help="Allow LLM behavior for conversion")
+    parser.add_argument("--allow-transcription", action="store_true", help="Allow transcription behavior for conversion")
+    parser.add_argument("--allow-hosted-document-intelligence", action="store_true", help="Allow hosted document-intelligence behavior for conversion")
     args = parser.parse_args()
+
+    if args.check and (
+        args.python_command
+        or args.conversion
+        or args.default_backend
+        or args.backend_order
+        or any(getattr(args, flag) for flag in SAFETY_FLAGS)
+    ):
+        parser.error("config-writing flags require --write-config")
+
+    if args.write_config:
+        if args.questions:
+            parser.error("--questions can only be used with --check")
+        if args.python_command is None and args.conversion is None:
+            parser.error("--write-config requires --python-command and/or --conversion")
+        result = write_config(args)
+        json.dump(result, sys.stdout, indent=None if args.compact else 2, sort_keys=True)
+        sys.stdout.write("\n")
+        return
 
     vault_root = Path(args.vault_root).resolve()
     report = build_report(vault_root)
