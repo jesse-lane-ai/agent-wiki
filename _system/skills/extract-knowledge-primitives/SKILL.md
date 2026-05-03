@@ -227,6 +227,7 @@ python3 _system/scripts/create-page.py \
   --claim-text "Acme Corp was founded in 2010." \
   --confidence 0.60 \
   --source-id <sourceId> \
+  --evidence "id=evidence.quote.supports.acme-founded-2010;sourceId=<sourceId>;path=<sourcePath>;kind=quote;relation=context_only;weight=0.60;excerpt=<short-excerpt>;updatedAt=<yyyy-mm-dd>;locatorText=<locator>" \
   --body-file <prepared-body.md> \
   --no-log
 ```
@@ -242,7 +243,9 @@ python3 _system/scripts/create-page.py \
   --no-log
 ```
 
-After creating a page with the scaffolder, immediately add any extraction-specific structured fields the scaffolder does not own, such as evidence entries, embedded relations, extracted primitive lists, or richer source references. Preserve the body prose written by the scaffolder and update `updatedAt` when structured content changes.
+For claim pages, pass source-grounded evidence records to the scaffolder with repeatable `--evidence` flags so the page is created with block YAML evidence frontmatter. Use `relation: supports` only when the source directly supports the claim; otherwise prefer `context_only`, `weakens`, or `contradicts`.
+
+After creating a page with the scaffolder, immediately add any extraction-specific structured fields the scaffolder does not own, such as embedded relations, extracted primitive lists, or richer source references. Preserve the body prose written by the scaffolder and update `updatedAt` when structured content changes.
 
 Use the body to explain the primitive in source-grounded context:
 

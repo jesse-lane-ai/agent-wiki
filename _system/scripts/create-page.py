@@ -5,6 +5,7 @@ Deterministic page scaffolder for the Agentics vault.
 Usage:
     python3 _system/scripts/create-page.py --type concept --subtype method --slug adaptive-reuse --title "Adaptive Reuse" --body-file /tmp/body.md
     python3 _system/scripts/create-page.py --type source --subtype webpage --slug urban-tree-canopy --title "Urban Tree Canopy" --source-url https://example.test --body-file /tmp/source.md
+    python3 _system/scripts/create-page.py --type claim --subtype descriptive --slug canopy-benefit --title "Canopy Benefit" --body-file /tmp/body.md --evidence 'id=evidence.quote.supports.canopy-benefit;sourceId=source.2026-04-28.article.urban-tree-canopy;path=sources/2026-04-28-article-urban-tree-canopy.md;kind=quote;relation=supports;weight=0.60;updatedAt=2026-04-28'
 """
 
 import argparse
@@ -54,6 +55,8 @@ VALID_CONCEPT_TYPES = {
 }
 VALID_SYNTHESIS_TYPES = {"summary", "overview", "analysis", "timeline", "brief", "comparison"}
 VALID_CLAIM_TYPES = {"descriptive", "historical", "causal", "interpretive", "normative", "forecast"}
+VALID_EVIDENCE_RELATIONS = {"supports", "weakens", "contradicts", "context_only"}
+VALID_EVIDENCE_KINDS = {"quote", "summary", "measurement", "observation", "screenshot", "transcript", "inference"}
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
@@ -102,8 +105,20 @@ def yaml_lines(key: str, value: Any, indent: int = 0) -> list[str]:
         lines = [f"{prefix}{key}:"]
         for item in value:
             if isinstance(item, dict):
-                lines.append(f"{prefix}  -")
-                for sub_key, sub_value in item.items():
+                item_fields = list(item.items())
+                first_key, first_value = item_fields[0]
+                if isinstance(first_value, (list, dict)):
+                    lines.append(f"{prefix}  - {first_key}:")
+                    if first_value:
+                        if isinstance(first_value, list):
+                            for nested_item in first_value:
+                                lines.append(f"{prefix}      - {yaml_scalar(nested_item)}")
+                        else:
+                            for nested_key, nested_value in first_value.items():
+                                lines.extend(yaml_lines(nested_key, nested_value, indent + 6))
+                else:
+                    lines.append(f"{prefix}  - {first_key}: {yaml_scalar(first_value)}")
+                for sub_key, sub_value in item_fields[1:]:
                     lines.extend(yaml_lines(sub_key, sub_value, indent + 4))
             else:
                 lines.append(f"{prefix}  - {yaml_scalar(item)}")
@@ -150,6 +165,102 @@ def read_body(args: argparse.Namespace, wiki_root: Path) -> str:
     if not body.strip():
         raise ScaffoldingError("body prose/content is required")
     return body.strip()
+
+
+def parse_evidence_value(value: str) -> dict[str, Any]:
+    """Parse one evidence record from JSON or semicolon-separated key=value pairs."""
+    value = value.strip()
+    if not value:
+        raise ScaffoldingError("--evidence values must not be empty")
+    if value.startswith("{"):
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError as exc:
+            raise ScaffoldingError(f"--evidence JSON is invalid: {exc}") from exc
+        if not isinstance(parsed, dict):
+            raise ScaffoldingError("--evidence JSON must be an object")
+        return parsed
+
+    record: dict[str, Any] = {}
+    for part in value.split(";"):
+        part = part.strip()
+        if not part:
+            continue
+        if "=" not in part:
+            raise ScaffoldingError("--evidence entries must use JSON objects or semicolon-separated key=value pairs")
+        key, raw = part.split("=", 1)
+        key = key.strip()
+        if not key:
+            raise ScaffoldingError("--evidence contains an empty key")
+        record[key] = raw.strip()
+    if not record:
+        raise ScaffoldingError("--evidence did not contain any fields")
+    return record
+
+
+def normalize_evidence_record(record: dict[str, Any], index: int) -> dict[str, Any]:
+    """Validate and order one evidence record for stable frontmatter output."""
+    allowed_fields = {
+        "id",
+        "sourceId",
+        "path",
+        "lines",
+        "kind",
+        "relation",
+        "weight",
+        "note",
+        "excerpt",
+        "retrievedAt",
+        "updatedAt",
+        "locatorText",
+    }
+    unknown = sorted(set(record) - allowed_fields)
+    if unknown:
+        raise ScaffoldingError(f"--evidence entry {index} has unsupported field(s): {', '.join(unknown)}")
+
+    required = {"id", "sourceId", "path", "kind", "relation", "weight", "updatedAt"}
+    missing = sorted(field for field in required if record.get(field) in (None, ""))
+    if missing:
+        raise ScaffoldingError(f"--evidence entry {index} is missing required field(s): {', '.join(missing)}")
+
+    kind = str(record["kind"])
+    relation = str(record["relation"])
+    if kind not in VALID_EVIDENCE_KINDS:
+        raise ScaffoldingError(f"--evidence entry {index} has invalid kind {kind!r}")
+    if relation not in VALID_EVIDENCE_RELATIONS:
+        raise ScaffoldingError(f"--evidence entry {index} has invalid relation {relation!r}")
+
+    try:
+        weight = float(record["weight"])
+    except (TypeError, ValueError) as exc:
+        raise ScaffoldingError(f"--evidence entry {index} weight must be numeric") from exc
+    if weight < 0.0 or weight > 1.0:
+        raise ScaffoldingError(f"--evidence entry {index} weight must be between 0.0 and 1.0")
+
+    require_date(str(record["updatedAt"]), f"--evidence entry {index} updatedAt")
+    if record.get("retrievedAt"):
+        require_date(str(record["retrievedAt"]), f"--evidence entry {index} retrievedAt")
+
+    ordered: dict[str, Any] = {
+        "id": str(record["id"]),
+        "sourceId": str(record["sourceId"]),
+        "path": str(record["path"]),
+    }
+    for field in ("lines", "kind", "relation"):
+        if record.get(field) not in (None, ""):
+            ordered[field] = str(record[field])
+    ordered["weight"] = weight
+    for field in ("note", "excerpt", "retrievedAt", "updatedAt", "locatorText"):
+        if record.get(field) not in (None, ""):
+            ordered[field] = str(record[field])
+    return ordered
+
+
+def parse_evidence_records(args: argparse.Namespace) -> list[dict[str, Any]]:
+    return [
+        normalize_evidence_record(parse_evidence_value(value), index)
+        for index, value in enumerate(args.evidence, start=1)
+    ]
 
 
 def extract_frontmatter_id(text: str) -> str | None:
@@ -241,6 +352,7 @@ def validate_status(page_type: str, status: str) -> None:
 def validate_claim_args(args: argparse.Namespace) -> None:
     if args.confidence < 0.0 or args.confidence > 1.0:
         raise ScaffoldingError("--confidence must be between 0.0 and 1.0")
+    parse_evidence_records(args)
 
 
 def build_page_id(args: argparse.Namespace, created_at: str) -> str:
@@ -310,7 +422,7 @@ def build_frontmatter(args: argparse.Namespace, page_id: str, created_at: str) -
         frontmatter["text"] = args.claim_text or args.title
         frontmatter["subjectPageId"] = args.subject_page_id or ""
         frontmatter["sourceIds"] = args.source_id
-        frontmatter["evidence"] = []
+        frontmatter["evidence"] = parse_evidence_records(args)
     elif args.page_type == "question":
         frontmatter["priority"] = args.priority
         frontmatter["relatedClaims"] = args.related_claim
@@ -417,6 +529,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--confidence", type=float, default=0.60, help="Claim confidence")
     parser.add_argument("--subject-page-id", help="Claim subject page ID")
     parser.add_argument("--source-id", action="append", default=[], help="Claim source ID; repeatable")
+    parser.add_argument(
+        "--evidence",
+        action="append",
+        default=[],
+        help=(
+            "Claim evidence record; repeatable. Use a JSON object or semicolon-separated key=value pairs. "
+            "Required fields: id, sourceId, path, kind, relation, weight, updatedAt."
+        ),
+    )
     parser.add_argument("--priority", default="medium", choices=sorted(VALID_QUESTION_PRIORITIES), help="Question priority")
     parser.add_argument("--opened-at", help="Question openedAt date")
     parser.add_argument("--scope", help="Synthesis scope")
@@ -441,6 +562,8 @@ def main() -> None:
             validate_source_args(args)
         elif args.page_type == "claim":
             validate_claim_args(args)
+        elif args.evidence:
+            raise ScaffoldingError("--evidence only applies to claim pages")
         elif args.source_role != "whole":
             raise ScaffoldingError("source role flags only apply to source pages")
 
