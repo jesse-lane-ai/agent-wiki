@@ -738,12 +738,22 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
         validate_enum(meta.get("conceptType"), VALID_CONCEPT_TYPES, "invalid_concept_type", path, issues, "conceptType", page_id)
     elif page_type == "synthesis":
         validate_enum(meta.get("status"), VALID_GENERAL_STATUSES, "invalid_page_status", path, issues, "status", page_id)
-        validate_required_fields(meta, {"synthesisType", "sourcePages", "derivedClaims"}, path, issues, "synthesis", page_id)
+        validate_required_fields(meta, {"synthesisType", "scope", "sourcePages", "derivedClaims"}, path, issues, "synthesis", page_id)
         validate_enum(meta.get("synthesisType"), VALID_SYNTHESIS_TYPES, "invalid_synthesis_type", path, issues, "synthesisType", page_id)
         if "sourcePages" in meta:
             validate_array_field(meta.get("sourcePages"), "invalid_synthesis_array", path, issues, "sourcePages", page_id)
         if "derivedClaims" in meta:
             validate_array_field(meta.get("derivedClaims"), "invalid_synthesis_array", path, issues, "derivedClaims", page_id)
+        source_pages = meta.get("sourcePages") if isinstance(meta.get("sourcePages"), list) else []
+        derived_claims = meta.get("derivedClaims") if isinstance(meta.get("derivedClaims"), list) else []
+        if meta.get("status") == "active" and not source_pages and not derived_claims:
+            add_validation_issue(
+                issues,
+                "ungrounded_synthesis",
+                path,
+                "Active synthesis pages should list at least one source page or derived claim.",
+                pageId=page_id,
+            )
     elif page_type == "question":
         validate_required_fields(meta, {"priority", "relatedClaims", "relatedPages", "openedAt"}, path, issues, "question", page_id)
         validate_enum(meta.get("status"), VALID_QUESTION_STATUSES, "invalid_question_status", path, issues, "status", page_id)

@@ -4,6 +4,7 @@ Deterministic page scaffolder for the Agentics vault.
 
 Usage:
     python3 _system/scripts/create-page.py --type concept --subtype method --slug adaptive-reuse --title "Adaptive Reuse" --body-file /tmp/body.md
+    python3 _system/scripts/create-page.py --type synthesis --subtype brief --slug coastal-resilience-options --title "Coastal Resilience Options" --scope "coastal flood mitigation options" --source-page source.2026-04-28.article.coastal-flooding --derived-claim claim.descriptive.high-tide-risk --body-file /tmp/body.md
     python3 _system/scripts/create-page.py --type source --subtype webpage --slug urban-tree-canopy --title "Urban Tree Canopy" --source-url https://example.test --body-file /tmp/source.md
     python3 _system/scripts/create-page.py --type claim --subtype descriptive --slug canopy-benefit --title "Canopy Benefit" --body-file /tmp/body.md --evidence 'id=evidence.quote.supports.canopy-benefit;sourceId=source.2026-04-28.article.urban-tree-canopy;path=sources/2026-04-28-article-urban-tree-canopy.md;kind=quote;relation=supports;weight=0.60;updatedAt=2026-04-28'
 """
@@ -355,6 +356,11 @@ def validate_claim_args(args: argparse.Namespace) -> None:
     parse_evidence_records(args)
 
 
+def validate_synthesis_args(args: argparse.Namespace) -> None:
+    if not args.scope:
+        raise ScaffoldingError("synthesis pages require --scope")
+
+
 def build_page_id(args: argparse.Namespace, created_at: str) -> str:
     if args.page_type == "source":
         source_date = args.source_date or args.retrieved_at or created_at
@@ -562,6 +568,8 @@ def main() -> None:
             validate_source_args(args)
         elif args.page_type == "claim":
             validate_claim_args(args)
+        elif args.page_type == "synthesis":
+            validate_synthesis_args(args)
         elif args.evidence:
             raise ScaffoldingError("--evidence only applies to claim pages")
         elif args.source_role != "whole":
