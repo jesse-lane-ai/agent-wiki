@@ -11,7 +11,13 @@ If inbox files are binary or non-markdown documents and local converter availabi
 python3 _system/scripts/onboard.py --check
 ```
 
-Use the probe output to choose a local conversion policy with the user. Do not install packages, create `.venv/`, write `_system/config.json`, or call network/OCR/LLM/cloud conversion services unless the user explicitly approves that setup.
+Use the probe output to choose a local conversion policy with the user. If the user approves persisting local policy, write `_system/config.json` through the onboarding config writer:
+
+```bash
+python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+```
+
+Do not install packages, create `.venv/`, hand-edit `_system/config.json`, or call network/OCR/LLM/cloud conversion services unless the user explicitly approves that setup.
 
 ### Folder meaning
 

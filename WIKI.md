@@ -67,7 +67,7 @@ Current vault structure:
   _attachments/
   _archive/
   _system/
-    config.json
+    config.example.json
     cache/
     indexes/
     logs/
@@ -95,7 +95,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 
 `_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
 
-Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user.
+Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
 
 ---
 

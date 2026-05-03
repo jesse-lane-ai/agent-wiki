@@ -92,6 +92,8 @@ python3 _system/scripts/onboard.py --check --questions
 
 Agents SHOULD ask setup questions as compact multiple-choice prompts so the user can reply with letter choices.
 
+If the operator approves persisting local setup choices, agents SHOULD write local `_system/config.json` through `_system/scripts/onboard.py --write-config` with the approved flags. Agents MUST NOT hand-edit `_system/config.json`.
+
 Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, or enable network/OCR/LLM/cloud conversion behavior unless explicitly instructed by the human operator.
 
 ---

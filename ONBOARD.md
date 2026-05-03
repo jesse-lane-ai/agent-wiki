@@ -19,7 +19,7 @@ Run the onboarding probe from the vault root:
 python3 _system/scripts/onboard.py --check
 ```
 
-The probe is read-only. It reports local Python commands, `.venv/` status, `_system/config.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+The probe is read-only. It reports local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
 
 To generate user-friendly setup prompts, run:
 
@@ -56,7 +56,13 @@ Use it when the user wants persistent local preferences such as:
 - backend command names
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 
-Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults. When a local config is needed, copy `_system/config.example.json` and adjust only the approved choices.
+Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults. When a local config is needed, use the onboarding config writer so only approved local policy fields are persisted:
+
+```bash
+python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+```
+
+Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
 
 ---
 
@@ -124,7 +130,7 @@ If any required value is unknown, the agent should ask the user before running `
 
 The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
 
-For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `_system/scripts/onboard.py --check` first when converter availability is unknown, then ask the user which conversion policy to use before writing `_system/config.json` or installing anything.
+For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `_system/scripts/onboard.py --check` first when converter availability is unknown, then ask the user which conversion policy to use before running `_system/scripts/onboard.py --write-config` or installing anything.
 
 Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
 
