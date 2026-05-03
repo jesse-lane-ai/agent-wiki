@@ -97,6 +97,8 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
 
+Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, and source part pages. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, and required body content. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
+
 This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content.
 
 ---
@@ -376,6 +378,8 @@ New `entity`, `concept`, `claim`, `question`, and `synthesis` pages must include
 
 The body should be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It should not be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
 
+Agents should use `_system/scripts/create-page.py` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence, relationships, source partitioning decisions, and optional fields that require judgment.
+
 Agents must preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
 
 ## 5. Status vocabularies
@@ -643,7 +647,7 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 
 1. Raw item arrives in `_inbox/`
 2. `process-inbox` reads the raw item
-3. If retained: item becomes a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
+3. If retained: `process-inbox` uses `_system/scripts/create-page.py` to write a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
 4. The original raw file moves to `raw/`
 5. If discarded: the raw file moves to `_inbox/trash/`
 

@@ -198,10 +198,12 @@ These outputs are generated artifacts. Do not hand-edit them, and do not treat r
 Skills live under `_system/skills/`:
 
 - `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
-- `import-link` imports external links and captures directly into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. Large captures are partitioned into parent source pages and source parts.
-- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
-- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. For large sources, extraction operates on source parts rather than the parent manifest.
+- `import-link` imports external links and captures into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
+- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `_system/scripts/create-page.py` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
+- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `_system/scripts/create-page.py` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
 - `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
+
+The page scaffolder covers required frontmatter for `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages. It does not invent optional metadata, evidence, relationships, body prose, source capture, or large-document split decisions.
 
 ## Scheduled Work
 

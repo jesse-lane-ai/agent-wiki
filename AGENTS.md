@@ -78,6 +78,8 @@ Agents SHOULD process inbox items by converting retained raw files into canonica
 
 Large retained sources SHOULD be converted into a short parent source page under `sources/` and child source part pages under `sources/parts/`. Agents SHOULD extract knowledge primitives from source part pages, not from the parent source manifest.
 
+When creating new canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` page files, agents SHOULD use `_system/scripts/create-page.py` unless a skill gives a more specific source-capture workflow. The script scaffolds required frontmatter and paths; it does not replace agent judgment about body prose, evidence, relationships, source capture, conversion, or large-source split decisions.
+
 When local setup or converter availability is uncertain, agents SHOULD run the read-only onboarding probe:
 
 ```bash
@@ -108,6 +110,7 @@ Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, 
 - Add or update relations in frontmatter
 - Update page body prose when explicitly instructed
 - Write substantive body prose for newly created authored knowledge pages
+- Use `_system/scripts/create-page.py` to scaffold new canonical page files
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate the root page catalog, caches, and reports
 - Create or refresh root `overview.md` when explicitly asked for a human-facing vault overview

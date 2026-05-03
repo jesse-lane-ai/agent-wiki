@@ -9,7 +9,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
 6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy or conversion backend preferences are needed.
 7. Configure `_system/skills/import-link/config.json` before importing external material.
-8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
+8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; page scaffolding uses `_system/scripts/create-page.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 9. Run the compile pipeline and confirm it reports zero validation issues.
 10. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
 
@@ -19,7 +19,7 @@ Run the onboarding probe from the wiki root:
 python3 _system/scripts/onboard.py --check
 ```
 
-The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the repository root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the repository root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, key script availability such as `_system/scripts/create-page.py`, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
 
 To generate user-friendly setup prompts, run:
 
