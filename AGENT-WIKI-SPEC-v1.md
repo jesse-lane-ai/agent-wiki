@@ -616,6 +616,22 @@ The page SHOULD include:
 
 `overview.md` MUST NOT be treated as primary evidence for claims unless the relevant material has been promoted into canonical source, claim, evidence, or page metadata records.
 
+### 7.10 Authored knowledge page bodies
+
+When an agent or human creates an `entity`, `concept`, `claim`, `question`, or `synthesis` page, the page MUST include a substantive Markdown body after the frontmatter.
+
+The body SHOULD be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It SHOULD NOT be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
+
+For each page type, the body SHOULD cover the natural human context for that page:
+
+- `entity` pages SHOULD describe the entity, its role in the vault, important identifiers or aliases, and known context or uncertainty.
+- `concept` pages SHOULD explain the concept, its meaning, boundaries, related methods or examples, and any important distinctions.
+- `claim` pages SHOULD restate the proposition in prose, summarize the evidence posture, and note important caveats or uncertainty.
+- `question` pages SHOULD explain why the question exists, what is already known, what remains unresolved, and what would count as resolution.
+- `synthesis` pages SHOULD provide maintained narrative interpretation, scope, source basis, and current conclusions or open tensions.
+
+Agents MUST preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
+
 ---
 
 ## 8. Page Identity and Naming

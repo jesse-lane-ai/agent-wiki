@@ -923,7 +923,7 @@ def walk_vault(vault_root: Path, verbose: bool = False) -> tuple[list[dict], lis
         pages.append(normalized_record)
 
         if verbose:
-            print(f"  [PAGE] {page_id} ({page_type}) — {rel}")
+            print(f"  [PAGE] {page_id} ({page_type}) - {rel}")
 
     return pages, validation_issues
 
@@ -2029,7 +2029,7 @@ def main():
     )
     print(f"\nWrote operational log: {LOG_DIR}/log.md")
 
-    print(f"\n✓ Compile complete.")
+    print(f"\nCompile complete.")
     print(f"  Pages: {len(pages)} | Claims: {len(claims)} | Relations: {len(relations)} | Contradictions: {len(contradictions)}")
     print(f"  Open questions: {open_questions_count}")
     print(f"  Evidence gaps: {len(health['evidence_gap_claims'])} | Low confidence: {len(health['low_confidence_claims'])}")
