@@ -233,6 +233,8 @@ aliases: []
 tags: []
 ```
 
+Add a substantive Markdown body after the frontmatter. Describe the entity, why it matters in the vault, important aliases or identifiers, and known uncertainty.
+
 ### Concept
 
 ```yaml
@@ -246,6 +248,8 @@ updatedAt: YYYY-MM-DD
 aliases: []
 tags: []
 ```
+
+Add a substantive Markdown body after the frontmatter. Explain the concept, its boundaries, source-grounded examples or steps, and important distinctions.
 
 ### Claim Page
 
@@ -265,6 +269,27 @@ updatedAt: YYYY-MM-DD
 aliases: []
 tags: []
 ```
+
+Add a substantive Markdown body after the frontmatter. Restate the atomic proposition in prose, summarize the evidence posture, and note caveats or uncertainty.
+
+### Synthesis
+
+```yaml
+id: synthesis.<synthesisType>.<synthesisSlug>
+pageType: synthesis
+title: <title>
+synthesisType: <synthesisType>
+scope: <scope>
+status: active
+sourcePages: []
+derivedClaims: []
+createdAt: YYYY-MM-DD
+updatedAt: YYYY-MM-DD
+aliases: []
+tags: []
+```
+
+Add a substantive Markdown body after the frontmatter. Provide maintained narrative interpretation, scope, source basis, current conclusions, and open tensions.
 
 ### Embedded Claim
 
@@ -315,6 +340,8 @@ aliases: []
 tags: []
 ```
 
+Add a substantive Markdown body after the frontmatter. Explain why the question exists, what is already known, what remains unresolved, and what would count as resolution.
+
 ### Relation
 
 ```yaml
@@ -340,6 +367,14 @@ tags: []
 ```
 
 ---
+
+## 4.2 Authored page bodies
+
+New `entity`, `concept`, `claim`, `question`, and `synthesis` pages must include a substantive Markdown body after frontmatter.
+
+The body should be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It should not be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
+
+Agents must preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
 
 ## 5. Status vocabularies
 

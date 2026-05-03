@@ -30,6 +30,8 @@ Agents SHOULD keep generated structured knowledge in frontmatter fields, claim/e
 
 When updating page body prose, agents MUST preserve human-authored content unless the human operator explicitly asks for a rewrite.
 
+When creating new `entity`, `concept`, `claim`, `question`, or `synthesis` pages, agents MUST write substantive Markdown body prose after the frontmatter. The body MUST explain the page in human-facing context and MUST NOT be only a placeholder, a one-line title restatement, or a metadata dump.
+
 ### 2.3 Use stable IDs
 
 Every page, claim, evidence entry, and relation MUST have a stable ID.
@@ -101,6 +103,7 @@ Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, 
 - Add or update claims and evidence in frontmatter
 - Add or update relations in frontmatter
 - Update page body prose when explicitly instructed
+- Write substantive body prose for newly created authored knowledge pages
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate the root page catalog, caches, and reports
 - Create or refresh root `overview.md` when explicitly asked for a human-facing vault overview
