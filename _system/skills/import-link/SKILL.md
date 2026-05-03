@@ -9,9 +9,10 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 - Before first use, read `ONBOARD.md` and `_system/skills/import-link/config.json`.
 - If local setup is uncertain, run `python3 _system/scripts/onboard.py --check` and use the read-only probe output to guide setup questions.
 - For first-run setup, prefer `python3 _system/scripts/onboard.py --check --questions` so the user can answer with compact letter choices.
-- If the user approves persisting local Python or conversion policy, use `python3 _system/scripts/onboard.py --write-config` with the approved flags. The writer creates local `_system/config.json` from `_system/config.example.json`.
+- If the user approves persisting local Python, conversion, or vault placement policy, use `python3 _system/scripts/onboard.py --write-config` with the approved flags. The writer creates local `_system/config.json` from `_system/config.example.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, Obsidian path, or external vault.
+- If vault placement is undecided, importing into this repository root is allowed only when the user confirms that this checkout is the target markdown workspace.
 - If `vaultRoot`, retrieval modes, or attachment policy is unknown, stop and ask the user to configure `_system/skills/import-link/config.json`.
 - Use the repository root as `vaultRoot` only when the user wants imports written into this checkout.
 - The default `manual_paste` retrieval mode requires no external tools. Other retrieval modes only apply when configured and available.
@@ -19,7 +20,8 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Vault Selection (required)
 - Accept an optional vault name or vault root in user input.
-- Resolve the target vault from `_system/skills/import-link/config.json` unless the user explicitly supplies a different path.
+- Use `_system/config.json` vault placement fields, when present, to understand whether this checkout is standalone, an Obsidian vault root, inside an Obsidian vault, external-vault controlled, or undecided.
+- Resolve the target vault from `_system/skills/import-link/config.json` unless the user explicitly supplies a different path. If `_system/config.json` says `vault.mode: external-vault`, the import-link vault root must agree with the configured external target or the user must choose which path to use.
 - If no configured vault root exists, stop and ask the user for the target vault root.
 - If the requested vault folder does not exist, stop and report the missing vault instead of guessing.
 - Use the resolved vault for all paths (`sources`, `_attachments`).
