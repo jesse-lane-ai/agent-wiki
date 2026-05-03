@@ -93,7 +93,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
-`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge and should not contain secrets.
+`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user.
 

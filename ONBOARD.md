@@ -7,7 +7,7 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run the read-only onboarding probe.
 5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
-6. Configure `_system/config.json` if local tool policy or conversion backend preferences are needed.
+6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy or conversion backend preferences are needed.
 7. Configure `_system/skills/import-link/config.json` before importing external material.
 8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 9. Run the compile pipeline and confirm it reports zero validation issues.
@@ -46,7 +46,7 @@ python3 _system/skills/compile-wiki/scripts/compile.py
 
 ## Local System Configuration
 
-`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge and should not contain secrets.
+`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
 
 Use it when the user wants persistent local preferences such as:
 
@@ -56,7 +56,7 @@ Use it when the user wants persistent local preferences such as:
 - backend command names
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 
-Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults.
+Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults. When a local config is needed, copy `_system/config.example.json` and adjust only the approved choices.
 
 ---
 

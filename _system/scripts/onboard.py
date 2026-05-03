@@ -17,6 +17,7 @@ from typing import Any
 
 
 SYSTEM_CONFIG = Path("_system/config.json")
+SYSTEM_CONFIG_EXAMPLE = Path("_system/config.example.json")
 IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
 CLI_CONVERTERS = ["markitdown", "marker", "arxiv2md"]
@@ -136,11 +137,16 @@ def read_json(path: Path) -> dict[str, Any] | None:
 
 def probe_config(vault_root: Path) -> dict[str, Any]:
     config_path = vault_root / SYSTEM_CONFIG
+    example_path = vault_root / SYSTEM_CONFIG_EXAMPLE
     data = read_json(config_path) if config_path.exists() else None
+    example_data = read_json(example_path) if example_path.exists() else None
     return {
         "path": str(SYSTEM_CONFIG),
         "exists": config_path.exists(),
         "readable": data is not None if config_path.exists() else False,
+        "examplePath": str(SYSTEM_CONFIG_EXAMPLE),
+        "exampleExists": example_path.exists(),
+        "exampleReadable": example_data is not None if example_path.exists() else False,
         "schemaVersion": data.get("schemaVersion") if data else None,
         "pythonCommand": data.get("pythonCommand") if data else None,
         "conversionEnabled": data.get("conversion", {}).get("enabled") if data else None,
@@ -263,7 +269,7 @@ def build_setup_questions(report: dict[str, Any]) -> str:
         python_label = "not found"
     lines.extend([
         f"2. Python and _system/config.json ({python_label})",
-        "   A. Write _system/config.json with the detected Python command. Recommended when you want repeatable local runs.",
+        "   A. Create local _system/config.json from the example with the detected Python command. Recommended when you want repeatable local runs.",
         "   B. Leave _system/config.json absent. Tools will use conservative defaults.",
         "   C. Use a different Python command. Reply with the command after the choice.",
         "",

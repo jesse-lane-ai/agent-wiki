@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "pythonCommand": null,
+  "conversion": {
+    "enabled": false,
+    "defaultBackend": "auto",
+    "backendOrder": [
+      "pymupdf4llm",
+      "markitdown"
+    ],
+    "allowNetwork": false,
+    "allowOcr": false,
+    "allowLlm": false,
+    "allowTranscription": false,
+    "allowHostedDocumentIntelligence": false,
+    "backends": {
+      "pymupdf4llm": {
+        "enabled": true,
+        "command": null,
+        "formats": [
+          "pdf"
+        ]
+      },
+      "markitdown": {
+        "enabled": true,
+        "command": "markitdown",
+        "formats": [
+          "pdf",
+          "docx",
+          "pptx",
+          "xlsx",
+          "html",
+          "csv",
+          "json",
+          "xml",
+          "epub"
+        ]
+      },
+      "arxiv2md": {
+        "enabled": false,
+        "command": null,
+        "formats": [
+          "pdf"
+        ]
+      },
+      "marker": {
+        "enabled": false,
+        "command": null,
+        "formats": [
+          "pdf"
+        ]
+      }
+    }
+  }
+}
