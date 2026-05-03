@@ -337,6 +337,12 @@ Recommended shape:
 {
   "schemaVersion": 1,
   "pythonCommand": null,
+  "vault": {
+    "mode": "undecided",
+    "root": null,
+    "obsidianVault": null,
+    "obsidianVaultRoot": null
+  },
   "conversion": {
     "enabled": true,
     "defaultBackend": "auto",
@@ -374,7 +380,19 @@ Recommended shape:
 
 `pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
 
+`vault.mode` describes the operator-approved placement of the wiki:
+
+- `undecided` - the operator has not chosen final placement yet
+- `standalone` - this repository root is the working markdown wiki
+- `obsidian-root` - this repository root is also the Obsidian vault root
+- `obsidian-subfolder` - this repository lives inside an existing Obsidian vault
+- `external-vault` - system files live here while content is written to another configured vault root
+
+`vault.root` MAY store the working wiki root when it differs from the current repository root. `vault.obsidianVault` MAY be `true`, `false`, or `null` when unknown. `vault.obsidianVaultRoot` MAY store the Obsidian vault root when known.
+
 Configuration SHOULD express operator policy and preferences, not transient detection state. For example, a backend can be enabled in config but still unavailable at runtime if the command or Python package is not installed. Tools SHOULD detect that condition during execution and report it clearly.
+
+Operating system, platform, and shell detection SHOULD be reported by onboarding probes as runtime environment state and SHOULD NOT be persisted in `_system/config.json` unless a future operator policy field requires an explicit override.
 
 If `.venv/` is used, it SHOULD be project-local and ignored by version control. Shared template repositories SHOULD NOT require it to exist.
 
@@ -400,10 +418,12 @@ python3 _system/scripts/onboard.py --check --questions
 
 The probe SHOULD check:
 
+- operating system and platform details needed for setup guidance
 - available Python commands, including `python3`, `python`, and `.venv/bin/python`
 - Python versions for available commands
 - whether `.venv/` exists
 - whether `_system/config.json` exists
+- whether `.obsidian/` exists at the current root or an obvious parent root
 - whether required runtime/content folders exist
 - whether `import-link` has a local config file and whether it appears configured
 - available local conversion CLI commands, such as `markitdown`, `marker`, and `arxiv2md`
@@ -428,6 +448,9 @@ When `_system/config.example.json` exists, `--write-config` SHOULD start from th
 The config writer SHOULD require explicit flags for choices that materially change behavior, including:
 
 - `--python-command <command>` for the preferred Python command
+- `--vault-mode <mode>` for the approved wiki placement
+- `--vault-root <path>` when the working wiki root differs from the current repository root
+- `--obsidian-vault-root <path>` when the Obsidian vault root is known
 - `--conversion disabled` to keep inbox conversion disabled
 - `--conversion available-local` to enable conversion using only already installed local backends
 - `--conversion custom` when explicit backend choices or policy flags are supplied
@@ -449,12 +472,26 @@ Question text SHOULD be friendly and operational. It SHOULD describe what the ch
 Recommended setup questions include:
 
 - which Python command to use
+- whether the wiki should be used standalone, opened as an Obsidian vault, placed inside an existing Obsidian vault, pointed at an external vault, or left undecided
 - whether to use or create a project-local `.venv/`
 - whether inbox conversion should be enabled
 - which conversion backend policy to use
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 - whether missing runtime folders should be created
 - whether `_system/config.json` should be written
+
+Vault placement MAY remain undecided after onboarding. This is a valid state and MUST NOT block compile, inbox processing, source creation, or ordinary markdown workflows. When vault placement is undecided, agents SHOULD treat the repository root as the working markdown wiki for local operations unless the operator supplies another path.
+
+After core onboarding, agents SHOULD recommend optional Obsidian setup when the operator wants an Obsidian workflow and the repository root is intended to be the vault root. The recommendation SHOULD be concise and operational:
+
+1. Open Obsidian.
+2. Click the current vault name at the bottom of the file explorer pane, or use Obsidian's vault switcher if the control is not visible.
+3. Click "Manage vaults..."
+4. Click "Open folder as vault".
+5. Navigate to the root of this wiki.
+6. Click "Select Folder".
+
+Opening the repository root as an Obsidian vault may create local `.obsidian/` settings. `.obsidian/` is local application state and SHOULD be ignored by version control.
 
 ### 6.5 Project development workflow
 
