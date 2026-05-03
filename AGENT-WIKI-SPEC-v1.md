@@ -2,7 +2,7 @@
 # Agentic Wiki v1 Specification
 
 Version: 1.3
-Last Updated: 2026-05-02
+Last Updated: 2026-05-03
 
 ---
 
@@ -670,6 +670,17 @@ Examples:
 
 A page in `syntheses/` MUST have `pageType: synthesis`.
 
+Agents SHOULD create a synthesis page when the user asks for durable interpretation across multiple sources, claims, entities, concepts, or time periods. Synthesis pages are appropriate for briefs, comparisons, literature-style summaries, chronological narratives, decision memos, and maintained analyses that should remain available as authored knowledge.
+
+Agents SHOULD NOT create a synthesis page for:
+- a single atomic proposition that belongs in `claims/`
+- a raw or verbatim captured item that belongs in `sources/`
+- an unresolved unknown that belongs in `questions/`
+- a deterministic maintenance output that belongs in `reports/`
+- whole-vault orientation that belongs in root `overview.md`
+
+Synthesis pages are secondary authored interpretation. They MUST preserve uncertainty, identify their source basis, and avoid presenting unsupported conclusions as established fact.
+
 ### 7.5 `questions/`
 
 A `question` page represents an unresolved issue.
@@ -1182,7 +1193,66 @@ Allowed values:
 - `brief`
 - `comparison`
 
-### 10.5 Question pages
+### 10.5 Synthesis workflow rules
+
+Synthesis pages are durable authored knowledge, not deterministic reports. They combine judgment, source selection, prose, and uncertainty management. A synthesis page MAY cite source pages, derived claim pages, related entities, related concepts, questions, or prior syntheses, but it MUST remain clear about what is directly sourced and what is interpretive.
+
+#### When to create a synthesis
+
+Agents SHOULD create a synthesis page when at least one of the following is true:
+- the user asks to synthesize, compare, summarize, brief, analyze, or narrate across more than one source or page
+- several claims or sources need an integrated explanation that is more useful than a flat list
+- the vault needs a durable current-state brief for a topic, project, decision area, or research thread
+- a chronological account is needed and the chronology is more naturally maintained as a narrative than as isolated timeline records
+- contradictions, open questions, or competing interpretations need to be held together in one maintained reading
+
+Agents SHOULD update an existing synthesis instead of creating a new one when the existing page has the same scope, audience, and synthesis type. Agents SHOULD create a new synthesis when the scope, time horizon, audience, or analytical question is materially different.
+
+#### Expected body structure
+
+The body of a synthesis page MUST be substantive Markdown prose. It SHOULD be written for a human reader and SHOULD contain enough context to stand alone without requiring the reader to inspect every referenced source first.
+
+A synthesis body SHOULD normally include:
+- scope and purpose
+- source basis or coverage
+- main synthesis in paragraph form
+- important evidence, claims, or examples
+- uncertainty, limits, contradictions, or unresolved questions
+- current conclusion or next-step implication, when appropriate
+
+Timeline syntheses SHOULD include a chronological narrative and MAY also include a structured `timeline:` field when individual events need deterministic extraction into `_system/cache/timeline-events.json`.
+
+Comparison syntheses SHOULD make comparison dimensions explicit. Brief syntheses SHOULD prioritize concise conclusions and decision-relevant context. Analysis syntheses SHOULD explain reasoning and uncertainty instead of only listing findings.
+
+#### Source and evidence grounding
+
+Synthesis pages MUST list their source basis in `sourcePages` when source pages are used. If the synthesis relies on established claim pages, it SHOULD list them in `derivedClaims`.
+
+Synthesis prose SHOULD cite the most specific canonical source page, source part, claim page, or question page needed to support the discussion. Large-document syntheses SHOULD cite source part pages rather than only parent source manifests when the relevant evidence came from a specific part.
+
+Synthesis pages MUST NOT be used to launder unsupported assertions into accepted knowledge. If a synthesis introduces an atomic proposition that should be tracked independently, the agent SHOULD create or update a claim page and reference it from `derivedClaims`.
+
+Evidence entries for claim pages SHOULD point back to canonical source pages whenever possible. They SHOULD NOT point only to a synthesis page unless the synthesis itself is the best available authored source for an interpretive claim about the wiki's analysis.
+
+When the evidence base is incomplete, contested, or weak, the synthesis body MUST say so plainly. Agents MUST preserve minority views, contradictions, and caveats that matter to the synthesis question.
+
+#### Maintenance rules
+
+When a synthesis page is meaningfully changed, the agent MUST update `updatedAt`. If the source basis changes, the agent SHOULD update `sourcePages`, `derivedClaims`, and any relevant relationships at the same time.
+
+Agents SHOULD maintain synthesis pages by revising the existing body prose in place, while preserving human-authored material unless the operator explicitly asks for a rewrite. If a prior conclusion becomes stale or contradicted, agents SHOULD revise the conclusion and record the reason in prose rather than silently removing the older context.
+
+Agents SHOULD create question pages for unresolved issues discovered during synthesis when the question is important enough to track independently. Agents SHOULD create or update claim pages for important atomic assertions that need evidence tracking outside the synthesis body.
+
+Synthesis pages SHOULD be refreshed intentionally after meaningful new sources or claims are added to their scope. They SHOULD NOT be regenerated automatically during every compile run.
+
+#### Skill boundary
+
+The deterministic page scaffolder MAY create the initial synthesis page file and required frontmatter, but it does not decide what to synthesize or write the synthesis body.
+
+A dedicated synthesis skill SHOULD be added if agents are expected to frequently handle requests such as "synthesize these sources", "write a brief", "compare these documents", "summarize this research thread", or "make a timeline synthesis". Such a skill SHOULD own source and claim selection, synthesis type selection, body prose, uncertainty handling, updates to related claim/question records, and operational logging.
+
+### 10.6 Question pages
 
 Questions are first-class authored pages in v1.
 
