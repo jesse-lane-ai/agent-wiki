@@ -5,7 +5,7 @@ description: "Extract knowledge primitives (entities, concepts, claims, question
 
 # Extract Knowledge Primitives
 
-This skill defines the extraction workflow. It does not own the vault schema.
+This skill defines the extraction workflow. It does not own the vault schema or synthesis prose workflow.
 
 Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums live in `WIKI.md` Sections 5 and 6. Evidence rules live in `WIKI.md` Section 7. Relationship predicates live in `WIKI.md` Section 8. Entity and concept type enums live in `WIKI.md` Section 12.1. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v1.md`.
 
@@ -194,6 +194,8 @@ Use the runtime page schemas and examples from `WIKI.md` Section 4.1. Do not use
 
 When creating a new `entity`, `concept`, `claim`, or `question` page, write a substantive Markdown body after the frontmatter. The body must be human-facing prose, not only frontmatter, a placeholder, or a one-line title restatement.
 
+Do not create `synthesis` pages as part of routine primitive extraction. If the extraction reveals a need for durable cross-source interpretation, comparison, brief, or timeline narrative, report that a synthesis may be useful and use the `write-synthesis` skill when the operator asks for it.
+
 Prepare the body prose in a temporary Markdown file outside the vault, then call the scaffolder. Examples:
 
 ```bash
@@ -327,6 +329,7 @@ Created or updated:
 - [ ] Skip `sourceRole: parent` pages during extraction
 - [ ] Read each selected source in full
 - [ ] Identify entities, concepts, claims, questions, and relations
+- [ ] Defer durable cross-source interpretation to the `write-synthesis` skill
 - [ ] Check for duplicates before creating pages
 - [ ] Use `_system/scripts/create-page.py --no-log` for newly created primitive page files
 - [ ] Use runtime schemas and examples from `WIKI.md` Section 4.1

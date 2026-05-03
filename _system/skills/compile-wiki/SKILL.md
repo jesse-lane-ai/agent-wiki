@@ -16,6 +16,7 @@ Run the compile pipeline after:
 - Adding source pages
 - Adding source parent or source part pages for large documents
 - Extracting knowledge primitives from source pages
+- Creating or refreshing synthesis pages
 - Resolving questions (status changes)
 - Any bulk edit to page metadata
 
@@ -110,6 +111,7 @@ When running compile:
 
 - validate page frontmatter and generated records
 - warn when authored knowledge pages are missing required Markdown body prose
+- validate synthesis scope and warn when active synthesis pages have no listed source or claim basis
 - validate large-source parent and source-part structure
 - detect duplicate IDs and malformed records
 - regenerate cache files, `_system/indexes/`, root `index.md`, and report artifacts
