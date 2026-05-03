@@ -6,20 +6,20 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run the read-only onboarding probe.
-5. Ask compact multiple-choice setup questions based on the probe output before writing config, choosing vault placement, creating folders, creating a virtual environment, or installing packages.
-6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy, vault placement, or conversion backend preferences are needed.
+5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
+6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy or conversion backend preferences are needed.
 7. Configure `_system/skills/import-link/config.json` before importing external material.
 8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 9. Run the compile pipeline and confirm it reports zero validation issues.
 10. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
 
-Run the onboarding probe from the vault root:
+Run the onboarding probe from the wiki root:
 
 ```bash
 python3 _system/scripts/onboard.py --check
 ```
 
-The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at or above the current root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the repository root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
 
 To generate user-friendly setup prompts, run:
 
@@ -51,7 +51,6 @@ python3 _system/skills/compile-wiki/scripts/compile.py
 Use it when the user wants persistent local preferences such as:
 
 - which Python command to use
-- vault placement, including whether this wiki is standalone, an Obsidian vault root, inside an existing Obsidian vault, external, or undecided
 - whether inbox conversion is enabled
 - automatic conversion backend order
 - backend command names
@@ -65,15 +64,7 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 
 Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
 
-Vault placement can be persisted with:
-
-```bash
-python3 _system/scripts/onboard.py --write-config --vault-mode undecided
-```
-
-Use `--vault-mode obsidian-root` when this repository root should be opened as the Obsidian vault. Use `--vault-mode obsidian-subfolder --obsidian-vault-root <path>` when this checkout is inside an existing Obsidian vault. Use `--vault-mode external-vault --config-vault-root <path>` when system files live here but content should be written elsewhere.
-
-Vault placement may stay undecided. In that case, use this repository root as the working markdown wiki unless the user supplies another path.
+This checkout is the only wiki root. `_system/config.json` does not store alternate roots, target vaults, or routing choices. Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
 
 ---
 
@@ -119,9 +110,8 @@ Edit `_system/skills/import-link/config.json` before importing. The checked-in f
 Required first-run edits:
 
 1. Set `configured` to `true`.
-2. Set `vaultRoot` to the absolute path where `sources/` and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault.
-3. Confirm `retrievalModes`.
-4. Confirm `attachmentPolicy`.
+2. Confirm `retrievalModes`.
+3. Confirm `attachmentPolicy`.
 
 Default config:
 
@@ -129,8 +119,6 @@ Default config:
 {
   "schemaVersion": 1,
   "configured": false,
-  "vaultRoot": null,
-  "defaultVaultName": null,
   "retrievalModes": ["manual_paste"],
   "browserProfile": null,
   "youtubeTranscriptTool": null,
@@ -145,8 +133,6 @@ Config fields:
 | Setting | Required | Notes |
 |---|---|---|
 | `configured` | yes | Must be `true` before import. Leave `false` in shared starter repos. |
-| `vaultRoot` | yes | Absolute path to the vault where `sources/` and `_attachments/` should be written. For this repo, use the repository root unless the user explicitly wants an external Obsidian vault. |
-| `defaultVaultName` | no | Optional display name for the target vault. |
 | `retrievalModes` | yes | Ordered list of available retrieval methods. Use `manual_paste` for no-tool setup. Other values may include `direct_fetch`, `browser_capture`, or `transcript`. |
 | `browserProfile` | no | Only needed if browser fallback is available in the user's environment. |
 | `youtubeTranscriptTool` | no | Only set if `yt-dlp` or another transcript tool is installed. |
