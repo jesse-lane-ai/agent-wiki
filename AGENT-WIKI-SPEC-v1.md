@@ -413,6 +413,27 @@ The probe MUST NOT install packages, create virtual environments, write `_system
 
 Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then write `_system/config.json` or create missing folders only after the operator has approved those actions.
 
+`onboard.py` MAY support an explicit mutating config writer:
+
+```bash
+python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+```
+
+`--write-config` MAY create or update local `_system/config.json`. It MUST NOT be implied by `--check` or `--questions`. Agents MUST run it only after the operator has approved the specific local choices to persist.
+
+When `_system/config.example.json` exists, `--write-config` SHOULD start from the example shape and update only approved local policy fields. It SHOULD preserve unrelated existing config fields when updating an existing `_system/config.json`.
+
+`--write-config` MUST write operator policy and command preferences only. It MUST NOT write transient detection state such as whether a package or command is currently installed. It MUST NOT create `.venv/`, install packages, create folders, modify `_system/skills/import-link/config.json`, or run the compile pipeline.
+
+The config writer SHOULD require explicit flags for choices that materially change behavior, including:
+
+- `--python-command <command>` for the preferred Python command
+- `--conversion disabled` to keep inbox conversion disabled
+- `--conversion available-local` to enable conversion using only already installed local backends
+- `--conversion custom` when explicit backend choices or policy flags are supplied
+
+Network, OCR, LLM, transcription, and hosted document-intelligence conversion behavior MUST remain disabled unless explicitly enabled by dedicated flags. The writer SHOULD report exactly which fields were written.
+
 Onboarding questions SHOULD be compact multiple-choice prompts. The operator should be able to answer quickly with letter choices such as `1A 2B 3A`. Agents SHOULD avoid long open-ended setup questions unless a path, command, or credential must be supplied by the operator.
 
 Each setup question SHOULD include:
