@@ -86,6 +86,12 @@ Then compile the wiki:
 Read AGENTS.md and run the local compile-wiki skill from _system/skills/
 ```
 
+Write a durable synthesis when you need cross-source interpretation, a brief, a comparison, or a timeline narrative:
+
+```text
+Read AGENTS.md and run the local write-synthesis skill from _system/skills/
+```
+
 Generate the overview landing page:
 
 ```text
@@ -201,9 +207,10 @@ Skills live under `_system/skills/`:
 - `import-link` imports external links and captures into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
 - `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `_system/scripts/create-page.py` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `_system/scripts/create-page.py` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
+- `write-synthesis` creates or refreshes durable synthesis pages for cross-source summaries, briefs, analyses, comparisons, and timeline narratives. It uses `_system/scripts/create-page.py` for new synthesis page files.
 - `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
 
-The page scaffolder covers required frontmatter for `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages. It does not invent optional metadata, evidence, relationships, body prose, source capture, or large-document split decisions.
+The page scaffolder covers required frontmatter for `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages. It does not invent optional metadata, evidence, relationships, body prose, source capture, synthesis judgment, or large-document split decisions.
 
 ## Scheduled Work
 
@@ -211,7 +218,7 @@ This repo does not ship a scheduler, daemon, or task runner. For recurring maint
 
 - inbox processing via `_system/skills/process-inbox/`
 - compile/regeneration via `_system/skills/compile-wiki/`
-- extraction or cleanup via the relevant skill
+- extraction, synthesis, or cleanup via the relevant skill
 
 Re-run compile after meaningful vault changes so `index.md`, caches, indexes, logs, and reports stay current.
 

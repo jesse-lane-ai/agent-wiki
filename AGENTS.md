@@ -80,6 +80,8 @@ Large retained sources SHOULD be converted into a short parent source page under
 
 When creating new canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` page files, agents SHOULD use `_system/scripts/create-page.py` unless a skill gives a more specific source-capture workflow. The script scaffolds required frontmatter and paths; it does not replace agent judgment about body prose, evidence, relationships, source capture, conversion, or large-source split decisions.
 
+When asked for durable cross-source interpretation, comparison, brief, analysis, summary, or timeline narrative, agents SHOULD use the local `write-synthesis` skill. Synthesis pages MUST identify their source basis, preserve uncertainty, and avoid treating unsupported interpretation as established fact.
+
 When local setup or converter availability is uncertain, agents SHOULD run the read-only onboarding probe:
 
 ```bash

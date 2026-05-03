@@ -11,7 +11,8 @@ Use this file when setting up a fresh checkout or when a new agent needs to orie
 7. Configure `_system/skills/import-link/config.json` before importing external material.
 8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; page scaffolding uses `_system/scripts/create-page.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
 9. Run the compile pipeline and confirm it reports zero validation issues.
-10. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
+10. Optionally run the `write-synthesis` skill when the vault needs a durable cross-source brief, comparison, analysis, summary, or timeline narrative.
+11. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
 
 Run the onboarding probe from the wiki root:
 

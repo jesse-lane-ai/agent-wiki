@@ -97,7 +97,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
 
-Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, and caller-supplied claim evidence records. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, and supplied evidence shape. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
+Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
 This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content.
 
@@ -295,6 +295,8 @@ tags: []
 
 Add a substantive Markdown body after the frontmatter. Provide maintained narrative interpretation, scope, source basis, current conclusions, and open tensions.
 
+Create synthesis pages when the user needs durable cross-source interpretation, such as a summary, overview, analysis, timeline, brief, or comparison. Do not use synthesis pages for a single atomic proposition, raw captured material, unresolved questions, deterministic reports, or whole-vault landing prose. List source basis in `sourcePages` when sources are used, list tracked claim dependencies in `derivedClaims` when claim pages are used, and preserve uncertainty or contradictions in the body prose.
+
 ### Embedded Claim
 
 ```yaml
@@ -378,7 +380,7 @@ New `entity`, `concept`, `claim`, `question`, and `synthesis` pages must include
 
 The body should be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It should not be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
 
-Agents should use `_system/scripts/create-page.py` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML.
+Agents should use `_system/scripts/create-page.py` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, synthesis judgment, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML. For synthesis pages, pass an explicit `--scope` and any known `--source-page` or `--derived-claim` values.
 
 Agents must preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
 
