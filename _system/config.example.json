@@ -1,6 +1,12 @@
 {
   "schemaVersion": 1,
   "pythonCommand": null,
+  "vault": {
+    "mode": "undecided",
+    "root": null,
+    "obsidianVault": null,
+    "obsidianVaultRoot": null
+  },
   "conversion": {
     "enabled": false,
     "defaultBackend": "auto",
