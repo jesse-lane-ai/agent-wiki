@@ -70,6 +70,7 @@ MAX_DIGEST_QUESTIONS = 20        # max open question pages included in agent dig
 MAX_DIGEST_CONTRADICTIONS = 10   # max open contradictions included in agent digest
 
 VALID_PAGE_TYPES = {"source", "entity", "concept", "synthesis", "question", "report", "claim", "index", "overview"}
+AUTHORED_BODY_PAGE_TYPES = {"entity", "concept", "claim", "question", "synthesis"}
 VALID_GENERAL_STATUSES = {"active", "draft", "archived", "deprecated"}
 VALID_SOURCE_STATUSES = {"unprocessed", "partitioned", "processed", "archived"}
 VALID_SOURCE_TYPES = {"webpage", "article", "document", "pdf", "transcript", "email", "meeting-notes", "dataset", "screenshot", "bridge", "import", "other"}
@@ -652,6 +653,7 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
     path = record.get("path", "")
     meta = record.get("meta", {})
     page_type = record.get("pageType", "")
+    body = str(record.get("body") or "").strip()
 
     validate_required_fields(meta, REQUIRED_UNIVERSAL_FIELDS, path, issues, "page", page_id)
     validate_date_field(meta.get("createdAt"), "invalid_page_date", path, issues, "createdAt", page_id)
@@ -696,6 +698,16 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
                 pageType=page_type,
                 expectedPageType=expected,
             )
+
+    if page_type in AUTHORED_BODY_PAGE_TYPES and not body:
+        add_validation_issue(
+            issues,
+            "missing_page_body",
+            path,
+            f"`pageType: {page_type}` pages must include substantive Markdown body prose after frontmatter.",
+            pageId=page_id,
+            pageType=page_type,
+        )
 
     if page_type == "source":
         validate_enum(meta.get("status"), VALID_SOURCE_STATUSES, "invalid_source_status", path, issues, "status", page_id)
