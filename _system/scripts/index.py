@@ -33,8 +33,8 @@ PAGE_TYPE_LABELS = {
 }
 
 
-def load_pages(vault_root: Path) -> list[dict[str, Any]]:
-    pages_path = vault_root / PAGES_CACHE
+def load_pages(wiki_root: Path) -> list[dict[str, Any]]:
+    pages_path = wiki_root / PAGES_CACHE
     if not pages_path.exists():
         raise FileNotFoundError(f"Missing {PAGES_CACHE}; run compile first.")
 
@@ -145,13 +145,11 @@ def render_index(pages: list[dict[str, Any]]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def write_operational_log(vault_root: Path, message: str) -> None:
+def write_operational_log(wiki_root: Path, message: str) -> None:
     subprocess.run(
         [
             sys.executable,
-            str(vault_root / LOG_SCRIPT),
-            "--vault-root",
-            str(vault_root),
+            str(wiki_root / LOG_SCRIPT),
             "--message",
             message,
         ],
@@ -166,14 +164,13 @@ def main() -> None:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", action="store_true", help="Rewrite index.md")
     mode.add_argument("--check", action="store_true", help="Fail if index.md is not current")
-    parser.add_argument("--vault-root", default=".", help="Path to vault root (default: current directory)")
     parser.add_argument("--no-log", action="store_true", help="Do not write an operational log entry")
     args = parser.parse_args()
 
-    vault_root = Path(args.vault_root).resolve()
-    pages = load_pages(vault_root)
+    wiki_root = Path.cwd().resolve()
+    pages = load_pages(wiki_root)
     rendered = render_index(pages)
-    index_path = vault_root / INDEX_PATH
+    index_path = wiki_root / INDEX_PATH
     existing = index_path.read_text(encoding="utf-8") if index_path.exists() else ""
 
     if args.check:
@@ -190,7 +187,7 @@ def main() -> None:
     index_path.write_text(rendered, encoding="utf-8")
     print("Wrote index.md")
     if not args.no_log:
-        write_operational_log(vault_root, f"index: regenerated root page catalog; pages={len(pages)}")
+        write_operational_log(wiki_root, f"index: regenerated root page catalog; pages={len(pages)}")
 
 
 if __name__ == "__main__":

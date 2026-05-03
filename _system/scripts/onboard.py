@@ -26,7 +26,6 @@ IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
 CLI_CONVERTERS = ["markitdown", "marker", "arxiv2md"]
 PYTHON_PACKAGES = ["pymupdf4llm", "markitdown", "marker"]
-VAULT_MODES = ["undecided", "standalone", "obsidian-root", "obsidian-subfolder", "external-vault"]
 SAFETY_FLAGS = {
     "allow_network": "allowNetwork",
     "allow_ocr": "allowOcr",
@@ -60,12 +59,6 @@ def default_config() -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "pythonCommand": None,
-        "vault": {
-            "mode": "undecided",
-            "root": None,
-            "obsidianVault": None,
-            "obsidianVaultRoot": None,
-        },
         "conversion": {
             "enabled": False,
             "defaultBackend": "auto",
@@ -108,15 +101,15 @@ def run_command(args: list[str], timeout: float = 5.0) -> subprocess.CompletedPr
         return None
 
 
-def command_path(command: str, vault_root: Path) -> str | None:
+def command_path(command: str, wiki_root: Path) -> str | None:
     if "/" in command:
-        path = vault_root / command
+        path = wiki_root / command
         return str(path) if path.exists() else None
     return shutil.which(command)
 
 
-def probe_python(command: str, vault_root: Path) -> dict[str, Any]:
-    path = command_path(command, vault_root)
+def probe_python(command: str, wiki_root: Path) -> dict[str, Any]:
+    path = command_path(command, wiki_root)
     result: dict[str, Any] = {
         "command": command,
         "available": path is not None,
@@ -192,19 +185,11 @@ def read_json(path: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
-def detect_obsidian(vault_root: Path) -> dict[str, Any]:
-    current_marker = vault_root / ".obsidian"
-    parent_root: Path | None = None
-    for parent in vault_root.parents:
-        if (parent / ".obsidian").is_dir():
-            parent_root = parent
-            break
-
+def detect_obsidian(wiki_root: Path) -> dict[str, Any]:
+    current_marker = wiki_root / ".obsidian"
     return {
         "currentRootHasObsidian": current_marker.is_dir(),
         "currentRootMarker": ".obsidian" if current_marker.is_dir() else None,
-        "insideObsidianVault": parent_root is not None,
-        "parentRoot": str(parent_root) if parent_root else None,
     }
 
 
@@ -219,9 +204,9 @@ def probe_platform() -> dict[str, Any]:
     }
 
 
-def load_config_base(vault_root: Path) -> dict[str, Any]:
-    config_path = vault_root / SYSTEM_CONFIG
-    example_path = vault_root / SYSTEM_CONFIG_EXAMPLE
+def load_config_base(wiki_root: Path) -> dict[str, Any]:
+    config_path = wiki_root / SYSTEM_CONFIG
+    example_path = wiki_root / SYSTEM_CONFIG_EXAMPLE
     for path in (config_path, example_path):
         if path.exists():
             data = read_json(path)
@@ -231,9 +216,9 @@ def load_config_base(vault_root: Path) -> dict[str, Any]:
     return default_config()
 
 
-def probe_config(vault_root: Path) -> dict[str, Any]:
-    config_path = vault_root / SYSTEM_CONFIG
-    example_path = vault_root / SYSTEM_CONFIG_EXAMPLE
+def probe_config(wiki_root: Path) -> dict[str, Any]:
+    config_path = wiki_root / SYSTEM_CONFIG
+    example_path = wiki_root / SYSTEM_CONFIG_EXAMPLE
     data = read_json(config_path) if config_path.exists() else None
     example_data = read_json(example_path) if example_path.exists() else None
     return {
@@ -245,15 +230,14 @@ def probe_config(vault_root: Path) -> dict[str, Any]:
         "exampleReadable": example_data is not None if example_path.exists() else False,
         "schemaVersion": data.get("schemaVersion") if data else None,
         "pythonCommand": data.get("pythonCommand") if data else None,
-        "vault": data.get("vault") if data else None,
         "conversionEnabled": data.get("conversion", {}).get("enabled") if data else None,
         "defaultBackend": data.get("conversion", {}).get("defaultBackend") if data else None,
         "backendOrder": data.get("conversion", {}).get("backendOrder") if data else None,
     }
 
 
-def probe_import_link_config(vault_root: Path) -> dict[str, Any]:
-    config_path = vault_root / IMPORT_LINK_CONFIG
+def probe_import_link_config(wiki_root: Path) -> dict[str, Any]:
+    config_path = wiki_root / IMPORT_LINK_CONFIG
     data = read_json(config_path) if config_path.exists() else None
     return {
         "path": str(IMPORT_LINK_CONFIG),
@@ -265,33 +249,33 @@ def probe_import_link_config(vault_root: Path) -> dict[str, Any]:
     }
 
 
-def probe_folders(vault_root: Path) -> dict[str, dict[str, Any]]:
+def probe_folders(wiki_root: Path) -> dict[str, dict[str, Any]]:
     return {
         folder: {
-            "exists": (vault_root / folder).is_dir(),
+            "exists": (wiki_root / folder).is_dir(),
             "path": folder,
         }
         for folder in REQUIRED_FOLDERS
     }
 
 
-def build_report(vault_root: Path) -> dict[str, Any]:
+def build_report(wiki_root: Path) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
-        "vaultRoot": str(vault_root),
+        "wikiRoot": str(wiki_root),
         "mode": "check",
         "mutating": False,
         "platform": probe_platform(),
-        "obsidian": detect_obsidian(vault_root),
-        "python": {command: probe_python(command, vault_root) for command in PYTHON_CANDIDATES},
+        "obsidian": detect_obsidian(wiki_root),
+        "python": {command: probe_python(command, wiki_root) for command in PYTHON_CANDIDATES},
         "virtualenv": {
             "path": ".venv",
-            "exists": (vault_root / ".venv").is_dir(),
-            "pythonExists": (vault_root / ".venv/bin/python").exists(),
+            "exists": (wiki_root / ".venv").is_dir(),
+            "pythonExists": (wiki_root / ".venv/bin/python").exists(),
         },
-        "config": probe_config(vault_root),
-        "importLink": probe_import_link_config(vault_root),
-        "folders": probe_folders(vault_root),
+        "config": probe_config(wiki_root),
+        "importLink": probe_import_link_config(wiki_root),
+        "folders": probe_folders(wiki_root),
         "conversion": {
             "cli": {command: probe_cli(command) for command in CLI_CONVERTERS},
         },
@@ -339,7 +323,6 @@ def build_setup_questions(report: dict[str, Any]) -> str:
     has_venv = bool(report["virtualenv"].get("exists"))
     has_converters = any_converter_available(report)
     import_link_configured = bool(report["importLink"].get("configured"))
-    vault_root = report["vaultRoot"]
     obsidian = report["obsidian"]
 
     lines = [
@@ -355,7 +338,7 @@ def build_setup_questions(report: dict[str, Any]) -> str:
         folder_summary = "all present"
     lines.extend([
         f"1. Folders ({folder_summary})",
-        "   A. Create missing folders now. Recommended when you want the vault ready for imports and compile runs.",
+        "   A. Create missing folders now. Recommended when you want the wiki ready for imports and compile runs.",
         "   B. Leave them for workflows to create later. Use this for a minimal checkout.",
         "   C. Skip folder setup for now.",
         "",
@@ -375,18 +358,11 @@ def build_setup_questions(report: dict[str, Any]) -> str:
         "",
     ])
 
-    if obsidian.get("currentRootHasObsidian"):
-        obsidian_label = "repo root is an Obsidian vault"
-    elif obsidian.get("insideObsidianVault"):
-        obsidian_label = "inside an Obsidian vault"
-    else:
-        obsidian_label = "not detected"
+    obsidian_label = "present at repo root" if obsidian.get("currentRootHasObsidian") else "not detected"
     lines.extend([
-        f"3. Vault placement ({obsidian_label})",
-        "   A. Decide later and use this repo as a standalone markdown workspace for now. Recommended if Obsidian is not set up yet.",
+        f"3. Obsidian ({obsidian_label})",
+        "   A. Skip Obsidian setup. Recommended when you use this as a plain markdown wiki.",
         "   B. Open this repo root as an Obsidian vault after onboarding.",
-        "   C. This repo is inside an existing Obsidian vault.",
-        "   D. Write content to a different vault path. Reply with the path after the choice.",
         "",
     ])
 
@@ -403,7 +379,7 @@ def build_setup_questions(report: dict[str, Any]) -> str:
     import_status = "configured" if import_link_configured else "not configured"
     lines.extend([
         f"5. import-link ({import_status})",
-        f"   A. Configure import-link for this vault root: {vault_root}.",
+        "   A. Configure import-link for this wiki root.",
         "   B. Configure only manual_paste for now. Use this when links will be pasted by the user.",
         "   C. Skip import-link setup for now.",
         "",
@@ -433,9 +409,9 @@ def parse_backend_order(raw_values: list[str] | None) -> list[str] | None:
 
 
 def write_config(args: argparse.Namespace) -> dict[str, Any]:
-    vault_root = Path(args.vault_root).resolve()
-    config_path = vault_root / SYSTEM_CONFIG
-    config = load_config_base(vault_root)
+    wiki_root = Path.cwd().resolve()
+    config_path = wiki_root / SYSTEM_CONFIG
+    config = load_config_base(wiki_root)
     written_fields: list[str] = []
 
     config["schemaVersion"] = config.get("schemaVersion") or 1
@@ -443,33 +419,6 @@ def write_config(args: argparse.Namespace) -> dict[str, Any]:
     if args.python_command is not None:
         config["pythonCommand"] = args.python_command
         written_fields.append("pythonCommand")
-
-    if args.vault_mode is not None or args.config_vault_root is not None or args.obsidian_vault_root is not None:
-        vault = config.setdefault("vault", {})
-        if not isinstance(vault, dict):
-            vault = {}
-            config["vault"] = vault
-        if args.vault_mode is not None:
-            vault["mode"] = args.vault_mode
-            if args.vault_mode == "obsidian-root":
-                vault["obsidianVault"] = True
-                if args.obsidian_vault_root is None:
-                    vault["obsidianVaultRoot"] = str(vault_root)
-                    written_fields.append("vault.obsidianVaultRoot")
-            elif args.vault_mode == "obsidian-subfolder":
-                vault["obsidianVault"] = True
-            elif args.vault_mode == "undecided":
-                vault["obsidianVault"] = None
-            else:
-                vault["obsidianVault"] = False
-            written_fields.extend(["vault.mode", "vault.obsidianVault"])
-        if args.config_vault_root is not None:
-            vault["root"] = args.config_vault_root
-            written_fields.append("vault.root")
-        if args.obsidian_vault_root is not None:
-            vault["obsidianVault"] = True
-            vault["obsidianVaultRoot"] = args.obsidian_vault_root
-            written_fields.extend(["vault.obsidianVault", "vault.obsidianVaultRoot"])
 
     conversion = config.setdefault("conversion", {})
     if not isinstance(conversion, dict):
@@ -516,13 +465,9 @@ def main() -> None:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="Inspect local setup without mutating files")
     mode.add_argument("--write-config", action="store_true", help="Create or update local _system/config.json")
-    parser.add_argument("--vault-root", default=".", help="Path to repo/vault root for script operation (default: current directory)")
     parser.add_argument("--compact", action="store_true", help="Print compact JSON")
     parser.add_argument("--questions", action="store_true", help="Print human-friendly setup questions instead of JSON")
     parser.add_argument("--python-command", help="Preferred Python command to persist in local config")
-    parser.add_argument("--vault-mode", choices=VAULT_MODES, help="Approved wiki placement mode to persist in local config")
-    parser.add_argument("--config-vault-root", help="Working wiki root to persist in local config when different from the script root")
-    parser.add_argument("--obsidian-vault-root", help="Obsidian vault root to persist in local config")
     parser.add_argument("--conversion", choices=["disabled", "available-local", "custom"], help="Inbox conversion policy")
     parser.add_argument("--default-backend", help="Default conversion backend")
     parser.add_argument("--backend-order", nargs="+", help="Conversion backend order as space-separated or comma-separated values")
@@ -535,9 +480,6 @@ def main() -> None:
 
     if args.check and (
         args.python_command
-        or args.vault_mode
-        or args.config_vault_root
-        or args.obsidian_vault_root
         or args.conversion
         or args.default_backend
         or args.backend_order
@@ -550,9 +492,6 @@ def main() -> None:
             parser.error("--questions can only be used with --check")
         if (
             args.python_command is None
-            and args.vault_mode is None
-            and args.config_vault_root is None
-            and args.obsidian_vault_root is None
             and args.conversion is None
         ):
             parser.error("--write-config requires at least one config field flag")
@@ -561,8 +500,8 @@ def main() -> None:
         sys.stdout.write("\n")
         return
 
-    vault_root = Path(args.vault_root).resolve()
-    report = build_report(vault_root)
+    wiki_root = Path.cwd().resolve()
+    report = build_report(wiki_root)
     if args.questions:
         sys.stdout.write(build_setup_questions(report))
         sys.stdout.write("\n")

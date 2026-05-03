@@ -1,8 +1,6 @@
 {
   "schemaVersion": 1,
   "configured": false,
-  "vaultRoot": null,
-  "defaultVaultName": null,
   "retrievalModes": [
     "manual_paste"
   ],

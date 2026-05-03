@@ -5,7 +5,7 @@ Agentics Wiki v1 Compile Pipeline
 Reads the vault, extracts structured data, and emits machine-facing cache artifacts.
 
 Usage:
-    python3 _system/skills/compile-wiki/scripts/compile.py [--vault-root <path>] [--verbose]
+    python3 _system/skills/compile-wiki/scripts/compile.py [--verbose]
 
 Outputs (under _system/cache/):
     pages.json            - normalized page index
@@ -1696,16 +1696,15 @@ def generate_evidence_gaps_report(health: dict, compiled_at: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Agentics Wiki v1 Compile Pipeline")
-    parser.add_argument("--vault-root", default=".", help="Path to vault root (default: current directory)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
     args = parser.parse_args()
 
-    vault_root = Path(args.vault_root).resolve()
+    vault_root = Path.cwd().resolve()
     compiled_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     compiled_date = datetime.now().strftime("%Y-%m-%d")
 
     print(f"Agentics Wiki v1 Compile Pipeline")
-    print(f"Vault root: {vault_root}")
+    print(f"Wiki root: {vault_root}")
     print(f"Compiled at: {compiled_at}")
     print()
 
@@ -1872,8 +1871,6 @@ def main():
         [
             sys.executable,
             str(vault_root / "_system/scripts/index.py"),
-            "--vault-root",
-            str(vault_root),
             "--write",
             "--no-log",
         ],
@@ -2030,8 +2027,6 @@ def main():
         [
             sys.executable,
             str(vault_root / "_system/scripts/log.py"),
-            "--vault-root",
-            str(vault_root),
             "--message",
             log_message,
         ],

@@ -14,12 +14,12 @@ from pathlib import Path
 LOG_PATH = Path("_system/logs/log.md")
 
 
-def write_log(message: str, vault_root: Path) -> Path:
+def write_log(message: str, wiki_root: Path) -> Path:
     message = message.strip()
     if not message:
         raise ValueError("--message cannot be empty")
 
-    log_path = vault_root / LOG_PATH
+    log_path = wiki_root / LOG_PATH
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().astimezone().isoformat(timespec="seconds")
@@ -37,11 +37,11 @@ def write_log(message: str, vault_root: Path) -> Path:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Write an operational log entry.")
     parser.add_argument("--message", required=True, help="Concise operational log message")
-    parser.add_argument("--vault-root", default=".", help="Path to vault root (default: current directory)")
     args = parser.parse_args()
 
-    log_path = write_log(args.message, Path(args.vault_root).resolve())
-    print(f"Wrote operational log: {log_path.relative_to(Path(args.vault_root).resolve())}")
+    wiki_root = Path.cwd().resolve()
+    log_path = write_log(args.message, wiki_root)
+    print(f"Wrote operational log: {log_path.relative_to(wiki_root)}")
 
 
 if __name__ == "__main__":
