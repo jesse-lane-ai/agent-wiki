@@ -208,7 +208,7 @@ The parent body should stay short and should not contain the full long-form sour
 
 ### 3e. Move the raw file
 
-After the source page is created successfully, move the original raw file to `raw/`.
+After the source page is created successfully, move the original raw file from `_inbox/` to `raw/` so it is no longer in the active inbox queue. A raw file that has been promoted into a canonical `source` page MUST NOT remain in `_inbox/`.
 
 Use a collision-resistant retained filename:
 
@@ -219,6 +219,8 @@ raw/<yyyy-mm-dd>-<source-slug>-original<extension>
 If a filename already exists, append a short unique suffix before the extension.
 
 The source page's `originPath` should match the final retained raw file path. For large sources, the parent and all child source parts should use the retained raw path as `originPath`.
+
+If source page creation succeeds but moving the raw file fails, report the move failure clearly and leave the source page in place. Do not process the same inbox file again until the raw file lifecycle has been resolved.
 
 If a raw file cannot be promoted, leave it in `_inbox/` and report the reason. Do not silently move failed items.
 
