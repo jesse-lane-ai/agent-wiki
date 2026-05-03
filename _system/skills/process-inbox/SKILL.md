@@ -66,6 +66,8 @@ For each raw file, work through files one at a time.
 
 Read the file fully. Preserve the original content exactly when writing the source body.
 
+If the raw file is plain text or Markdown, treat the raw file itself as the prepared source body file. Prefer passing that file directly to `_system/scripts/create-page.py` with `--body-file` unless the source needs partitioning. Do not copy text or Markdown inbox content into `--body`.
+
 If the raw file is a binary or non-markdown document, use configured local conversion tools only when they are available. Read conversion policy from `_system/config.json` if it exists. Missing config means use conservative local-only defaults.
 
 Do not install dependencies during this skill run. Do not call network, cloud OCR, LLM, transcription, or hosted document-intelligence services unless the operator explicitly configured or requested that behavior.
@@ -141,6 +143,8 @@ raw/<yyyy-mm-dd>-<source-slug>-original<extension>
 Use that future retained path as `--origin-path` when calling the scaffolder. If a filename already exists, choose the collision-resistant retained filename before creating the source page.
 
 For an ordinary source, save the prepared verbatim Markdown body to a temporary file outside the vault, then call:
+
+For `.md` or `.txt` inbox files that do not need conversion or cleanup, the prepared source body may be the raw inbox file itself. For converted binary files, use the converted Markdown output file. Always prefer `--body-file` for source bodies.
 
 ```bash
 python3 _system/scripts/create-page.py \
