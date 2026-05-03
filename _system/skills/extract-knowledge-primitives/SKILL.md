@@ -12,6 +12,7 @@ Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums l
 Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
 
 Authored body requirements for newly created `entity`, `concept`, `claim`, `question`, and `synthesis` pages live in `AGENT-WIKI-SPEC-v1.md` Section 7.10.
+Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v1.md` Section 6.6. Use `_system/scripts/create-page.py` when creating new primitive page files.
 
 ## Core Principles
 
@@ -32,6 +33,7 @@ Before extracting anything, read:
 Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 are insufficient.
 
 Do not copy schemas from this skill when creating pages. Use `WIKI.md` Section 4.1 as the routine source of truth for ordinary vault schemas.
+Use `_system/scripts/create-page.py` for new page files so IDs, filenames, required frontmatter, and body requirements stay deterministic.
 
 ## Step 2: Find Source Pages Needing Extraction
 
@@ -179,6 +181,8 @@ Use predicates from `WIKI.md` Section 8. Relations are directional; record the d
 
 For each primitive, check for an existing page before creating a new one. Search the relevant folder and the compiled cache when available.
 
+Create new page files with `_system/scripts/create-page.py --no-log`. This skill writes one extraction batch log entry after all primitive creation and source metadata updates succeed.
+
 Create pages in the folder required by `AGENTS.md`:
 
 - `entities/` for `pageType: entity`
@@ -189,6 +193,56 @@ Create pages in the folder required by `AGENTS.md`:
 Use the runtime page schemas and examples from `WIKI.md` Section 4.1. Do not use local schema templates or copied frontmatter examples.
 
 When creating a new `entity`, `concept`, `claim`, or `question` page, write a substantive Markdown body after the frontmatter. The body must be human-facing prose, not only frontmatter, a placeholder, or a one-line title restatement.
+
+Prepare the body prose in a temporary Markdown file outside the vault, then call the scaffolder. Examples:
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type entity \
+  --subtype organization \
+  --slug acme-corp \
+  --title "Acme Corp" \
+  --body-file <prepared-body.md> \
+  --source-page <sourceId> \
+  --no-log
+```
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type concept \
+  --subtype workflow \
+  --slug adaptive-reuse-review \
+  --title "Adaptive Reuse Review" \
+  --body-file <prepared-body.md> \
+  --source-page <sourceId> \
+  --no-log
+```
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type claim \
+  --subtype historical \
+  --slug acme-founded-2010 \
+  --title "Acme Corp was founded in 2010" \
+  --claim-text "Acme Corp was founded in 2010." \
+  --confidence 0.60 \
+  --source-id <sourceId> \
+  --body-file <prepared-body.md> \
+  --no-log
+```
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type question \
+  --subtype acquisition \
+  --slug acme-founder-identity \
+  --title "Who founded Acme Corp?" \
+  --body-file <prepared-body.md> \
+  --related-page <pageId> \
+  --no-log
+```
+
+After creating a page with the scaffolder, immediately add any extraction-specific structured fields the scaffolder does not own, such as evidence entries, embedded relations, extracted primitive lists, or richer source references. Preserve the body prose written by the scaffolder and update `updatedAt` when structured content changes.
 
 Use the body to explain the primitive in source-grounded context:
 
@@ -271,6 +325,7 @@ Created or updated:
 - [ ] Read each selected source in full
 - [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Check for duplicates before creating pages
+- [ ] Use `_system/scripts/create-page.py --no-log` for newly created primitive page files
 - [ ] Use runtime schemas and examples from `WIKI.md` Section 4.1
 - [ ] Write substantive Markdown body prose for every new entity, concept, claim, and question page
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`

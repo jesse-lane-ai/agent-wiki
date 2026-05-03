@@ -34,11 +34,13 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Source Schema (required, strictly enforced)
 
-Create source files in `sources/` using the source page schema and examples in `WIKI.md` Section 4.1.
+Create source files in `sources/` using `_system/scripts/create-page.py`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
 
 Use `WIKI.md` Section 4.1 as the routine source of truth for page-type schemas, ID formats, and examples. Use `WIKI.md` Sections 5 and 12 for status and source type enums. This skill owns the import workflow, not the source frontmatter schema.
 
 Use `WIKI.md` Section 13 for large-source parent and part handling. Consult `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
+
+Use `AGENT-WIKI-SPEC-v1.md` Section 6.6 only when you need the page scaffolding contract or `create-page.py` option semantics.
 
 Newly imported ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -65,26 +67,34 @@ Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status
    - Target 8,000-15,000 words per source part.
    - Do not exceed 20,000 words per part unless preserving an indivisible structure requires it.
    - Avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible.
-6. Write ordinary raw source to:
-   - `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md` using the source page schema and examples in `WIKI.md` Section 4.1.
-   - Set `status: unprocessed`.
-   - Set `sourceRole: whole`.
-   - Include the full captured verbatim body with inline images + source URLs below the frontmatter.
-   - images save to `_attachments`. filename: `yyyy-mm-dd-<sourceSlug>-<UUID>-<index>.<ext>` <index> starts at 1 and increments for each attachment.
-   - if a video, capture thumbnail and place it at the top of the transcript.
-   - inline images uses Obsidian image syntax `![[filename]]`
-7. Write large sources as:
-   - parent: `sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md`
-   - parts: `sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md`
-   - The parent body should stay short and should not contain the full long-form source text.
-   - The parent frontmatter should include ordered `sourceParts`.
-   - Each part should include verbatim text for its segment, `sourceRole: part`, `parentSourceId`, `partIndex`, `partCount`, and `locator`.
-8. Write one operational log entry for the import:
+6. Save the prepared source body or source-part bodies to temporary Markdown files outside the vault, then call `_system/scripts/create-page.py` with `--no-log` for each canonical source page. The skill writes one batch log entry after the import succeeds.
+7. For an ordinary source, call the scaffolder with:
+   ```bash
+   python3 _system/scripts/create-page.py \
+     --type source \
+     --subtype <sourceType> \
+     --slug <sourceSlug> \
+     --title "<title>" \
+     --source-date <yyyy-mm-dd> \
+     --retrieved-at <yyyy-mm-dd> \
+     --source-url "<originUrl>" \
+     --source-role whole \
+     --body-file <prepared-source-body.md> \
+     --no-log
+   ```
+   Use `--origin-path` instead of `--source-url` only when the imported source is local. Add `--attachment <attachment>` once for each saved attachment. The body file must contain the full captured verbatim body with inline images and source URLs below the frontmatter. Images save to `_attachments/` using filename `yyyy-mm-dd-<sourceSlug>-<UUID>-<index>.<ext>`, where `<index>` starts at 1 and increments for each attachment. If a video thumbnail is captured, place it at the top of the transcript. Inline images use Obsidian image syntax `![[filename]]`.
+8. For a large source, call the scaffolder once for each child source part, then once for the parent manifest:
+   - part pages use `--source-role part`, `--parent-source-id <parentSourceId>`, `--part-index <n>`, `--part-count <count>`, and `--locator "<locator>"`
+   - the parent page uses `--source-role parent`, `--source-part <partPath>` once for each ordered child part path, and `--part-count <count>`
+   - the parent body should stay short and should not contain the full long-form source text
+   - each part body file must contain the verbatim text for its segment
+   - use `--no-log` on each scaffolder call and log the import once after all pages and attachments are written
+9. Write one operational log entry for the import:
    ```bash
    python3 _system/scripts/log.py --message "import-link: imported source <sourceId> to sources/<filename>; attachments=<count>"
    ```
    Log only after the source page and any attachments have been written successfully.
-9. Confirm in chat with:
+10. Confirm in chat with:
    - source path
    - source part paths when a large source was partitioned
    - number of attachments saved

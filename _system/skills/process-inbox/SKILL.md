@@ -22,7 +22,9 @@ Key rules for this workflow:
 - Use `WIKI.md` Section 4.1 for source page schema, examples, and conversion provenance fields.
 - Use `WIKI.md` Sections 5 and 12 for status values and source types.
 - Use `WIKI.md` Section 13 for large-source parent and part handling.
+- Use `_system/scripts/create-page.py` to write canonical source pages and source part pages.
 - Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
+  Use `AGENT-WIKI-SPEC-v1.md` Section 6.6 only when you need the page scaffolding contract or `create-page.py` option semantics.
 
 If local Python or converter availability is unknown, run the read-only onboarding probe before processing binary or non-markdown files:
 
@@ -48,7 +50,7 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 
 This checkout is the only wiki root. Process `_inbox/`, write `sources/`, and move retained raw files to `raw/` relative to the repository root. Do not accept an alternate vault root or external destination for this workflow.
 
-Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
+Do not create a virtual environment, install packages, write `_system/config.json`, or create unrelated setup folders unless the user explicitly asks for that setup work. Creating the target source directories and `raw/` as part of an approved inbox promotion is allowed. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
 
 ## Step 2: Check the Inbox
 
@@ -80,7 +82,7 @@ When conversion is used, record conversion provenance in the source frontmatter 
 
 ### 3b. Infer source metadata
 
-Create a source page using the source page schema and examples in `WIKI.md` Section 4.1.
+Create source pages using `_system/scripts/create-page.py`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
 
 Newly promoted ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -130,29 +132,75 @@ For large sources, write:
 
 ### 3d. Write the source page or source parts
 
-For an ordinary source, write the canonical source page to:
+Before writing the source page, determine the final retained raw path that will be used after promotion:
 
 ```text
-sources/<yyyy-mm-dd>-<source-slug>.md
+raw/<yyyy-mm-dd>-<source-slug>-original<extension>
 ```
 
-The body must contain the full verbatim raw content below the frontmatter. Preserve user context, annotations, and formatting. Set `sourceRole: whole`.
+Use that future retained path as `--origin-path` when calling the scaffolder. If a filename already exists, choose the collision-resistant retained filename before creating the source page.
 
-For a large source, write the parent source page to:
+For an ordinary source, save the prepared verbatim Markdown body to a temporary file outside the vault, then call:
 
-```text
-sources/<yyyy-mm-dd>-<sourceType>-<sourceSlug>.md
+```bash
+python3 _system/scripts/create-page.py \
+  --type source \
+  --subtype <sourceType> \
+  --slug <sourceSlug> \
+  --title "<title>" \
+  --source-date <yyyy-mm-dd> \
+  --retrieved-at <yyyy-mm-dd> \
+  --origin-path "raw/<retained-filename>" \
+  --source-role whole \
+  --body-file <prepared-source-body.md> \
+  --no-log
 ```
 
-The parent body should stay short and should not contain the full long-form source text. Include metadata, import notes, attachment references, retained raw path, and an ordered `sourceParts` manifest.
+The body file must contain the full verbatim raw or converted content below the frontmatter. Preserve user context, annotations, and formatting.
 
-Write child source parts to:
+For a large source, save each prepared segment body and the short parent manifest body to temporary Markdown files outside the vault. Call the scaffolder once for each child source part, then once for the parent manifest.
 
-```text
-sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part<nnn>.md
+Part pages use:
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type source \
+  --subtype <sourceType> \
+  --slug <sourceSlug> \
+  --title "<title> - Part <n>" \
+  --source-date <yyyy-mm-dd> \
+  --retrieved-at <yyyy-mm-dd> \
+  --origin-path "raw/<retained-filename>" \
+  --source-role part \
+  --parent-source-id <parentSourceId> \
+  --part-index <n> \
+  --part-count <count> \
+  --locator "<locator>" \
+  --body-file <prepared-source-part-body.md> \
+  --no-log
 ```
 
-Each part must contain the verbatim text for that segment, `sourceRole: part`, `parentSourceId`, `partIndex`, `partCount`, and a stable `locator`.
+Parent pages use:
+
+```bash
+python3 _system/scripts/create-page.py \
+  --type source \
+  --subtype <sourceType> \
+  --slug <sourceSlug> \
+  --title "<title>" \
+  --source-date <yyyy-mm-dd> \
+  --retrieved-at <yyyy-mm-dd> \
+  --origin-path "raw/<retained-filename>" \
+  --source-role parent \
+  --source-part sources/parts/<yyyy-mm-dd>-<sourceType>-<sourceSlug>-part001.md \
+  --part-count <count> \
+  --body-file <prepared-parent-manifest-body.md> \
+  --no-log
+```
+
+Repeat `--source-part` once for each ordered child part path.
+
+The parent body should stay short and should not contain the full long-form source text. Include metadata, import notes, attachment references, retained raw path, and an ordered source part manifest. Each part body must contain the verbatim text for that segment.
 
 ### 3e. Move the raw file
 
