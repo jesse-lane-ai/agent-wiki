@@ -11,6 +11,8 @@ Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums l
 
 Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
 
+Authored body requirements for newly created `entity`, `concept`, `claim`, `question`, and `synthesis` pages live in `AGENT-WIKI-SPEC-v1.md` Section 7.10.
+
 ## Core Principles
 
 - Preserve source content. Add structure without rewriting human-authored prose.
@@ -186,6 +188,15 @@ Create pages in the folder required by `AGENTS.md`:
 
 Use the runtime page schemas and examples from `WIKI.md` Section 4.1. Do not use local schema templates or copied frontmatter examples.
 
+When creating a new `entity`, `concept`, `claim`, or `question` page, write a substantive Markdown body after the frontmatter. The body must be human-facing prose, not only frontmatter, a placeholder, or a one-line title restatement.
+
+Use the body to explain the primitive in source-grounded context:
+
+- `entity` pages: describe the entity, why it matters in the vault, important aliases or identifiers, and known uncertainty.
+- `concept` pages: explain the concept, its boundaries, source-grounded examples or steps, and any important distinctions.
+- `claim` pages: restate the atomic proposition in prose, summarize the evidence posture, and note caveats or uncertainty.
+- `question` pages: explain why the question exists, what is already known, what remains unresolved, and what would count as resolution.
+
 When updating an existing page:
 
 - preserve human-authored prose
@@ -261,6 +272,7 @@ Created or updated:
 - [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Check for duplicates before creating pages
 - [ ] Use runtime schemas and examples from `WIKI.md` Section 4.1
+- [ ] Write substantive Markdown body prose for every new entity, concept, claim, and question page
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`
 - [ ] Add source-grounded evidence without overstating support
 - [ ] Include source part locators in evidence when available

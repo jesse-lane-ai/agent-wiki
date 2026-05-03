@@ -113,6 +113,7 @@ This skill owns validation, cache regeneration, root catalog generation, report 
 When running compile:
 
 - validate page frontmatter and generated records
+- warn when authored knowledge pages are missing required Markdown body prose
 - validate large-source parent and source-part structure
 - detect duplicate IDs and malformed records
 - regenerate cache files, `_system/indexes/`, root `index.md`, and report artifacts
