@@ -23,6 +23,7 @@ from typing import Any
 SYSTEM_CONFIG = Path("_system/config.json")
 SYSTEM_CONFIG_EXAMPLE = Path("_system/config.example.json")
 IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
+CREATE_PAGE_SCRIPT = Path("_system/scripts/create-page.py")
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
 CLI_CONVERTERS = ["markitdown", "marker", "arxiv2md"]
 PYTHON_PACKAGES = ["pymupdf4llm", "markitdown", "marker"]
@@ -259,6 +260,15 @@ def probe_folders(wiki_root: Path) -> dict[str, dict[str, Any]]:
     }
 
 
+def probe_scripts(wiki_root: Path) -> dict[str, dict[str, Any]]:
+    return {
+        "createPage": {
+            "path": str(CREATE_PAGE_SCRIPT),
+            "exists": (wiki_root / CREATE_PAGE_SCRIPT).is_file(),
+        },
+    }
+
+
 def build_report(wiki_root: Path) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
@@ -276,6 +286,7 @@ def build_report(wiki_root: Path) -> dict[str, Any]:
         "config": probe_config(wiki_root),
         "importLink": probe_import_link_config(wiki_root),
         "folders": probe_folders(wiki_root),
+        "scripts": probe_scripts(wiki_root),
         "conversion": {
             "cli": {command: probe_cli(command) for command in CLI_CONVERTERS},
         },
