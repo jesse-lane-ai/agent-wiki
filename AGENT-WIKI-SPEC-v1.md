@@ -1528,6 +1528,8 @@ evidence:
     updatedAt: 2026-04-12
 ```
 
+Nested block YAML is the canonical representation for evidence records. Obsidian's Properties UI MAY display nested evidence lists as JSON-like inline objects instead of editable nested fields. That display is cosmetic and MUST NOT be treated as a schema violation when the underlying Markdown frontmatter is valid YAML matching this shape.
+
 ### 12.2 Required evidence fields
 
 #### `id`
