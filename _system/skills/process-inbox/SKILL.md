@@ -38,7 +38,15 @@ python3 _system/scripts/onboard.py --check --questions
 
 Use the generated multiple-choice prompts so the user can answer with compact letter choices.
 
-Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work.
+Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. `_system/config.example.json` is the tracked example shape; `_system/config.json` is local-only policy.
+
+If the user approves persisting local Python or conversion policy, write local config with explicit approved flags:
+
+```bash
+python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+```
+
+Do not create a virtual environment, install packages, write `_system/config.json`, or create missing folders unless the user explicitly asks for that setup work. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
 
 ## Step 2: Check the Inbox
 
