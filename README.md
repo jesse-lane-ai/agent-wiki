@@ -50,7 +50,7 @@ claims/       entities/       concepts/       questions/
   structured knowledge primitives with evidence and relations
         ↓
 _system/cache/
-  compact agent-facing indexes and reports
+  compact agent-facing indexes
         ↓
 index.md      overview.md      reports/
   human-facing generated views
@@ -66,38 +66,40 @@ Clone the repo and ask your agent:
 Read ONBOARD.md, then onboard me.
 ```
 
-Ingest text or markdown from `_inbox/` via a new agent session:
+Ingest text or markdown from `_inbox/` in a new agent session:
 
 ```text
-Read AGENTS.md, then run the process-inbox skill.
+Read AGENTS.md, then run the local process-inbox skill from _system/skills/
 ```
 
 *Text and markdown ingest works out of the box.*
 
-Then run the `extract-knowledge-primitives` skill to extract claims, evidence, relations, questions, and contradictions.
+Then run the `extract-knowledge-primitives` skill to extract claims, evidence, relations, questions, and contradictions. From a new agent session:
 
 ```text
-Run the extract-knowledge-primitives skill
+Read AGENTS.md and run the local extract-knowledge-primitives skill from _system/skills/
 ```
 
 Then compile the wiki:
 
 ```text
-Run the compile-wiki skill
+Read AGENTS.md and run the local compile-wiki skill from _system/skills/
 ```
 
 Generate the overview landing page:
 
 ```text
-Run the update-overview skill
+Read AGENTS.md and run the local update-overview skill from _system/skills/
 ```
 
-For daily vault work, start a new agent session with:
+For daily vault work, start a new agent session, then:
 
 ```text
 Read AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 before ordinary vault work.
 Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtime detail.
 ```
+
+These can all be scheduled as tasks for an agent.
 
 ## Core documents
 
@@ -224,3 +226,12 @@ You will likely customize:
 - ontology and relationship vocabularies
 
 Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary vault work. Keep [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
+
+## Harness and Models
+
+This project has been tested and working with:
+
+- OpenCode on Windows (PowerShell) + Kimi K2.6 (openrouter)
+- Claude Desktop on Windows + Sonnet 4.6 (low)
+- Claude CLI on WSL2 + Sonnet 4.6
+- Codex CLI on Windows (PowerShell) and WSL2 + GPT-5.4
