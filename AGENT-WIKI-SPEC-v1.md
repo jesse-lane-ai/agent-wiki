@@ -202,7 +202,7 @@ A v1-compliant vault MUST use the following top-level structure.
   _archive/
 
   _system/
-    config.json
+    config.example.json
     cache/
     indexes/
     logs/
@@ -305,11 +305,13 @@ Sub-directories:
 - `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
 Files:
-- `config.json` — optional local system configuration for tool policy, command preferences, and non-secret environment settings
+- `config.example.json` — tracked example for optional local system configuration
 
 The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
 
-`_system/config.json` is local operational configuration, not canonical vault knowledge. It SHOULD NOT contain secrets, API keys, access tokens, private credentials, or machine-specific state that changes on every run. Detection results such as whether a converter is currently installed SHOULD be checked at runtime rather than stored as durable truth.
+`_system/config.json`, when present, is local operational configuration, not canonical vault knowledge. It SHOULD be ignored by version control and SHOULD NOT be committed to shared template repositories. `_system/config.example.json` SHOULD be tracked when the project wants to document the supported shape of local configuration.
+
+Local config SHOULD NOT contain secrets, API keys, access tokens, private credentials, or machine-specific state that changes on every run. Detection results such as whether a converter is currently installed SHOULD be checked at runtime rather than stored as durable truth.
 
 Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
 
@@ -326,6 +328,8 @@ _system/skills/
 ### 6.3 Local system configuration
 
 `_system/config.json` MAY define local tool policy and command preferences used by deterministic scripts and skills. The file is optional. Tools SHOULD use conservative defaults when it is absent.
+
+Shared repositories SHOULD track `_system/config.example.json` and ignore `_system/config.json`. Operators MAY create `_system/config.json` by copying the example or by approving an onboarding setup action. Agents MUST NOT write `_system/config.json` unless the operator explicitly approves the local choices to persist.
 
 Recommended shape:
 
@@ -373,6 +377,8 @@ Recommended shape:
 Configuration SHOULD express operator policy and preferences, not transient detection state. For example, a backend can be enabled in config but still unavailable at runtime if the command or Python package is not installed. Tools SHOULD detect that condition during execution and report it clearly.
 
 If `.venv/` is used, it SHOULD be project-local and ignored by version control. Shared template repositories SHOULD NOT require it to exist.
+
+`.gitignore` SHOULD include `_system/config.json` and `.venv/` so local setup choices and installed packages do not become shared vault content.
 
 ### 6.4 Onboarding probe
 
