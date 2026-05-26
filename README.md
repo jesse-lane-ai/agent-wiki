@@ -236,6 +236,20 @@ You will likely customize:
 
 Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary vault work. Keep [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
 
+## Development Workflow
+
+Changes to this project should move from contract to implementation in a consistent order.
+
+When adding a feature or changing project behavior:
+
+1. Update [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) first.
+2. Update configuration files or configuration templates when the change affects operator policy, defaults, or local setup.
+3. Update deterministic scripts.
+4. Update skill instructions and skill-local support files.
+5. Update root-level Markdown documentation other than the specification.
+
+Skip any step that the change does not affect. The specification should be reviewed first because it defines the contract that configuration, scripts, skills, and root-level documentation implement.
+
 ## Harness and Models
 
 This project has been tested and working with:
