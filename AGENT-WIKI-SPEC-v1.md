@@ -828,6 +828,37 @@ To prevent silent overwrites in the flat `_attachments/` directory, attachment I
 - `<UUID>`: A unique identifier generated specifically for the attachment.
 - `<index>`: An incremental index (starting at 1) for sources containing multiple attachments.
 
+### 8.6 Cross-vault linking
+
+Pages in one vault MAY reference pages in a separate Obsidian vault using an `obsidian://` URI link.
+
+An `obsidian://` URI has the form:
+
+```
+obsidian://open?vault=<vault-name>&file=<url-encoded-file-path>
+```
+
+- `<vault-name>` is the name of the target vault as registered in Obsidian (the folder name Obsidian uses to identify the vault).
+- `<url-encoded-file-path>` is the path to the target file within that vault, URL-encoded (spaces become `%20`, slashes remain `/`).
+
+To obtain the URI for a target page, open the target vault in Obsidian, right-click the file in the file explorer, and select **Copy Obsidian URL**.
+
+In the linking page, write the cross-vault reference as a standard markdown link (NOT a wikilink, since wikilinks only resolve within the same vault):
+
+```md
+[Display text](obsidian://open?vault=my-other-vault&file=folder%2Fpage-slug)
+```
+
+Example:
+
+```md
+[Working with multiple vaults](obsidian://open?vault=o4e-06&file=00%20Obsidian%20for%20Everyone%20course%2F00-02%20First%20steps%20with%20Obsidian%2FWorking%20with%20multiple%20vaults)
+```
+
+Cross-vault links are Obsidian-local and will not resolve in GitHub, plain markdown renderers, or agent contexts. Pages that use cross-vault links SHOULD note this limitation in a comment or body prose so future readers and agents do not treat broken links as vault errors.
+
+Agents MUST NOT follow or resolve `obsidian://` URIs. They SHOULD treat them as opaque external references.
+
 ---
 
 ## 9. Required Universal Frontmatter
