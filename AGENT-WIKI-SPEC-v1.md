@@ -337,6 +337,9 @@ Recommended shape:
 {
   "schemaVersion": 1,
   "pythonCommand": null,
+  "knownVaults": {
+    "my-vault-name": "/absolute/path/to/vault"
+  },
   "conversion": {
     "enabled": true,
     "defaultBackend": "auto",
@@ -371,6 +374,8 @@ Recommended shape:
   }
 }
 ```
+
+`knownVaults` is an optional object that maps Obsidian vault names (as registered in the Obsidian app) to their absolute paths on the local file system. When present, agents MAY use this map to resolve `obsidian://` cross-vault links to readable file paths. Keys SHOULD match the vault folder name exactly as Obsidian registers it. Values MUST be absolute paths. This field is local operator configuration and MUST NOT be committed to shared template repositories.
 
 `pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
 
@@ -857,7 +862,20 @@ Example:
 
 Cross-vault links are Obsidian-local and will not resolve in GitHub, plain markdown renderers, or agent contexts. Pages that use cross-vault links SHOULD note this limitation in a comment or body prose so future readers and agents do not treat broken links as vault errors.
 
-Agents MUST NOT follow or resolve `obsidian://` URIs. They SHOULD treat them as opaque external references.
+#### Agent resolution of `obsidian://` URIs
+
+Agents MUST NOT attempt to launch or dispatch `obsidian://` URIs through the OS protocol handler.
+
+An agent MAY resolve an `obsidian://` URI to a readable file path when `knownVaults` is present in `_system/config.json`. The resolution procedure is:
+
+1. Parse the URI query string and extract the `vault` and `file` parameters.
+2. URL-decode the `file` parameter (replace `%20` with space, `%2F` with `/`, etc.) to obtain the relative file path within the target vault.
+3. Append `.md` if the decoded path has no file extension.
+4. Look up the `vault` value as a key in `knownVaults`. If the key is absent, stop and report that the vault is not configured locally.
+5. Construct the full absolute file path: `<knownVaults[vault]>/<decoded-file-path>`.
+6. Verify the file exists before reading. If it does not exist, report the missing path rather than silently failing.
+
+When `knownVaults` is absent or the target vault is not listed, agents MUST treat the `obsidian://` URI as an opaque external reference and MUST NOT guess or scan for the vault root.
 
 ---
 
