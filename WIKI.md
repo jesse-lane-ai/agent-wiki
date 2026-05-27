@@ -93,13 +93,13 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
-`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
+`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape. Optional `knownVaults` entries may map Obsidian vault names to absolute local paths so agents can resolve `obsidian://` cross-vault references for reading only.
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
 
 Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
-This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content.
+This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
 
 ---
 
@@ -672,7 +672,7 @@ All internal links within the vault use Obsidian-style wikilinks.
 | `[[page-slug\|Display Text]]` | Link with custom display text |
 | `[[page-slug#section]]` | Link to a section |
 
-Standard markdown links are only used for external URLs.
+Standard markdown links are only used for external URLs and `obsidian://` cross-vault references. Cross-vault Obsidian links are not wikilinks; they use the `obsidian://open?vault=<vault-name>&file=<url-encoded-path>` URI form. Agents resolve them only through local `_system/config.json` `knownVaults`; if no mapping exists, treat the URI as an opaque external reference.
 
 ---
 

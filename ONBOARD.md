@@ -56,6 +56,7 @@ Use it when the user wants persistent local preferences such as:
 - automatic conversion backend order
 - backend command names
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
+- optional `knownVaults` mappings from Obsidian vault names to absolute local paths for resolving `obsidian://` references
 
 Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults. When a local config is needed, use the onboarding config writer so only approved local policy fields are persisted:
 
@@ -65,7 +66,7 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 
 Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
 
-This checkout is the only wiki root. `_system/config.json` does not store alternate roots, target vaults, or routing choices. Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
+This checkout is the only wiki root. `_system/config.json` does not store alternate write roots, target vaults, or routing choices. `knownVaults` is only a local read-resolution map for `obsidian://` cross-vault references. Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
 
 ---
 
@@ -83,6 +84,8 @@ After onboarding, if the user wants to use this wiki in Obsidian, recommend open
 6. Click "Select Folder".
 
 Obsidian may create a local `.obsidian/` folder. That folder is local application state and should not be committed.
+
+For links to another Obsidian vault, use Obsidian's "Copy Obsidian URL" action and store the result as a standard markdown link using an `obsidian://` URI. Agents must not launch these URIs. They can read the target only when `_system/config.json` includes a matching `knownVaults` entry; otherwise the URI remains an opaque external reference.
 
 ---
 

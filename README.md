@@ -111,7 +111,7 @@ These can all be scheduled as tasks for an agent.
 
 - [ONBOARD.md](ONBOARD.md) — first-run setup, onboarding probe, local configuration, and import-link setup.
 - [AGENTS.md](AGENTS.md) — the agent behavior contract.
-- [WIKI.md](WIKI.md) — page types, schemas, status enums, runtime examples, and vault rules.
+- [WIKI.md](WIKI.md) — page types, schemas, status enums, runtime examples, linking rules, and vault rules.
 - [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) — full project contract for changing behavior, scripts, skills, configuration, or validation.
 
 ## How Agent Wiki differs from other LLM wiki projects
