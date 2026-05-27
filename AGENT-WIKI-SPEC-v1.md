@@ -1,8 +1,8 @@
 
 # Agentic Wiki v1 Specification
 
-Version: 1.3
-Last Updated: 2026-05-03
+Version: 1.4.0
+Last Updated: 2026-05-27
 
 ---
 
