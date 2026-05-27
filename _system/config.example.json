@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "pythonCommand": null,
+  "knownVaults": {},
   "conversion": {
     "enabled": false,
     "defaultBackend": "auto",
