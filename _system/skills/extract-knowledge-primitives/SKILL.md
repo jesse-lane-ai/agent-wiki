@@ -21,7 +21,7 @@ Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v1.md` Section 6.6. Use
 - Do not invent certainty. New source-extracted claims start `status: unverified` with `confidence: 0.60` unless the canonical spec says otherwise.
 - Keep claims atomic. One proposition per claim.
 - Treat evidence honestly. An excerpt can show that a source made a statement without proving the statement true.
-- Use Obsidian wikilinks for internal vault references.
+- Use Obsidian wikilinks for internal vault references. Cross-vault Obsidian references are the exception: write them as standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v1.md` Section 8.6.
 
 ## Step 1: Read the Contract and Runtime Reference
 
@@ -34,6 +34,7 @@ Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving am
 
 Do not copy schemas from this skill when creating pages. Use `WIKI.md` Section 4.1 as the routine source of truth for ordinary vault schemas.
 Use `_system/scripts/create-page.py` for new page files so IDs, filenames, required frontmatter, and body requirements stay deterministic.
+Do not launch `obsidian://` URIs. Resolve them only through local `_system/config.json` `knownVaults`; if no mapping exists, treat the URI as an opaque external reference.
 
 ## Step 2: Find Source Pages Needing Extraction
 

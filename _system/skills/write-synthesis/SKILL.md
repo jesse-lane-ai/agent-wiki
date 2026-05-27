@@ -11,6 +11,8 @@ Runtime synthesis schema lives in `WIKI.md` Section 4.1. Page type rules live in
 
 Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 3, 4.1, 5, or 7 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
 
+Use Obsidian wikilinks for references inside this vault. For cross-vault Obsidian references, use standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v1.md` Section 8.6. Do not launch `obsidian://` URIs; resolve them only through local `_system/config.json` `knownVaults`, and treat unconfigured vaults as opaque external references.
+
 ## When to Use
 
 Use this skill when the user asks to:

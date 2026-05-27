@@ -40,7 +40,7 @@ python3 _system/scripts/onboard.py --check --questions
 
 Use the generated multiple-choice prompts so the user can answer with compact letter choices.
 
-Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Also use the probe output to understand OS/platform and whether the repository root has local Obsidian settings. `_system/config.example.json` is the tracked example shape; `_system/config.json` is local-only policy.
+Use the probe output and `_system/config.json`, when present, to determine which local conversion backends are configured and available. Also use the probe output to understand OS/platform, whether the repository root has local Obsidian settings, and whether local `knownVaults` mappings exist for `obsidian://` references. `_system/config.example.json` is the tracked example shape; `_system/config.json` is local-only policy.
 
 If the user approves persisting local Python or conversion policy, write local config with explicit approved flags:
 
@@ -51,6 +51,8 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 This checkout is the only wiki root. Process `_inbox/`, write `sources/`, and move retained raw files to `raw/` relative to the repository root. Do not accept an alternate vault root or external destination for this workflow.
 
 Do not create a virtual environment, install packages, write `_system/config.json`, or create unrelated setup folders unless the user explicitly asks for that setup work. Creating the target source directories and `raw/` as part of an approved inbox promotion is allowed. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
+
+If an inbox item contains an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v1.md` Section 8.6. Do not launch the URI. Resolve it only through `_system/config.json` `knownVaults`, and otherwise preserve it as an opaque external reference.
 
 ## Step 2: Check the Inbox
 

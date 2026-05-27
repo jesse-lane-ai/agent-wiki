@@ -24,6 +24,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 - Source pages are written under `sources/`.
 - Attachments are written under `_attachments/`.
 - Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
+- If the incoming link is an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v1.md` Section 8.6: do not launch the URI; resolve it only through `_system/config.json` `knownVaults`, and treat it as an opaque external reference when the target vault is not configured.
 
 ## UUID Generation
 - Use `scripts/uuid.py` to generate a new UUID for each source attachment.
