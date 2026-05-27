@@ -60,6 +60,7 @@ def default_config() -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "pythonCommand": None,
+        "knownVaults": {},
         "conversion": {
             "enabled": False,
             "defaultBackend": "auto",
@@ -222,6 +223,8 @@ def probe_config(wiki_root: Path) -> dict[str, Any]:
     example_path = wiki_root / SYSTEM_CONFIG_EXAMPLE
     data = read_json(config_path) if config_path.exists() else None
     example_data = read_json(example_path) if example_path.exists() else None
+    known_vaults = data.get("knownVaults") if isinstance(data, dict) else None
+    known_vault_names = sorted(known_vaults) if isinstance(known_vaults, dict) else []
     return {
         "path": str(SYSTEM_CONFIG),
         "exists": config_path.exists(),
@@ -231,6 +234,8 @@ def probe_config(wiki_root: Path) -> dict[str, Any]:
         "exampleReadable": example_data is not None if example_path.exists() else False,
         "schemaVersion": data.get("schemaVersion") if data else None,
         "pythonCommand": data.get("pythonCommand") if data else None,
+        "knownVaultCount": len(known_vault_names),
+        "knownVaultNames": known_vault_names,
         "conversionEnabled": data.get("conversion", {}).get("enabled") if data else None,
         "defaultBackend": data.get("conversion", {}).get("defaultBackend") if data else None,
         "backendOrder": data.get("conversion", {}).get("backendOrder") if data else None,
