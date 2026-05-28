@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.1 - 2026-05-28
+
+### Changed
+
+- Cleaned up the root files in the repository.
+
+### Compatibility
+
+- Backward-compatible with existing v1 vaults.
+- No migration required.
+
 ## v1.4.0 - 2026-05-27
 
 ### Added
