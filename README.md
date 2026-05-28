@@ -236,6 +236,36 @@ You will likely customize:
 
 Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary vault work. Keep [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
 
+## Updating an Existing Agent Wiki
+
+Before updating, commit or back up your current vault. Updates may change root documentation, scripts, skills, configuration templates, and generated behavior.
+
+To update from the upstream repository:
+
+```bash
+git fetch origin --tags
+git checkout main
+git pull --ff-only origin main
+```
+
+To update to a specific release tag instead of the latest `main`:
+
+```bash
+git fetch origin --tags
+git checkout v1.4.0
+```
+
+Do not overwrite local `_system/config.json`; it is local-only operator policy. Compare `_system/config.example.json` after updating and copy only settings you explicitly want.
+
+After updating, run the onboarding probe and compile pipeline:
+
+```bash
+python3 _system/scripts/onboard.py --check
+python3 _system/skills/compile-wiki/scripts/compile.py
+```
+
+If the release notes mention a migration script, run its dry-run mode first and review the planned changes before applying it.
+
 ## Development Workflow
 
 Changes to this project should move from contract to implementation in a consistent order.
