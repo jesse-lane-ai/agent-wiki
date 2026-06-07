@@ -83,6 +83,8 @@ The overview should include:
 
 Use headings sparingly and make the page readable as a landing article, not a generated table or report.
 
+When referring to specific vault pages — entities, sources, concepts, claims, syntheses, questions, or any other canonical page — use Obsidian-style wikilinks (`[[page-slug]]` or `[[page-slug|Display Text]]`). Do not use plain text names, standard markdown links, or bare file paths for internal vault references. This applies to every page mentioned in the overview body, including examples, highlights, and section summaries.
+
 Do not make unsupported claims about the vault. If the cache shows no pages for a page type, either omit that page type or describe it as a supported structure that currently has no active pages, depending on what best serves the reader.
 
 ## Step 6: Authority Rules
