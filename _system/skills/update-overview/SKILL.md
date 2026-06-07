@@ -45,8 +45,9 @@ Use compiled and canonical inputs, in this order:
 
 1. `_system/cache/pages.json` for page inventory, page types, titles, statuses, paths, and metadata.
 2. `_system/cache/agent-digest.json` for compact high-signal context.
-3. Canonical pages in content folders when the overview needs richer context than the cache provides.
-4. Root docs such as `README.md`, `WIKI.md` Sections 1.1 and 2, and `INBOX.md` for project and workflow orientation.
+3. `_system/cache/relations.jsonl` for explicit cross-page links, relation types, and densely connected subgraphs — used to derive topical clusters.
+4. Canonical pages in content folders when the overview needs richer context than the cache provides.
+5. Root docs such as `README.md`, `WIKI.md` Sections 1.1 and 2, and `INBOX.md` for project and workflow orientation.
 
 Do not use reports or logs as primary truth. Reports may help identify maintenance concerns, but the overview should be grounded in canonical pages and compiled cache data.
 
@@ -78,12 +79,33 @@ Write in long-form article style for a human reader.
 The overview should include:
 - a vault-level summary
 - paragraph-form summaries for each active page type represented in the vault
+- a detailed cluster analysis (see below)
 - clear orientation about what the reader can find and where the material lives
 - an honest account of sparse, draft, or incomplete areas when the vault is small or early-stage
 
 Use headings sparingly and make the page readable as a landing article, not a generated table or report.
 
-When referring to specific vault pages — entities, sources, concepts, claims, syntheses, questions, or any other canonical page — use Obsidian-style wikilinks (`[[page-slug]]` or `[[page-slug|Display Text]]`). Do not use plain text names, standard markdown links, or bare file paths for internal vault references. This applies to every page mentioned in the overview body, including examples, highlights, and section summaries.
+### Cluster Analysis Section
+
+The overview MUST include a dedicated section that groups vault pages into meaningful topical clusters. A cluster is a set of related pages that share a common subject, entity, theme, or research thread — regardless of their individual page type.
+
+To derive clusters:
+
+1. Read the titles, tags, and relations fields from `_system/cache/pages.json`.
+2. Read `_system/cache/relations.jsonl` for explicit cross-page links and relation types.
+3. Group pages by shared subject matter, named entities, recurring themes, or densely connected subgraphs.
+4. Name each cluster after its dominant topic or entity (e.g., "Urban Water Infrastructure", "Key Decision-Makers", "Unanswered Questions About X").
+5. Write a paragraph for each cluster that:
+   - describes what the cluster is about and why these pages belong together
+   - names the most important or representative pages using wikilinks
+   - notes the mix of page types present (sources, claims, entities, syntheses, etc.)
+   - identifies open questions or gaps within the cluster, if any
+
+If the vault has fewer than five pages, describe the emerging clusters as early-stage threads rather than omitting the section.
+
+Do not invent clusters that are not grounded in actual page content. If pages are too sparse to cluster meaningfully, say so honestly.
+
+When referring to specific vault pages — entities, sources, concepts, claims, syntheses, questions, or any other canonical page — use Obsidian-style wikilinks (`[[page-slug]]` or `[[page-slug|Display Text]]`). Do not use plain text names, standard markdown links, or bare file paths for internal vault references. This applies to every page mentioned in the overview body, including examples, highlights, cluster descriptions, and section summaries.
 
 Do not make unsupported claims about the vault. If the cache shows no pages for a page type, either omit that page type or describe it as a supported structure that currently has no active pages, depending on what best serves the reader.
 
