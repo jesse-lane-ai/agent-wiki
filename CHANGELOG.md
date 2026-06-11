@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.4.2 - 2026-06-10
+
+### Added
+
+- Added a migration script for converting existing soft reference fields to Obsidian wikilinks.
+
+### Changed
+
+- Updated page creation so `sourcePages`, `derivedClaims`, `relatedPages`, and `relatedClaims` are written as aliased wikilinks that target the actual filename stem.
+- Clarified which frontmatter reference fields should be wikilinked and which compiler-resolved raw ID fields must stay bare.
+
+### Compatibility
+
+- Backward-compatible with existing v1 vaults.
+- Existing vaults can run `_system/scripts/migrate-refs-to-links.py --write` to convert soft reference fields.
+
 ## v1.4.1 - 2026-05-28
 
 ### Changed
