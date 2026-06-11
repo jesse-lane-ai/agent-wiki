@@ -813,9 +813,31 @@ Standard markdown links (`[text](path)`) MUST NOT be used for internal vault-pag
 This convention applies to:
 - page body content
 - vault-native root docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `ONBOARD.md`, `CLAUDE.md`, etc.)
-- `relatedPages`, `relatedClaims`, and similar string reference fields in frontmatter
+- the **grounding reference fields** in frontmatter: `sourcePages`, `derivedClaims`, `relatedPages`, `relatedClaims`
 
 Public repository documentation MAY use standard markdown links for repository readability, especially `README.md` when it is intended to render cleanly on GitHub.
+
+#### 8.4.1 Reference target vs. display text
+
+The wikilink **target is the filename stem, not the page ID** (see §8.2: the id is hyphenated, and the `source.` prefix is dropped for source pages). The page ID is carried as the wikilink **alias** (display text) so the type-prefixed ID stays human-legible:
+
+```yaml
+# id source.2026-04-12.webpage.tidal-flood-map lives in
+# sources/2026-04-12-webpage-tidal-flood-map.md
+sourcePages: ["[[2026-04-12-webpage-tidal-flood-map|source.2026-04-12.webpage.tidal-flood-map]]"]
+derivedClaims: ["[[claim-descriptive-high-tide-risk|claim.descriptive.high-tide-risk]]"]
+```
+
+Writing the dotted ID directly as the target (`[[source.2026-04-12.webpage.tidal-flood-map]]`) does **not** resolve in Obsidian, because no file is named that. `create-page.py` wraps these fields automatically; `migrate-refs-to-links.py` converts existing pages.
+
+#### 8.4.2 Raw-ID fields (MUST NOT be wikilinked)
+
+The following frontmatter fields are resolved by **exact ID match** during compilation (`compile.py` builds an id→page map and looks these up). They MUST remain bare IDs — wrapping them in `[[ ]]` breaks resolution:
+
+- `id`, `parentSourceId`, `subjectPageId`, `sourceIds`, `sourceParts`
+- `evidence[].sourceId`, relation `sourceClaimIds`, timeline `sourceIds`
+
+In short: **grounding/relationship lists are links; structural pointers used by the compiler are raw IDs.**
 
 Skill instruction files SHOULD use explicit relative paths when directing agents to project files, schemas, scripts, or examples. Skills MAY mention wikilinks only when the desired output is vault-native content that should contain wikilinks.
 
@@ -1227,8 +1249,8 @@ title: Coastal Resilience Overview
 synthesisType: overview
 scope: coastal flood mitigation
 status: active
-sourcePages: ["[[source.2026-04-12.webpage.tidal-flood-map]]"]
-derivedClaims: ["[[claim.descriptive.high-tide-risk]]"]
+sourcePages: ["[[2026-04-12-webpage-tidal-flood-map|source.2026-04-12.webpage.tidal-flood-map]]"]
+derivedClaims: ["[[claim-descriptive-high-tide-risk|claim.descriptive.high-tide-risk]]"]
 createdAt: 2026-04-12
 updatedAt: 2026-04-12
 aliases: []
@@ -1670,7 +1692,7 @@ relations:
     predicate: uses
     object: entity.system.ground-source-heat-pump
     confidence: 0.88
-    sourceClaimIds: ["[[claim.descriptive.school-energy-retrofit]]"]
+    sourceClaimIds: ["claim.descriptive.school-energy-retrofit"]
 ```
 
 ### 13.2 Required relationship fields

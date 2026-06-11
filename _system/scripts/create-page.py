@@ -297,6 +297,31 @@ def id_to_filename(page_id: str) -> str:
     return page_id.replace(".", "-") + ".md"
 
 
+def id_to_link_target(page_id: str) -> str:
+    """Filename stem (no folder, no .md) that an Obsidian wikilink should target."""
+    return id_to_filename(page_id)[:-len(".md")]
+
+
+def ref_to_wikilink(value: str) -> str:
+    """Wrap a bare page-reference ID as an Obsidian wikilink.
+
+    Targets the actual filename stem (IDs are not filenames) and keeps the
+    original dotted ID as display text. Idempotent: values already wrapped in
+    [[...]] are returned unchanged.
+    """
+    text = (value or "").strip()
+    if not text or text.startswith("[["):
+        return text
+    return f"[[{id_to_link_target(text)}|{text}]]"
+
+
+def wikilink_refs(values: Any) -> list[str]:
+    """Apply ref_to_wikilink across a list of reference IDs."""
+    if not isinstance(values, list):
+        return values
+    return [ref_to_wikilink(v) for v in values]
+
+
 def page_path(args: argparse.Namespace, page_id: str) -> Path:
     folder = PAGE_FOLDERS[args.page_type]
     if args.page_type == "source" and args.source_role == "part":
@@ -431,18 +456,18 @@ def build_frontmatter(args: argparse.Namespace, page_id: str, created_at: str) -
         frontmatter["evidence"] = parse_evidence_records(args)
     elif args.page_type == "question":
         frontmatter["priority"] = args.priority
-        frontmatter["relatedClaims"] = args.related_claim
-        frontmatter["relatedPages"] = args.related_page
+        frontmatter["relatedClaims"] = wikilink_refs(args.related_claim)
+        frontmatter["relatedPages"] = wikilink_refs(args.related_page)
         frontmatter["openedAt"] = args.opened_at or created_at
     elif args.page_type == "synthesis":
         frontmatter["scope"] = args.scope or ""
-        frontmatter["sourcePages"] = args.source_page
-        frontmatter["derivedClaims"] = args.derived_claim
+        frontmatter["sourcePages"] = wikilink_refs(args.source_page)
+        frontmatter["derivedClaims"] = wikilink_refs(args.derived_claim)
 
     if args.page_type not in {"claim", "question", "synthesis"} and args.source_page:
-        frontmatter["sourcePages"] = args.source_page
+        frontmatter["sourcePages"] = wikilink_refs(args.source_page)
     if args.page_type not in {"question"} and args.related_page:
-        frontmatter["relatedPages"] = args.related_page
+        frontmatter["relatedPages"] = wikilink_refs(args.related_page)
 
     frontmatter["createdAt"] = created_at
     frontmatter["updatedAt"] = args.updated_at or created_at
