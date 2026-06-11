@@ -8,7 +8,8 @@
 
 ### Changed
 
-- Updated page creation so `sourcePages`, `derivedClaims`, `relatedPages`, and `relatedClaims` are written as aliased wikilinks that target the actual filename stem.
+- Updated page creation so `sourcePages`, `derivedClaims`, `relatedPages`, `relatedClaims`, and local-source `originPath` values are written as aliased wikilinks that target the actual filename stem or raw file path.
+- Expanded the migration script to convert extracted primitive lists (`extractedEntities`, `extractedConcepts`, `extractedClaims`, `extractedQuestions`) and `originPath`.
 - Clarified which frontmatter reference fields should be wikilinked and which compiler-resolved raw ID fields must stay bare.
 
 ### Compatibility

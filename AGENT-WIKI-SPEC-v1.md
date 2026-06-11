@@ -813,7 +813,7 @@ Standard markdown links (`[text](path)`) MUST NOT be used for internal vault-pag
 This convention applies to:
 - page body content
 - vault-native root docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `ONBOARD.md`, `CLAUDE.md`, etc.)
-- the **grounding reference fields** in frontmatter: `sourcePages`, `derivedClaims`, `relatedPages`, `relatedClaims`
+- the **navigation/display reference fields** in frontmatter: `sourcePages`, `derivedClaims`, `relatedPages`, `relatedClaims`, `extractedEntities`, `extractedConcepts`, `extractedClaims`, `extractedQuestions`, `originPath`
 
 Public repository documentation MAY use standard markdown links for repository readability, especially `README.md` when it is intended to render cleanly on GitHub.
 
@@ -826,9 +826,10 @@ The wikilink **target is the filename stem, not the page ID** (see §8.2: the id
 # sources/2026-04-12-webpage-tidal-flood-map.md
 sourcePages: ["[[2026-04-12-webpage-tidal-flood-map|source.2026-04-12.webpage.tidal-flood-map]]"]
 derivedClaims: ["[[claim-descriptive-high-tide-risk|claim.descriptive.high-tide-risk]]"]
+originPath: "[[raw/2026-04-12-report|raw/2026-04-12-report.md]]"
 ```
 
-Writing the dotted ID directly as the target (`[[source.2026-04-12.webpage.tidal-flood-map]]`) does **not** resolve in Obsidian, because no file is named that. `create-page.py` wraps these fields automatically; `migrate-refs-to-links.py` converts existing pages.
+Writing the dotted ID directly as the target (`[[source.2026-04-12.webpage.tidal-flood-map]]`) does **not** resolve in Obsidian, because no file is named that. `create-page.py` wraps supported fields automatically; `migrate-refs-to-links.py` converts existing pages.
 
 #### 8.4.2 Raw-ID fields (MUST NOT be wikilinked)
 
@@ -1000,7 +1001,7 @@ partCount: <number>
 locator: <locator>
 sourceParts: []
 originUrl: <url>
-originPath: <path>
+originPath: <wikilink-to-local-raw-file>
 convertedAt: <yyyy-mm-dd>
 conversionTool: <tool>
 conversionToolVersion: <version>

@@ -3,10 +3,12 @@
 One-shot migration: convert bare page-reference IDs in frontmatter to Obsidian
 wikilinks so Obsidian actually resolves them.
 
-Only the "soft" reference fields are converted — the ones used for grounding /
-display, never for exact-ID resolution in compile.py:
+Only the display/reference fields are converted — the ones used for grounding /
+navigation, never for exact-ID resolution in compile.py:
 
-    sourcePages, derivedClaims, relatedPages, relatedClaims
+    sourcePages, derivedClaims, relatedPages, relatedClaims,
+    extractedEntities, extractedConcepts, extractedClaims, extractedQuestions,
+    originPath
 
 Structural reference fields are intentionally LEFT ALONE because compile.py
 matches them by exact ID (wrapping them would break resolution):
@@ -16,6 +18,8 @@ matches them by exact ID (wrapping them would break resolution):
 Each bare ID  "source.2026-05-12.transcript.foo"  becomes
     "[[2026-05-12-transcript-foo|source.2026-05-12.transcript.foo]]"
 keeping the dotted ID visible as display text while linking to the real file.
+Each local Markdown path such as "raw/foo.md" becomes
+    "[[raw/foo|raw/foo.md]]"
 
 Idempotent: already-wrapped [[...]] values are left untouched, so re-running is
 safe. Use --dry-run to preview, --write to apply.
@@ -29,7 +33,18 @@ import re
 import sys
 from pathlib import Path
 
-CONVERT_FIELDS = ("sourcePages", "derivedClaims", "relatedPages", "relatedClaims")
+ID_LIST_FIELDS = (
+    "sourcePages",
+    "derivedClaims",
+    "relatedPages",
+    "relatedClaims",
+    "extractedEntities",
+    "extractedConcepts",
+    "extractedClaims",
+    "extractedQuestions",
+)
+PATH_FIELDS = ("originPath",)
+CONVERT_FIELDS = ID_LIST_FIELDS + PATH_FIELDS
 
 # folders that hold pages with frontmatter we care about
 PAGE_FOLDERS = ("sources", "entities", "concepts", "claims", "questions", "syntheses")
@@ -52,8 +67,24 @@ def ref_to_wikilink(value: str) -> str:
     return f"[[{id_to_link_target(text)}|{text}]]"
 
 
+def path_to_wikilink(value: str) -> str:
+    text = value.strip().strip('"').strip("'").strip()
+    if not text or text.startswith("[["):
+        return text
+    target = text[:-len(".md")] if text.endswith(".md") else text
+    return f"[[{target}|{text}]]"
+
+
+def convert_value(key: str, value: str) -> str:
+    if key in PATH_FIELDS:
+        return path_to_wikilink(value)
+    return ref_to_wikilink(value)
+
+
 # matches a YAML inline-list line:  key: ["a", "b"]   or   key: [a, b]   or  key: []
 INLINE_LIST = re.compile(r"^(\s*)([A-Za-z0-9_]+):\s*\[(.*)\]\s*$")
+# matches a scalar line:  key: value
+SCALAR_FIELD = re.compile(r"^(\s*)([A-Za-z0-9_]+):\s+(.+?)\s*$")
 # matches a block-list item:  - value
 BLOCK_ITEM = re.compile(r"^(\s*)-\s+(.*?)\s*$")
 KEY_LINE = re.compile(r"^(\s*)([A-Za-z0-9_]+):\s*$")
@@ -83,9 +114,9 @@ def split_inline_items(inner: str) -> list[str]:
     return [i for i in items if i != ""]
 
 
-def requote(item: str) -> str:
+def requote(key: str, item: str) -> str:
     """Quote a converted value for inline YAML (wikilinks contain [ ] | so always quote)."""
-    return '"' + ref_to_wikilink(item).replace('"', '\\"') + '"'
+    return '"' + convert_value(key, item).replace('"', '\\"') + '"'
 
 
 def migrate_frontmatter(text: str) -> tuple[str, int]:
@@ -109,12 +140,12 @@ def migrate_frontmatter(text: str) -> tuple[str, int]:
 
         # inline list:  field: [ ... ]
         m = INLINE_LIST.match(line)
-        if m and m.group(2) in CONVERT_FIELDS:
+        if m and m.group(2) in ID_LIST_FIELDS:
             indent, key, inner = m.group(1), m.group(2), m.group(3)
             items = split_inline_items(inner)
             new_items = []
             for it in items:
-                conv = requote(it)
+                conv = requote(key, it)
                 if conv.strip('"') != it.strip().strip('"').strip("'"):
                     changed += 1
                 new_items.append(conv)
@@ -126,19 +157,31 @@ def migrate_frontmatter(text: str) -> tuple[str, int]:
         # block list header:  field:
         km = KEY_LINE.match(line)
         if km:
-            active_block_field = km.group(2) if km.group(2) in CONVERT_FIELDS else None
+            active_block_field = km.group(2) if km.group(2) in ID_LIST_FIELDS else None
             out.append(line)
             i += 1
             continue
 
         # block list item under an active field:  - value
         bm = BLOCK_ITEM.match(line)
-        if bm and active_block_field is not None:
+        if bm and active_block_field in ID_LIST_FIELDS:
             indent, val = bm.group(1), bm.group(2)
-            conv = ref_to_wikilink(val.strip().strip('"').strip("'"))
+            conv = convert_value(active_block_field, val.strip().strip('"').strip("'"))
             if conv != val.strip().strip('"').strip("'"):
                 changed += 1
             out.append(f'{indent}- "{conv}"')
+            i += 1
+            continue
+
+        # scalar field:  originPath: raw/foo.md
+        sm = SCALAR_FIELD.match(line)
+        if sm and sm.group(2) in PATH_FIELDS:
+            indent, key, val = sm.group(1), sm.group(2), sm.group(3)
+            conv = convert_value(key, val)
+            if conv != val.strip().strip('"').strip("'"):
+                changed += 1
+            out.append(f'{indent}{key}: "{conv}"')
+            active_block_field = None
             i += 1
             continue
 

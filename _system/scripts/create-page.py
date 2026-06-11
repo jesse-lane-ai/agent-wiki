@@ -315,6 +315,15 @@ def ref_to_wikilink(value: str) -> str:
     return f"[[{id_to_link_target(text)}|{text}]]"
 
 
+def path_to_wikilink(value: str) -> str:
+    """Wrap a vault-relative Markdown path as an Obsidian wikilink."""
+    text = (value or "").strip()
+    if not text or text.startswith("[["):
+        return text
+    target = text[:-len(".md")] if text.endswith(".md") else text
+    return f"[[{target}|{text}]]"
+
+
 def wikilink_refs(values: Any) -> list[str]:
     """Apply ref_to_wikilink across a list of reference IDs."""
     if not isinstance(values, list):
@@ -437,7 +446,7 @@ def build_frontmatter(args: argparse.Namespace, page_id: str, created_at: str) -
         else:
             frontmatter["sourceParts"] = []
         append_optional(frontmatter, "originUrl", args.source_url)
-        append_optional(frontmatter, "originPath", args.origin_path)
+        append_optional(frontmatter, "originPath", path_to_wikilink(args.origin_path) if args.origin_path else None)
         append_optional(frontmatter, "publishedAt", args.published_at)
         frontmatter["retrievedAt"] = args.retrieved_at or created_at
         append_optional(frontmatter, "convertedAt", args.converted_at)

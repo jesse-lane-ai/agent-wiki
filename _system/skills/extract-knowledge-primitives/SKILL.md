@@ -289,7 +289,9 @@ At minimum, record:
 
 - `status: processed`
 - `updatedAt`
-- IDs of extracted entities, concepts, claims, and questions where applicable
+- wikilinked IDs of extracted entities, concepts, claims, and questions where applicable
+
+Extracted primitive lists (`extractedEntities`, `extractedConcepts`, `extractedClaims`, `extractedQuestions`) are navigation/display fields. Write each value as an aliased Obsidian wikilink that targets the page filename stem and displays the dotted ID, for example `"[[concept-principle-agentic-workflows|concept.principle.agentic-workflows]]"`.
 
 When processing source parts, update each processed part to `status: processed`. After all parts for a parent source are processed, update the parent source from `status: partitioned` to `status: processed` and update its `updatedAt`.
 
