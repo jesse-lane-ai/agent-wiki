@@ -171,6 +171,21 @@ agent-wiki workspace mark-sourced \
   --source-path sources/2026-06-26-document-customer-research.md
 ```
 
+## E2E Smoke Test
+
+Use the temp-only smoke harness when you want to exercise both operating modes with real copied files:
+
+```bash
+python3 tests/e2e_smoke.py \
+  --vault-raw /path/to/source-one.md \
+  --vault-raw /path/to/source-two.md \
+  --workspace-root /path/to/workspace \
+  --workspace-file docs/source-one.md \
+  --workspace-file notes/source-two.md
+```
+
+The harness creates temporary vault and workspace wikis, copies the supplied files into those temp fixtures, promotes them to canonical `source` pages, runs workspace discovery and `mark-sourced`, compiles both wikis, runs `doctor`, and prints a JSON summary. It does not move or modify the original files.
+
 ## Core documents
 
 - [ONBOARD.md](ONBOARD.md) — first-run setup, onboarding probe, local configuration, and import-link setup.
