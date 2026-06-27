@@ -7,9 +7,9 @@ description: "Create or refresh the root overview.md landing page for the vault.
 
 This skill creates or refreshes root `overview.md`, the human-facing narrative landing page for the vault. It does not own the schema.
 
-Runtime overview schema lives in `WIKI.md` Section 4.1. Page type rules live in `WIKI.md` Section 3. Authority rules live in `WIKI.md` Sections 1.1, 9, and 11. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v1.md`.
+Runtime overview schema lives in `WIKI.md` Section 4.1. Page type rules live in `WIKI.md` Section 3. Authority rules live in `WIKI.md` Sections 1.1, 9, and 11. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v2.md`.
 
-Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
+Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v2.md`, follow `AGENT-WIKI-SPEC-v2.md`.
 
 ## When to Use
 
@@ -27,7 +27,7 @@ Before updating `overview.md`, read:
 1. `AGENTS.md` for behavior rules.
 2. `WIKI.md` Sections 3, 4.1, 9, and 11 for the `overview.md` page type, runtime schema, generated-content authority, and report authority.
 
-Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 are insufficient.
+Read `AGENT-WIKI-SPEC-v2.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 1.1, 3, 4.1, 9, or 11 are insufficient.
 
 ## Step 2: Compile First
 

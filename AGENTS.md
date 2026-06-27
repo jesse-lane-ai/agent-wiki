@@ -1,8 +1,7 @@
 # AGENTS.md
 
 Agent behavior contract for the Agentics vault.  
-Version: v1  
-Last updated: 2026-05-02
+Version: v2Last updated: 2026-05-02
 
 ---
 
@@ -12,7 +11,7 @@ This file is the authoritative description of how agents are expected to behave 
 
 Agents MUST read this file before making any edits to the vault. See also [[WIKI#4.1 Common runtime schemas]] for schema, [[WIKI#16 Editorial principles]] for editorial rules, and [[INBOX]] for the raw intake workflow.
 
-For routine field-level schema details, use [[WIKI#4.1 Common runtime schemas]]. Use [[AGENT-WIKI-SPEC-v1]] when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient. This file only defines agent behavior.
+For routine field-level schema details, use [[WIKI#4.1 Common runtime schemas]]. Use [[AGENT-WIKI-SPEC-v2]] when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient. This file only defines agent behavior.
 
 ---
 
@@ -298,7 +297,7 @@ All internal links within the vault MUST use Obsidian-style wikilinks.
 | Link with display text | `[[page-slug\|Display Text]]` |
 | Link to a section | `[[page-slug#section-heading]]` |
 
-Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs and `obsidian://` cross-vault references only. For cross-vault Obsidian links, follow [[AGENT-WIKI-SPEC-v1#8.6 Cross-vault linking]].
+Standard markdown links (`[text](path)`) MUST NOT be used for internal vault references. They MAY be used for external URLs and `obsidian://` cross-vault references only. For cross-vault Obsidian links, follow [[AGENT-WIKI-SPEC-v2#8.6 Cross-vault linking]].
 
 This convention applies to:
 - page body content
@@ -310,4 +309,4 @@ This convention applies to:
 
 ## 13. Full Specification
 
-[[AGENT-WIKI-SPEC-v1]]
+[[AGENT-WIKI-SPEC-v2]]

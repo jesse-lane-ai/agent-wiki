@@ -24,7 +24,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 - Source pages are written under `sources/`.
 - Attachments are written under `_attachments/`.
 - Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
-- If the incoming link is an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v1.md` Section 8.6: do not launch the URI; resolve it only through `_system/config.json` `knownVaults`, and treat it as an opaque external reference when the target vault is not configured.
+- If the incoming link is an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v2.md` Section 8.6: do not launch the URI; resolve it only through `_system/config.json` `knownVaults`, and treat it as an opaque external reference when the target vault is not configured.
 
 ## UUID Generation
 - Use `scripts/uuid.py` to generate a new UUID for each source attachment.
@@ -39,9 +39,9 @@ Create source files in `sources/` using `_system/scripts/create-page.py`. The sc
 
 Use `WIKI.md` Section 4.1 as the routine source of truth for page-type schemas, ID formats, and examples. Use `WIKI.md` Sections 5 and 12 for status and source type enums. This skill owns the import workflow, not the source frontmatter schema.
 
-Use `WIKI.md` Section 13 for large-source parent and part handling. Consult `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
+Use `WIKI.md` Section 13 for large-source parent and part handling. Consult `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
 
-Use `AGENT-WIKI-SPEC-v1.md` Section 6.6 only when you need the page scaffolding contract or `create-page.py` option semantics.
+Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `create-page.py` option semantics.
 
 Newly imported ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 

@@ -1,18 +1,18 @@
 # WIKI.md
 
-Human-readable schema and editorial guide for the Agentics vault.  
-Spec version: v1  
+Human-readable schema and editorial guide for Agent Wiki.
+Spec version: v2
 Last updated: 2026-05-02
 
 ---
 
 ## 1. What this wiki is
 
-This vault is a structured knowledge base designed to be useful for both humans and AI agents.
+This wiki is a structured knowledge base designed to be useful for both humans and AI agents.
 
-This file is the compact runtime schema and editorial guide for ordinary vault operations. User agents should prefer this file for page schemas, status enums, ID formats, evidence rules, and common examples.
+This file is the compact runtime schema and editorial guide for ordinary wiki operations. User agents should prefer this file for page schemas, status enums, ID formats, evidence rules, and common examples.
 
-The full project and development contract lives in [[AGENT-WIKI-SPEC-v1]]. Use the full spec when changing project behavior, scripts, skills, configuration policy, validation behavior, or when this file is insufficient. If this file conflicts with the full spec, the full spec remains canonical until the conflict is resolved.
+The full project and development contract lives in [[AGENT-WIKI-SPEC-v2]]. Use the full spec when changing project behavior, scripts, skills, configuration policy, validation behavior, or when this file is insufficient. If this file conflicts with the full spec, the full spec remains canonical until the conflict is resolved.
 
 It separates:
 - **things** from **ideas**
@@ -32,7 +32,7 @@ It separates:
 | [[WIKI#4.1 Common runtime schemas]] | Compact runtime schema and editorial reference for ordinary vault work |
 | [[INBOX]] | Raw inbox lifecycle |
 | [[ONBOARD]] | First-run setup and local environment workflow |
-| [[AGENT-WIKI-SPEC-v1]] | Full project/development contract and detailed implementation reference |
+| [[AGENT-WIKI-SPEC-v2]] | Full project/development contract and detailed implementation reference |
 
 Agents should load the smallest document that answers the task. Routine source import, inbox processing, extraction, overview, and compile work should not require loading the full spec unless there is ambiguity.
 
@@ -45,7 +45,7 @@ Current vault structure:
 ```text
 <vault>/
   AGENTS.md
-  AGENT-WIKI-SPEC-v1.md
+  AGENT-WIKI-SPEC-v2.md
   INBOX.md
   ONBOARD.md
   README.md
@@ -101,7 +101,7 @@ Use `_system/scripts/onboard.py --check` for a read-only local setup probe befor
 
 Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
-This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
+This project is scoped to one wiki per wiki root. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is usually `workspace/wiki`. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
 
 ---
 
@@ -492,7 +492,7 @@ Evidence attaches provenance and support semantics to a claim.
 
 ## 8. Relationship predicates
 
-The v1 controlled predicate set:
+The v2 controlled predicate set:
 
 | Predicate | Meaning |
 |---|---|

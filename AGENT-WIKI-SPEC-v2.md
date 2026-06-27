@@ -1,14 +1,14 @@
 
-# Agentic Wiki v1 Specification
+# Agent Wiki v2 Specification
 
-Version: 1.4.2
-Last Updated: 2026-06-10
+Version: 2.0.0
+Last Updated: 2026-06-27
 
 ---
 
 ## 1. Purpose
 
-This specification defines the **v1 format, rules, and runtime expectations** for an ai agent compatible wiki vault.
+This specification defines the **v2 format, rules, and runtime expectations** for an AI-agent-compatible wiki.
 
 The goal of the system is to make the wiki useful for both:
 
@@ -18,10 +18,11 @@ The goal of the system is to make the wiki useful for both:
 This spec merges two requirements:
 
 1. a **knowledge ontology** that distinguishes entities, concepts, sources, claims, evidence, relationships, contradictions, and questions
-2. a **practical vault architecture** that works as a markdown-first knowledge system with compile-time normalization
+2. a **practical wiki architecture** that works as a markdown-first knowledge system with compile-time normalization in either standalone vault mode or embedded workspace mode
 
-This document defines the v1 contract for:
+This document defines the v2 contract for:
 
+- operating modes
 - folder layout
 - page types
 - frontmatter fields
@@ -60,18 +61,20 @@ The wiki is intended to act as:
 
 The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** in this document are to be interpreted as requirement levels.
 
-- **MUST**: required for v1 compliance
+- **MUST**: required for v2 compliance
 - **SHOULD**: strongly recommended unless there is a justified reason not to
 - **MAY**: optional
 
 ---
 
-## 4. Scope of v1
+## 4. Scope of v2
 
-v1 is intentionally constrained.
+v2 is intentionally constrained.
 
-v1 includes:
+v2 includes:
 
+- vault and workspace operating modes
+- lifecycle CLI commands for initialization and health checks
 - page typing
 - structured claims
 - structured evidence
@@ -80,7 +83,7 @@ v1 includes:
 - generated reports
 - machine-facing compile outputs
 
-v1 does **not** require:
+v2 does **not** require:
 
 - a dedicated top-level timeline folder
 - full contradiction pages as primary authoring surfaces
@@ -88,7 +91,7 @@ v1 does **not** require:
 - automatic semantic deduplication
 - ontology inference beyond explicit page metadata and claims
 
-Those can be added in v2.
+Those can be added in a later version.
 
 ---
 
@@ -172,16 +175,25 @@ A dated event record represented inside an entity page, synthesis page, or compi
 An alternate name for a page/object.
 
 #### Metric / State
-Optional quantitative or stateful information. Not a required first-class authored page type in v1.
+Optional quantitative or stateful information. Not a required first-class authored page type in v2.
 
 ---
 
-## 6. Vault Layout
+## 6. Operating Modes and Wiki Layout
 
-A v1-compliant vault MUST use the following top-level structure.
+Agent Wiki supports two operating modes.
+
+- **Vault mode**: the wiki root is the primary repository or folder. Source material enters through `_inbox/`, `import-link`, or direct source-page creation. Original inbox files are retained in `raw/` after promotion.
+- **Workspace mode**: the wiki root is embedded inside a larger workspace, normally at `workspace/wiki`. Source candidates live outside the wiki directory. Original workspace files stay in place and are referenced by canonical source pages through workspace-relative `originPath` values.
+
+A v2-compliant wiki MUST have a `wikiType` of `vault` or `workspace`. If `_system/config.json` is absent, tools SHOULD default to `vault` mode for backward compatibility.
+
+### 6.1 Vault Mode Layout
+
+A vault-mode wiki SHOULD use the following top-level structure when initialized.
 
 ```text
-<vault>/
+<wiki>/
   AGENTS.md
   WIKI.md
   overview.md
@@ -212,10 +224,52 @@ A v1-compliant vault MUST use the following top-level structure.
 
 Fresh template repositories MAY omit empty runtime/content directories. Initialization tooling and workflows SHOULD create missing directories when they are needed.
 
-### 6.1 Required top-level files
+### 6.2 Workspace Mode Layout
+
+A workspace-mode wiki is stored inside a larger workspace. The default wiki directory is `wiki/`.
+
+```text
+<workspace>/
+  docs/
+  research/
+  decisions/
+  wiki/
+    AGENTS.md
+    WIKI.md
+    overview.md
+    index.md
+    INBOX.md
+
+    sources/
+    entities/
+    concepts/
+    claims/
+    syntheses/
+    questions/
+    reports/
+
+    _attachments/
+    _archive/
+
+    _system/
+      config.json
+      config.example.json
+      cache/
+      indexes/
+      logs/
+      state/
+      scripts/
+      skills/
+```
+
+Workspace mode MUST NOT require `_inbox/`, `_inbox/trash/`, or `raw/` inside the wiki root. Those folders MAY exist if an operator explicitly wants an inbox workflow inside a workspace wiki, but their absence MUST NOT make the workspace wiki non-compliant.
+
+Workspace discovery state SHOULD live under `_system/state/` or another deterministic local runtime location inside the wiki root. It is local operational state, not canonical wiki knowledge.
+
+### 6.3 Required top-level files
 
 #### `AGENTS.md`
-MUST describe how agents are expected to behave in the vault.
+MUST describe how agents are expected to behave in the wiki.
 
 Typical contents:
 - editing conventions
@@ -242,21 +296,21 @@ SHOULD be the deterministic root-level page catalog.
 The file SHOULD be regenerated as a whole by `_system/scripts/index.py` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
 
 #### `overview.md`
-SHOULD be the human-facing landing page for the vault.
+SHOULD be the human-facing landing page for the wiki.
 
-The file SHOULD provide a long-form narrative overview of the vault, including a vault summary and paragraph-form summaries for each active page type. It MAY be AI-authored or AI-maintained, but it is durable orientation prose and SHOULD NOT be regenerated automatically on every compile.
+The file SHOULD provide a long-form narrative overview of the wiki, including a wiki summary and paragraph-form summaries for each active page type. It MAY be AI-authored or AI-maintained, but it is durable orientation prose and SHOULD NOT be regenerated automatically on every compile.
 
 `overview.md` is not evidence, not a generated report, and not a replacement for compiled caches. Claims in `overview.md` SHOULD be treated as orientation unless they are represented in canonical pages, claims, evidence records, or source pages.
 
 #### `INBOX.md`
-MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. Documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages.
+MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. In vault mode, it documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages. In workspace mode, it SHOULD clarify that source candidates normally remain outside the wiki root.
 
-### 6.1.1 Optional top-level files
+### 6.3.1 Optional top-level files
 
 #### `log.md`
 Operational log entries belong in `_system/logs/log.md`.
 
-### 6.2 Required directories
+### 6.4 Required directories
 
 #### `sources/`
 Stores canonical verbatim source pages.
@@ -283,10 +337,10 @@ Stores open question pages.
 Stores generated dashboard pages and maintenance views.
 
 #### `_inbox/`
-Stores raw files waiting to be promoted into canonical source pages. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
+Vault mode only. Stores raw files waiting to be promoted into canonical source pages. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
 #### `raw/`
-Stores retained original raw files after inbox promotion. Files in `raw/` are not canonical source pages and MUST NOT be treated as evidence for claims.
+Vault mode only. Stores retained original raw files after inbox promotion. Files in `raw/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
 #### `_attachments/`
 Stores binary assets and attachments referenced by source pages or other pages (PDFs, images, raw files). Created on vault initialization; MAY be empty.
@@ -301,6 +355,7 @@ Sub-directories:
 - `cache/` — compiled artifact outputs (do not hand-edit)
 - `indexes/` — generated index files (do not hand-edit)
 - `logs/` — compile run logs (do not hand-edit)
+- `state/` — local runtime state for deterministic workflows, including workspace source discovery (do not hand-edit)
 - `scripts/` — deterministic utility scripts for operational logging, generated catalog pages, onboarding checks, and page scaffolding
 - `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
@@ -325,7 +380,7 @@ _system/skills/
     instructions.md
 ```
 
-### 6.3 Local system configuration
+### 6.5 Local system configuration
 
 `_system/config.json` MAY define local tool policy and command preferences used by deterministic scripts and skills. The file is optional. Tools SHOULD use conservative defaults when it is absent.
 
@@ -336,9 +391,19 @@ Recommended shape:
 ```json
 {
   "schemaVersion": 1,
+  "wikiType": "vault",
   "pythonCommand": null,
   "knownVaults": {
     "my-vault-name": "/absolute/path/to/vault"
+  },
+  "workspace": {
+    "root": null,
+    "wikiDir": "wiki",
+    "scan": {
+      "includeExtensions": [".md", ".markdown", ".txt", ".pdf", ".docx", ".csv", ".json", ".yaml", ".yml"],
+      "excludeDirs": [".git", ".hg", ".svn", ".obsidian", ".venv", "venv", "env", "__pycache__", "node_modules", "dist", "build", "_system", "reports"],
+      "excludeFileGlobs": ["*.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock"]
+    }
   },
   "conversion": {
     "enabled": true,
@@ -375,15 +440,21 @@ Recommended shape:
 }
 ```
 
+`wikiType` MUST be either `vault` or `workspace` when present. Missing `wikiType` SHOULD be interpreted as `vault`.
+
+`workspace.root` MAY be `null` for vault mode. In workspace mode, it SHOULD be the absolute workspace root when known. `workspace.wikiDir` is the path from the workspace root to the wiki root, defaulting to `wiki`.
+
+`workspace.scan` MAY define deterministic workspace discovery policy. Discovery policy is local operational policy, not canonical wiki knowledge. Workspace scanning MUST exclude the wiki directory itself and SHOULD exclude source-control, dependency, build, cache, and generated-output directories.
+
 `knownVaults` is an optional object that maps Obsidian vault names (as registered in the Obsidian app) to their absolute paths on the local file system. When present, agents MAY use this map to resolve `obsidian://` cross-vault links to readable file paths. Keys SHOULD match the vault folder name exactly as Obsidian registers it. Values MUST be absolute paths. This field is local operator configuration and MUST NOT be committed to shared template repositories.
 
 `pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
 
-This project is scoped to one wiki per checkout. The repository root is the wiki root. Skills, scripts, and config files MUST read and write paths relative to that root.
+This project is scoped to one wiki per wiki root. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is the configured wiki directory inside a larger workspace. Skills, scripts, and config files MUST read and write wiki content relative to the wiki root unless a workspace-mode command explicitly reads source candidates from the workspace root.
 
-Multiple wikis are outside the scope of this project. Operators who want multiple independent wikis SHOULD clone this repository into multiple folders, onboard each checkout separately, and handle any cross-wiki routing or selection outside this project.
+Multiple active wiki roots in one command invocation are outside the scope of this project. Operators who want multiple independent wikis SHOULD initialize each wiki separately and handle cross-wiki routing or selection outside this project.
 
-Obsidian is an optional editor for the same repository root. Opening the repository root as an Obsidian vault MUST NOT change where skills or scripts read and write content.
+Obsidian is an optional editor for the wiki root. Opening the wiki root as an Obsidian vault MUST NOT change where skills or scripts read and write content.
 
 Configuration SHOULD express operator policy and preferences, not transient detection state. For example, a backend can be enabled in config but still unavailable at runtime if the command or Python package is not installed. Tools SHOULD detect that condition during execution and report it clearly.
 
@@ -393,7 +464,58 @@ If `.venv/` is used, it SHOULD be project-local and ignored by version control. 
 
 `.gitignore` SHOULD include `_system/config.json` and `.venv/` so local setup choices and installed packages do not become shared vault content.
 
-### 6.4 Onboarding probe
+### 6.6 Lifecycle CLI
+
+The system SHOULD provide an agent-independent lifecycle CLI. The command name MAY be installed as `agent-wiki`, and the Python module entry point SHOULD be invokable during development:
+
+```bash
+python3 -m agent_wiki.cli
+```
+
+The lifecycle CLI SHOULD support initializing a vault-mode wiki:
+
+```bash
+agent-wiki init --type vault --root /path/to/wiki --write-config
+```
+
+It SHOULD support initializing a workspace-mode wiki:
+
+```bash
+agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
+```
+
+`init` SHOULD create the required content, generated, and system directories for the selected mode. Vault mode SHOULD create `_inbox/`, `_inbox/trash/`, and `raw/`. Workspace mode MUST NOT create those folders by default.
+
+When `--write-config` is supplied, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config.
+
+The lifecycle CLI SHOULD provide a read-only health check:
+
+```bash
+agent-wiki doctor --wiki-root /path/to/wiki --type vault
+agent-wiki doctor --wiki-root /path/to/workspace/wiki --type workspace
+```
+
+`doctor` SHOULD verify mode-specific required folders, local config sanity, required template script/skill availability, and whether `wikiType` is valid. It MUST NOT create files, write config, install packages, run conversion, or mutate wiki content. It SHOULD return a non-zero exit code only for errors, not warnings or informational findings.
+
+### 6.7 Workspace Discovery CLI
+
+Workspace mode SHOULD provide deterministic discovery commands that operate from the workspace root while storing local state under the wiki root.
+
+The CLI SHOULD support:
+
+```bash
+agent-wiki workspace scan --workspace-root /path/to/workspace --wiki-dir wiki --json
+agent-wiki workspace pending --workspace-root /path/to/workspace --wiki-dir wiki --json
+agent-wiki workspace mark-sourced --workspace-root /path/to/workspace --path docs/example.md --source-id source.2026-06-27.document.example --source-path sources/2026-06-27-document-example.md
+```
+
+Workspace scanning SHOULD identify candidate non-code files outside the wiki directory using deterministic include/exclude rules. It SHOULD report file path, modified time, size, extension, content hash, recommended source type, and any known source-page mapping.
+
+Workspace discovery MUST NOT semantically read files, create source pages, modify workspace files, move files, delete files, or treat workspace files as canonical evidence. It only reports candidates and records local mapping state.
+
+After an agent creates a canonical source page for a workspace file, `mark-sourced` MAY record the relationship between the workspace-relative source path and the wiki source page. That mapping is local operational state and SHOULD NOT replace source-page metadata.
+
+### 6.8 Onboarding probe
 
 The system SHOULD provide a deterministic onboarding probe at `_system/scripts/onboard.py`.
 
@@ -418,15 +540,16 @@ The probe SHOULD check:
 - Python versions for available commands
 - whether `.venv/` exists
 - whether `_system/config.json` exists
-- whether `.obsidian/` exists at the repository root
-- whether required runtime/content folders exist
+- whether `_system/config.json` declares `wikiType`
+- whether `.obsidian/` exists at the wiki root
+- whether mode-specific required runtime/content folders exist
 - whether `import-link` has a local config file and whether it appears configured
 - available local conversion CLI commands, such as `markitdown`, `marker`, and `arxiv2md`
 - importable Python conversion packages under each available Python command, such as `pymupdf4llm`, `markitdown`, and `marker`
 
 The probe MUST NOT install packages, create virtual environments, write `_system/config.json`, create folders, modify skill config, or mutate vault content when run with `--check`.
 
-Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then write `_system/config.json` or create missing folders only after the operator has approved those actions.
+Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then run lifecycle commands or write local config only after the operator has approved those actions.
 
 `onboard.py` MAY support an explicit mutating config writer:
 
@@ -447,7 +570,7 @@ The config writer SHOULD require explicit flags for choices that materially chan
 - `--conversion available-local` to enable conversion using only already installed local backends
 - `--conversion custom` when explicit backend choices or policy flags are supplied
 
-The only supported wiki root is the current repository root.
+The supported wiki root for the probe is the current working directory. In workspace mode, callers SHOULD run the probe from the embedded wiki root, not from the workspace root.
 
 Network, OCR, LLM, transcription, and hosted document-intelligence conversion behavior MUST remain disabled unless explicitly enabled by dedicated flags. The writer SHOULD report exactly which fields were written.
 
@@ -470,7 +593,7 @@ Recommended setup questions include:
 - whether inbox conversion should be enabled
 - which conversion backend policy to use
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
-- whether missing runtime folders should be created
+- whether mode-specific missing runtime folders should be created with `agent-wiki init`
 - whether `_system/config.json` should be written
 
 After core onboarding, agents SHOULD recommend optional Obsidian setup when the operator wants an Obsidian workflow. The recommendation SHOULD be concise and operational:
@@ -479,12 +602,12 @@ After core onboarding, agents SHOULD recommend optional Obsidian setup when the 
 2. Click the current vault name at the bottom of the file explorer pane, or use Obsidian's vault switcher if the control is not visible.
 3. Click "Manage vaults..."
 4. Click "Open folder as vault".
-5. Navigate to the root of this wiki.
+5. Navigate to the wiki root.
 6. Click "Select Folder".
 
-Opening the repository root as an Obsidian vault may create local `.obsidian/` settings. `.obsidian/` is local application state and SHOULD be ignored by version control.
+Opening the wiki root as an Obsidian vault may create local `.obsidian/` settings. `.obsidian/` is local application state and SHOULD be ignored by version control.
 
-### 6.5 Project development workflow
+### 6.9 Project development workflow
 
 Changes to this project SHOULD move from contract to implementation in a consistent order.
 
@@ -498,7 +621,7 @@ When adding a feature or changing project behavior, the recommended workflow is:
 
 Each step SHOULD be skipped when the change does not affect that surface. The specification SHOULD be reviewed first because it defines the contract that configuration, scripts, skills, and root-level documentation implement.
 
-### 6.6 Deterministic page scaffolding
+### 6.10 Deterministic page scaffolding
 
 The system SHOULD provide a deterministic page scaffolding utility at `_system/scripts/create-page.py`.
 
@@ -543,14 +666,14 @@ The exact option set MAY evolve, but the script SHOULD support:
 
 For each created page, the scaffolder MUST:
 
-- resolve all paths relative to the repository root
+- resolve wiki paths relative to the wiki root
 - select the correct folder for the requested `pageType`
 - construct the stable `id` using this specification's naming rules
 - create the required frontmatter for the page type using the current date for `createdAt` and `updatedAt`
 - map `--subtype` to the correct page-type-specific field
 - derive the filename from the stable ID using the filename rules in Section 8.2
 - refuse to overwrite an existing file unless a future explicit update mode is specified
-- check for duplicate IDs in existing vault pages before writing
+- check for duplicate IDs in existing wiki pages before writing
 - require verbatim Markdown body content for `source` pages
 - validate source role requirements: `whole` source pages stand alone; `parent` source pages carry ordered `sourceParts`; `part` source pages carry `parentSourceId`, `partIndex`, `partCount`, and a stable `locator`
 - require substantive Markdown body prose for `entity`, `concept`, `claim`, `question`, and `synthesis` pages
@@ -616,7 +739,9 @@ Raw inbox files MAY be converted to Markdown before source page creation. Conver
 
 Plain text and Markdown inbox files SHOULD be treated as already prepared source body files. `process-inbox` SHOULD pass those files, or prepared source-part files derived from them, to `_system/scripts/create-page.py` with `--body-file` rather than copying the body into `--body`. This preserves formatting, avoids shell quoting failures, and lets the scaffolder validate canonical `source` pages from file-backed body content.
 
-Original raw files SHOULD be retained in `raw/` after successful promotion. Raw files in `_inbox/` or `raw/` are not canonical evidence. The converted source page or source part page is the canonical evidence surface.
+In vault mode, original raw files SHOULD be retained in `raw/` after successful inbox promotion. Raw files in `_inbox/` or `raw/` are not canonical evidence. The converted source page or source part page is the canonical evidence surface.
+
+In workspace mode, original workspace files MUST remain in place. A workspace source page SHOULD use `originPath` to point to the workspace-relative file path. Workspace files outside the wiki directory are discovery inputs until promoted into canonical source pages; they MUST NOT be treated as canonical evidence merely because discovery reported them.
 
 Conversion tools SHOULD preserve document structure and stable locators when available, including headings, page ranges, slide numbers, table boundaries, timestamps, and section paths. When a source is partitioned, partition locators SHOULD use the most specific stable locator available from the conversion output.
 
@@ -625,7 +750,7 @@ Conversion behavior SHOULD be deterministic:
 1. Tools SHOULD use a stable backend order for automatic conversion.
 2. Tools MUST NOT install converters, model dependencies, or system packages during a skill run.
 3. Tools MUST NOT call network, cloud OCR, LLM, transcription, or hosted document-intelligence services unless the operator explicitly requests or configures that behavior.
-4. If no configured local conversion path exists, the raw file MUST remain in `_inbox/` and the failure reason SHOULD be reported to the operator.
+4. If no configured local conversion path exists, the source candidate MUST remain where it is and the failure reason SHOULD be reported to the operator. In vault mode that means the raw file remains in `_inbox/`; in workspace mode that means the workspace file remains untouched.
 5. If conversion succeeds but produces warnings or degraded output, those warnings SHOULD be recorded in source metadata.
 
 Automatic conversion tools SHOULD read local policy from `_system/config.json` when that file exists. The config MAY define the preferred Python command, whether conversion is enabled, the automatic backend order, backend-specific command names, and whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed. Missing config SHOULD fall back to conservative local-only defaults.
@@ -639,7 +764,7 @@ Common local converter backends MAY include:
 - `arxiv2md` for arXiv or academic sources where a structured arXiv source can be identified
 - `marker` for complex PDFs where higher-fidelity local extraction is needed
 
-These backend names are examples, not required dependencies. The vault schema MUST remain stable regardless of the converter used.
+These backend names are examples, not required dependencies. The wiki schema MUST remain stable regardless of the converter used.
 
 ### 7.2 `entities/`
 
@@ -684,7 +809,7 @@ Agents SHOULD NOT create a synthesis page for:
 - a raw or verbatim captured item that belongs in `sources/`
 - an unresolved unknown that belongs in `questions/`
 - a deterministic maintenance output that belongs in `reports/`
-- whole-vault orientation that belongs in root `overview.md`
+- whole-wiki orientation that belongs in root `overview.md`
 
 Synthesis pages are secondary authored interpretation. They MUST preserve uncertainty, identify their source basis, and avoid presenting unsupported conclusions as established fact.
 
@@ -712,11 +837,11 @@ Reports are views over compiled or source page data.
 
 ### 7.8 `index.md`
 
-`index.md` is the deterministic root-level page catalog for the vault.
+`index.md` is the deterministic root-level page catalog for the wiki.
 
 It SHOULD have `pageType: index`. It MUST NOT be typed as `report`.
 
-The `index` page type is reserved for vault-level navigation and page discovery. There is typically only one `index` page per vault.
+The `index` page type is reserved for wiki-level navigation and page discovery. There is typically only one `index` page per wiki root.
 
 `index.md` SHOULD be regenerated as a whole by `_system/scripts/index.py` from `_system/cache/pages.json`. The script MUST NOT independently define page truth; it only renders a deterministic catalog from compiled page metadata.
 
@@ -731,16 +856,16 @@ Because the whole file is deterministic, agents and humans SHOULD NOT place dura
 
 ### 7.9 `overview.md`
 
-`overview.md` is the root-level narrative landing page for the vault.
+`overview.md` is the root-level narrative landing page for the wiki.
 
 It SHOULD have `pageType: overview`. It MUST NOT be typed as `report`, `index`, or `synthesis`.
 
-The `overview` page type is reserved for vault-level orientation. There is typically only one `overview` page per vault, and it SHOULD live at root `overview.md`.
+The `overview` page type is reserved for wiki-level orientation. There is typically only one `overview` page per wiki root, and it SHOULD live at root `overview.md`.
 
 The page SHOULD include:
-- a human-facing summary of the vault
+- a human-facing summary of the wiki
 - paragraph-form summaries of each active page type
-- enough context for a new human reader to understand what is in the vault and where to go next
+- enough context for a new human reader to understand what is in the wiki and where to go next
 
 `overview.md` MAY be written or refreshed by an agent, but it SHOULD be updated intentionally after meaningful content changes rather than regenerated as part of every compile run. It is durable orientation prose, not a deterministic artifact.
 
@@ -769,7 +894,7 @@ Agents MUST preserve existing human-authored body prose unless the operator expl
 Each page MUST have a stable `id`.
 
 ### 8.1 Requirements
-- `id` MUST be globally unique within the vault.
+- `id` MUST be globally unique within the wiki root.
   - *Note: Duplicate IDs will not self-repair. The compiler flags collisions in the console and logs the offending file paths in `_system/logs/`. In the compiled indexes, the last processed file with the duplicate ID will overwrite previous entries.*
 - `id` SHOULD be stable over time
 - `id` SHOULD NOT depend on the page filename alone
@@ -800,7 +925,7 @@ Entities and concepts SHOULD include `canonicalName`.
 
 ### 8.4 Internal linking convention
 
-Internal references in vault-native pages and vault-native documentation MUST use Obsidian-style wikilinks.
+Internal references in wiki-native pages and wiki-native documentation MUST use Obsidian-style wikilinks.
 
 ```md
 [[page-slug]]
@@ -812,7 +937,7 @@ Standard markdown links (`[text](path)`) MUST NOT be used for internal vault-pag
 
 This convention applies to:
 - page body content
-- vault-native root docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `ONBOARD.md`, `CLAUDE.md`, etc.)
+- wiki-native root docs (`AGENTS.md`, `WIKI.md`, `INBOX.md`, `ONBOARD.md`, `CLAUDE.md`, etc.)
 - the **navigation/display reference fields** in frontmatter: `sourcePages`, `derivedClaims`, `relatedPages`, `relatedClaims`, `extractedEntities`, `extractedConcepts`, `extractedClaims`, `extractedQuestions`, `originPath`
 
 Public repository documentation MAY use standard markdown links for repository readability, especially `README.md` when it is intended to render cleanly on GitHub.
@@ -840,7 +965,7 @@ The following frontmatter fields are resolved by **exact ID match** during compi
 
 In short: **grounding/relationship lists are links; structural pointers used by the compiler are raw IDs.**
 
-Skill instruction files SHOULD use explicit relative paths when directing agents to project files, schemas, scripts, or examples. Skills MAY mention wikilinks only when the desired output is vault-native content that should contain wikilinks.
+Skill instruction files SHOULD use explicit relative paths when directing agents to project files, schemas, scripts, or examples. Skills MAY mention wikilinks only when the desired output is wiki-native content that should contain wikilinks.
 
 Rationale: wikilinks decouple vault references from file system paths, survive renames, and are resolved natively by Obsidian and compatible tooling. Public repository docs have a different audience and SHOULD remain readable in standard markdown renderers.
 
@@ -898,7 +1023,7 @@ An agent MAY resolve an `obsidian://` URI to a readable file path when `knownVau
 5. Construct the full absolute file path: `<knownVaults[vault]>/<decoded-file-path>`.
 6. Verify the file exists before reading. If it does not exist, report the missing path rather than silently failing.
 
-When `knownVaults` is absent or the target vault is not listed, agents MUST treat the `obsidian://` URI as an opaque external reference and MUST NOT guess or scan for the vault root.
+When `knownVaults` is absent or the target vault is not listed, agents MUST treat the `obsidian://` URI as an opaque external reference and MUST NOT guess or scan for the target vault root.
 
 ---
 
@@ -977,7 +1102,7 @@ confidence:
 freshness:
 ```
 
-These are optional in v1, but strongly recommended where applicable.
+These are optional in v2, but strongly recommended where applicable.
 
 ---
 
@@ -1328,7 +1453,7 @@ A dedicated synthesis skill SHOULD be added if agents are expected to frequently
 
 ### 10.6 Question pages
 
-Questions are first-class authored pages in v1.
+Questions are first-class authored pages in v2.
 
 They represent known unknowns, unresolved research tasks, or ambiguity the system should not erase.
 
@@ -1432,7 +1557,7 @@ tags: []
 
 Claims are a primary **pagetype** in the system. They are authored as top-level, standalone files in the `claims/` directory. 
 
-For v1, Standalone Claim Pages are the normative shape. However, pages MAY also contain zero or more embedded claims in their frontmatter under the `claims:` key for convenience. Both formats are parsed identically by the compile pipeline.
+For v2, Standalone Claim Pages are the normative shape. However, pages MAY also contain zero or more embedded claims in their frontmatter under the `claims:` key for convenience. Both formats are parsed identically by the compile pipeline.
 
 ### 11.1 Claim shape
 
@@ -1723,7 +1848,7 @@ Range: `0.0` to `1.0`
 
 ### 13.4 Recommended predicates
 
-v1 SHOULD use a controlled predicate set:
+v2 SHOULD use a controlled predicate set:
 
 - `is_a`
 - `part_of`
@@ -1742,19 +1867,19 @@ v1 SHOULD use a controlled predicate set:
 
 ### 13.5 Relationship rules
 
-- Relationship IDs are optional in v1, but compiled output MAY assign normalized IDs.
+- Relationship IDs are optional in v2, but compiled output MAY assign normalized IDs.
 - Relationships SHOULD be grounded by source claims where possible.
-- Freeform predicates SHOULD be avoided in v1.
+- Freeform predicates SHOULD be avoided in v2.
 
 ---
 
 ## 14. Contradictions
 
-v1 tracks contradictions primarily through compiled outputs and reports.
+v2 tracks contradictions primarily through compiled outputs and reports.
 
 Contradictions MAY also be represented in page content.
 
-v1 does not require contradiction pages, but the compiler MUST be able to surface contradiction records.
+v2 does not require contradiction pages, but the compiler MUST be able to surface contradiction records.
 
 ### 14.1 Compiled contradiction shape
 
@@ -1830,7 +1955,7 @@ Semantic contradiction detection operates on structured fields only. It does not
 
 Timelines represent dated events and temporal changes tied to pages in the wiki. They exist to support chronology, historical tracking, date-based retrieval, and temporal conflict detection.
 
-Timeline data does not require a top-level `timelines/` folder in v1. It is represented through page-level `timeline:` records, synthesis pages with `synthesisType: timeline`, and compiled timeline cache output.
+Timeline data does not require a top-level `timelines/` folder in v2. It is represented through page-level `timeline:` records, synthesis pages with `synthesisType: timeline`, and compiled timeline cache output.
 ### 15.1 Structure
 
 Timeline entries MUST be represented under a `timeline:` field.
@@ -1913,7 +2038,7 @@ _system/cache/timeline-events.json
 
 This cache is used for chronological queries, filtering, timeline reports, and temporal conflict detection.
 
-A v1 validator SHOULD check:
+A v2 validator SHOULD check:
 - every timeline entry has an `id`
 - every timeline entry has a valid `date`
 - every timeline entry has `text`
@@ -1981,11 +2106,11 @@ Documentation layers:
 - `WIKI.md` — compact runtime schema, editorial guide, page type summary, ID formats, status enums, and examples for ordinary vault operations.
 - `INBOX.md` — raw inbox workflow and raw-to-source lifecycle.
 - `ONBOARD.md` — first-run setup and local environment configuration workflow.
-- `AGENT-WIKI-SPEC-v1.md` — full project and development contract for maintainers, system changes, script behavior, validation rules, compatibility rules, and unresolved ambiguity.
+- `AGENT-WIKI-SPEC-v2.md` — full project and development contract for maintainers, system changes, script behavior, validation rules, compatibility rules, and unresolved ambiguity.
 
-Skills and ordinary vault operations SHOULD prefer `WIKI.md` for schema, allowed enums, ID formats, and examples. They SHOULD consult `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, updating scripts, updating skills, modifying configuration policy, resolving ambiguity, or when `WIKI.md` does not contain enough detail.
+Skills and ordinary wiki operations SHOULD prefer `WIKI.md` for schema, allowed enums, ID formats, and examples. They SHOULD consult `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, updating scripts, updating skills, modifying configuration policy, resolving ambiguity, or when `WIKI.md` does not contain enough detail.
 
-If `WIKI.md` conflicts with `AGENT-WIKI-SPEC-v1.md`, the full specification remains canonical until the conflict is resolved.
+If `WIKI.md` conflicts with `AGENT-WIKI-SPEC-v2.md`, the full specification remains canonical until the conflict is resolved.
 
 ---
 
@@ -2006,7 +2131,7 @@ It MUST:
 - emit stable cache files
 - generate reports
 
-### 18.2 Minimum v1 compile outputs
+### 18.2 Minimum v2 compile outputs
 
 The following files MUST be emitted under `_system/cache/`:
 
@@ -2131,7 +2256,7 @@ Examples:
 - path-to-id index
 - id-to-path index
 
-These indexes are implementation details and not normative v1 authored data.
+These indexes are implementation details and not normative v2 authored data.
 
 ---
 
@@ -2230,7 +2355,7 @@ A page or claim MAY be considered stale when:
 - or linked source retrieval dates are old
 - or evidence is old relative to domain expectations
 
-v1 does not prescribe one universal stale threshold because domains vary.
+v2 does not prescribe one universal stale threshold because domains vary.
 
 #### 22.4 Contradictions
 
@@ -2261,7 +2386,7 @@ Compile SHOULD distinguish between recent edits and recent underlying evidence.
 
 ## 24. Validation Rules
 
-A v1 validator SHOULD check the following.
+A v2 validator SHOULD check the following.
 
 ### 24.1 Required validation
 - every page has a valid `pageType`
@@ -2419,7 +2544,7 @@ We need to identify which sensors require calibration before they are used for s
 
 ## 29. Compatibility Notes
 
-v1 implementations MAY add fields beyond this spec, provided they do not break:
+v2 implementations MAY add fields beyond this spec, provided they do not break:
 
 - required fields
 - required enum values

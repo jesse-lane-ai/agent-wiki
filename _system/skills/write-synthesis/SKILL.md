@@ -7,11 +7,11 @@ description: "Create or refresh durable synthesis pages. Use this skill when the
 
 This skill creates or refreshes `synthesis` pages in `syntheses/`. It owns judgment and prose for cross-source interpretation. It does not own the vault schema or deterministic file scaffolding.
 
-Runtime synthesis schema lives in `WIKI.md` Section 4.1. Page type rules live in `WIKI.md` Section 3. Status enums live in `WIKI.md` Section 5. Evidence rules live in `WIKI.md` Section 7. Synthesis workflow rules live in `AGENT-WIKI-SPEC-v1.md` Section 10.5. The vault behavior contract lives in `AGENTS.md`.
+Runtime synthesis schema lives in `WIKI.md` Section 4.1. Page type rules live in `WIKI.md` Section 3. Status enums live in `WIKI.md` Section 5. Evidence rules live in `WIKI.md` Section 7. Synthesis workflow rules live in `AGENT-WIKI-SPEC-v2.md` Section 10.5. The vault behavior contract lives in `AGENTS.md`.
 
-Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 3, 4.1, 5, or 7 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
+Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 3, 4.1, 5, or 7 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v2.md`, follow `AGENT-WIKI-SPEC-v2.md`.
 
-Use Obsidian wikilinks for references inside this vault. For cross-vault Obsidian references, use standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v1.md` Section 8.6. Do not launch `obsidian://` URIs; resolve them only through local `_system/config.json` `knownVaults`, and treat unconfigured vaults as opaque external references.
+Use Obsidian wikilinks for references inside this vault. For cross-vault Obsidian references, use standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v2.md` Section 8.6. Do not launch `obsidian://` URIs; resolve them only through local `_system/config.json` `knownVaults`, and treat unconfigured vaults as opaque external references.
 
 ## When to Use
 
@@ -35,7 +35,7 @@ Before writing or refreshing a synthesis, read:
 
 1. `AGENTS.md` for behavior rules.
 2. `WIKI.md` Sections 3, 4.1, 5, and 7 for page types, runtime schema, status values, and evidence rules.
-3. `AGENT-WIKI-SPEC-v1.md` Section 10.5 for synthesis workflow rules.
+3. `AGENT-WIKI-SPEC-v2.md` Section 10.5 for synthesis workflow rules.
 
 ## Step 2: Compile or Inspect Current Cache
 
@@ -140,7 +140,7 @@ Report a concise summary:
 
 ## Checklist
 
-- [ ] Read `AGENTS.md`, `WIKI.md` Sections 3, 4.1, 5, and 7, and `AGENT-WIKI-SPEC-v1.md` Section 10.5
+- [ ] Read `AGENTS.md`, `WIKI.md` Sections 3, 4.1, 5, and 7, and `AGENT-WIKI-SPEC-v2.md` Section 10.5
 - [ ] Identify the synthesis scope, audience, and `synthesisType`
 - [ ] Select canonical source pages, source parts, claims, and related pages
 - [ ] Check for an existing synthesis before creating a new one

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Agentics Wiki v1 Compile Pipeline
+Agent Wiki v2 Compile Pipeline
 ==================================
 Reads the vault, extracts structured data, and emits machine-facing cache artifacts.
 
@@ -49,7 +49,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 SKIP_DIRS = {".obsidian", "_system", "_archive", "_inbox", "_attachments", "raw", "reports"}
-SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "ONBOARD.md", "AGENT-WIKI-SPEC-v1.md"}
+SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "ONBOARD.md", "AGENT-WIKI-SPEC-v2.md"}
 CACHE_DIR = "_system/cache"
 INDEX_DIR = "_system/indexes"
 LOG_DIR = "_system/logs"
@@ -558,7 +558,7 @@ def summarize_validation_issues(issues: list[dict]) -> dict[str, int]:
 
 
 def validate_evidence_record(evidence: Any, claim_id: str, owner_path: str, issues: list[dict], index: int) -> None:
-    """Validate one evidence entry against required v1 fields."""
+    """Validate one evidence entry against required v2 fields."""
     if not isinstance(evidence, dict):
         add_validation_issue(
             issues,
@@ -588,7 +588,7 @@ def validate_evidence_record(evidence: Any, claim_id: str, owner_path: str, issu
 
 
 def validate_claim_record(record: dict, owner_id: str, owner_path: str, issues: list[dict]) -> None:
-    """Validate a standalone or embedded claim record against v1 fields."""
+    """Validate a standalone or embedded claim record against v2 fields."""
     claim_id = str(record.get("id", "")).strip()
     validate_required_fields(
         record,
@@ -617,7 +617,7 @@ def validate_claim_record(record: dict, owner_id: str, owner_path: str, issues: 
             issues,
             "deprecated_claim_status_field",
             owner_path,
-            "Use `status` for claims; `claimStatus` is no longer part of the v1 schema.",
+            "Use `status` for claims; `claimStatus` is no longer part of the v2 schema.",
             ownerId=owner_id,
             claimId=claim_id,
         )
@@ -648,7 +648,7 @@ def normalize_page_record(record: dict, issues: list[dict]) -> dict:
 
 
 def validate_page_record(record: dict, issues: list[dict]) -> None:
-    """Validate page metadata and folder ownership against the v1 spec."""
+    """Validate page metadata and folder ownership against the v2 spec."""
     page_id = record.get("id", "")
     path = record.get("path", "")
     meta = record.get("meta", {})
@@ -765,7 +765,7 @@ def validate_page_record(record: dict, issues: list[dict]) -> None:
             validate_array_field(meta.get("relatedPages"), "invalid_question_array", path, issues, "relatedPages", page_id)
 
 def validate_relation_record(record: Any, owner_id: str, owner_path: str, issues: list[dict], index: int) -> None:
-    """Validate one relation entry against v1 fields."""
+    """Validate one relation entry against v2 fields."""
     if not isinstance(record, dict):
         add_validation_issue(
             issues,
@@ -787,7 +787,7 @@ def validate_relation_record(record: Any, owner_id: str, owner_path: str, issues
 
 
 def validate_timeline_record(record: Any, owner_id: str, owner_path: str, issues: list[dict], index: int) -> None:
-    """Validate one timeline entry against v1 fields."""
+    """Validate one timeline entry against v2 fields."""
     if not isinstance(record, dict):
         add_validation_issue(
             issues,
@@ -1467,7 +1467,7 @@ def build_agent_digest(pages: list[dict], claims: list[dict], relations: list[di
 
     return {
         "compiledAt": compiled_at,
-        "specVersion": "v1",
+        "specVersion": "v2",
         "vaultStats": {
             "totalPages": len(pages),
             "totalClaims": len(claims),
@@ -1705,7 +1705,7 @@ def generate_evidence_gaps_report(health: dict, compiled_at: str) -> str:
 # ---------------------------------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Agentics Wiki v1 Compile Pipeline")
+    parser = argparse.ArgumentParser(description="Agent Wiki v2 Compile Pipeline")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
     args = parser.parse_args()
 
@@ -1713,7 +1713,7 @@ def main():
     compiled_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     compiled_date = datetime.now().strftime("%Y-%m-%d")
 
-    print(f"Agentics Wiki v1 Compile Pipeline")
+    print(f"Agent Wiki v2 Compile Pipeline")
     print(f"Wiki root: {vault_root}")
     print(f"Compiled at: {compiled_at}")
     print()

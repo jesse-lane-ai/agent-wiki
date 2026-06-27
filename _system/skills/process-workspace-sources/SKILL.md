@@ -13,7 +13,7 @@ Before touching anything, read:
 
 1. `AGENTS.md`
 2. `WIKI.md` Sections 4.1, 5, 12, and 13
-3. `AGENT-WIKI-SPEC-v1.md` only when changing behavior or resolving ambiguity
+3. `AGENT-WIKI-SPEC-v2.md` only when changing behavior or resolving ambiguity
 
 Key rules:
 

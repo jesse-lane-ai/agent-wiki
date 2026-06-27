@@ -23,8 +23,8 @@ Key rules for this workflow:
 - Use `WIKI.md` Sections 5 and 12 for status values and source types.
 - Use `WIKI.md` Section 13 for large-source parent and part handling.
 - Use `_system/scripts/create-page.py` to write canonical source pages and source part pages.
-- Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
-  Use `AGENT-WIKI-SPEC-v1.md` Section 6.6 only when you need the page scaffolding contract or `create-page.py` option semantics.
+- Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
+  Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `create-page.py` option semantics.
 
 If local Python or converter availability is unknown, run the read-only onboarding probe before processing binary or non-markdown files:
 
@@ -52,7 +52,7 @@ This checkout is the only wiki root. Process `_inbox/`, write `sources/`, and mo
 
 Do not create a virtual environment, install packages, write `_system/config.json`, or create unrelated setup folders unless the user explicitly asks for that setup work. Creating the target source directories and `raw/` as part of an approved inbox promotion is allowed. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
 
-If an inbox item contains an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v1.md` Section 8.6. Do not launch the URI. Resolve it only through `_system/config.json` `knownVaults`, and otherwise preserve it as an opaque external reference.
+If an inbox item contains an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v2.md` Section 8.6. Do not launch the URI. Resolve it only through `_system/config.json` `knownVaults`, and otherwise preserve it as an opaque external reference.
 
 ## Step 2: Check the Inbox
 

@@ -22,7 +22,7 @@ Before editing wiki content:
 
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
-3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
+3. Read [[AGENT-WIKI-SPEC-v2]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run `agent-wiki doctor` for the target wiki root.
 5. Run `_system/scripts/onboard.py --check` only if local Python/converter/import-link setup is relevant.
 6. Configure local `_system/config.json` only through approved setup choices.
@@ -233,7 +233,7 @@ Source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]
 
 ---
 
-## Recommended v1 Implementation Sequence
+## Recommended v2 Implementation Sequence
 
 1. Create wiki lifecycle commands
 2. Add universal frontmatter handling
@@ -252,9 +252,9 @@ Source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]
 
 ---
 
-## Out of Scope for v1
+## Out of Scope for v2
 
-The following are out of scope for strict v1 compliance:
+The following are out of scope for strict v2 compliance:
 
 - automatic ontology learning from prose
 - autonomous contradiction resolution
@@ -268,7 +268,7 @@ The following are out of scope for strict v1 compliance:
 
 ## Philosophy
 
-The v1 model has four layers:
+The v2 model has four layers:
 
 - The wiki is the container: markdown pages, folders, human notes, and generated artifacts.
 - The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, and syntheses.

@@ -131,7 +131,7 @@ For daily vault work, start a new agent session, then:
 
 ```text
 Read AGENTS.md, and WIKI.md sections 4.1, 5, 6, 7, 8, 12, and 13 before ordinary vault work.
-Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtime detail.
+Use AGENT-WIKI-SPEC-v2.md only for project changes, ambiguity, or missing runtime detail.
 ```
 
 These can all be scheduled as tasks for an agent.
@@ -176,7 +176,7 @@ agent-wiki workspace mark-sourced \
 - [ONBOARD.md](ONBOARD.md) — first-run setup, onboarding probe, local configuration, and import-link setup.
 - [AGENTS.md](AGENTS.md) — the agent behavior contract.
 - [WIKI.md](WIKI.md) — page types, schemas, status enums, runtime examples, linking rules, and vault rules.
-- [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) — full project contract for changing behavior, scripts, skills, configuration, or validation.
+- [AGENT-WIKI-SPEC-v2.md](AGENT-WIKI-SPEC-v2.md) — full project contract for changing behavior, scripts, skills, configuration, or validation.
 
 ## How Agent Wiki differs from other LLM wiki projects
 
@@ -299,7 +299,7 @@ You will likely customize:
 - maintenance schedules
 - ontology and relationship vocabularies
 
-Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary vault work. Keep [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
+Use [WIKI.md section 4.1](WIKI.md#41-common-runtime-schemas) for ordinary wiki work. Keep [AGENT-WIKI-SPEC-v2.md](AGENT-WIKI-SPEC-v2.md) as the source of truth when changing schema, script, skill, configuration, or validation behavior.
 
 ## Updating an Existing Agent Wiki
 
@@ -337,7 +337,7 @@ Changes to this project should move from contract to implementation in a consist
 
 When adding a feature or changing project behavior:
 
-1. Update [AGENT-WIKI-SPEC-v1.md](AGENT-WIKI-SPEC-v1.md) first.
+1. Update [AGENT-WIKI-SPEC-v2.md](AGENT-WIKI-SPEC-v2.md) first.
 2. Update configuration files or configuration templates when the change affects operator policy, defaults, or local setup.
 3. Update deterministic scripts.
 4. Update skill instructions and skill-local support files.

@@ -7,12 +7,12 @@ description: "Extract knowledge primitives (entities, concepts, claims, question
 
 This skill defines the extraction workflow. It does not own the vault schema or synthesis prose workflow.
 
-Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums live in `WIKI.md` Sections 5 and 6. Evidence rules live in `WIKI.md` Section 7. Relationship predicates live in `WIKI.md` Section 8. Entity and concept type enums live in `WIKI.md` Section 12.1. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v1.md`.
+Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums live in `WIKI.md` Sections 5 and 6. Evidence rules live in `WIKI.md` Section 7. Relationship predicates live in `WIKI.md` Section 8. Entity and concept type enums live in `WIKI.md` Section 12.1. The vault behavior contract lives in `AGENTS.md`. The full project/development contract lives in `AGENT-WIKI-SPEC-v2.md`.
 
-Use `AGENT-WIKI-SPEC-v1.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v1.md`, follow `AGENT-WIKI-SPEC-v1.md`.
+Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v2.md`, follow `AGENT-WIKI-SPEC-v2.md`.
 
-Authored body requirements for newly created `entity`, `concept`, `claim`, `question`, and `synthesis` pages live in `AGENT-WIKI-SPEC-v1.md` Section 7.10.
-Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v1.md` Section 6.6. Use `_system/scripts/create-page.py` when creating new primitive page files.
+Authored body requirements for newly created `entity`, `concept`, `claim`, `question`, and `synthesis` pages live in `AGENT-WIKI-SPEC-v2.md` Section 7.10.
+Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v2.md` Section 6.10. Use `_system/scripts/create-page.py` when creating new primitive page files.
 
 ## Core Principles
 
@@ -21,7 +21,7 @@ Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v1.md` Section 6.6. Use
 - Do not invent certainty. New source-extracted claims start `status: unverified` with `confidence: 0.60` unless the canonical spec says otherwise.
 - Keep claims atomic. One proposition per claim.
 - Treat evidence honestly. An excerpt can show that a source made a statement without proving the statement true.
-- Use Obsidian wikilinks for internal vault references. Cross-vault Obsidian references are the exception: write them as standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v1.md` Section 8.6.
+- Use Obsidian wikilinks for internal vault references. Cross-vault Obsidian references are the exception: write them as standard markdown links with `obsidian://` URIs per `AGENT-WIKI-SPEC-v2.md` Section 8.6.
 
 ## Step 1: Read the Contract and Runtime Reference
 
@@ -30,7 +30,7 @@ Before extracting anything, read:
 1. `AGENTS.md` for behavior rules.
 2. `WIKI.md` Sections 4.1, 5, 6, 7, 8, and 12.1 for runtime schema, field requirements, ID formats, enums, and common examples.
 
-Read `AGENT-WIKI-SPEC-v1.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 are insufficient.
+Read `AGENT-WIKI-SPEC-v2.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 are insufficient.
 
 Do not copy schemas from this skill when creating pages. Use `WIKI.md` Section 4.1 as the routine source of truth for ordinary vault schemas.
 Use `_system/scripts/create-page.py` for new page files so IDs, filenames, required frontmatter, and body requirements stay deterministic.
@@ -347,4 +347,4 @@ Created or updated:
 
 ## Schema Authority
 
-This skill owns extraction workflow guidance only. Runtime page schemas, ID formats, and common examples live in `WIKI.md` Section 4.1. Allowed enum values live in `WIKI.md` Sections 5, 6, 7, 8, 12, and 12.1. Use `AGENT-WIKI-SPEC-v1.md` only for project changes, ambiguity, or missing detail.
+This skill owns extraction workflow guidance only. Runtime page schemas, ID formats, and common examples live in `WIKI.md` Section 4.1. Allowed enum values live in `WIKI.md` Sections 5, 6, 7, 8, 12, and 12.1. Use `AGENT-WIKI-SPEC-v2.md` only for project changes, ambiguity, or missing detail.
