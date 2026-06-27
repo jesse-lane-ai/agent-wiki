@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Onboarding probe and local config writer for the Agentics vault.
+Onboarding probe and local config writer for Agent Wiki.
 
 Usage:
     python3 _system/scripts/onboard.py --check
@@ -24,6 +24,7 @@ SYSTEM_CONFIG = Path("_system/config.json")
 SYSTEM_CONFIG_EXAMPLE = Path("_system/config.example.json")
 IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
 CREATE_PAGE_SCRIPT = Path("_system/scripts/create-page.py")
+VALID_WIKI_TYPES = {"vault", "workspace"}
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
 CLI_CONVERTERS = ["markitdown", "marker", "arxiv2md"]
 PYTHON_PACKAGES = ["pymupdf4llm", "markitdown", "marker"]
@@ -34,7 +35,7 @@ SAFETY_FLAGS = {
     "allow_transcription": "allowTranscription",
     "allow_hosted_document_intelligence": "allowHostedDocumentIntelligence",
 }
-REQUIRED_FOLDERS = [
+BASE_REQUIRED_FOLDERS = [
     "sources",
     "sources/parts",
     "entities",
@@ -43,9 +44,6 @@ REQUIRED_FOLDERS = [
     "syntheses",
     "questions",
     "reports",
-    "_inbox",
-    "_inbox/trash",
-    "raw",
     "_attachments",
     "_archive",
     "_system/cache",
@@ -53,6 +51,11 @@ REQUIRED_FOLDERS = [
     "_system/logs",
     "_system/scripts",
     "_system/skills",
+]
+VAULT_REQUIRED_FOLDERS = [
+    "_inbox",
+    "_inbox/trash",
+    "raw",
 ]
 
 
@@ -225,6 +228,7 @@ def probe_config(wiki_root: Path) -> dict[str, Any]:
     example_data = read_json(example_path) if example_path.exists() else None
     known_vaults = data.get("knownVaults") if isinstance(data, dict) else None
     known_vault_names = sorted(known_vaults) if isinstance(known_vaults, dict) else []
+    wiki_type = detect_wiki_type(data)
     return {
         "path": str(SYSTEM_CONFIG),
         "exists": config_path.exists(),
@@ -233,6 +237,7 @@ def probe_config(wiki_root: Path) -> dict[str, Any]:
         "exampleExists": example_path.exists(),
         "exampleReadable": example_data is not None if example_path.exists() else False,
         "schemaVersion": data.get("schemaVersion") if data else None,
+        "wikiType": wiki_type,
         "pythonCommand": data.get("pythonCommand") if data else None,
         "knownVaultCount": len(known_vault_names),
         "knownVaultNames": known_vault_names,
@@ -240,6 +245,19 @@ def probe_config(wiki_root: Path) -> dict[str, Any]:
         "defaultBackend": data.get("conversion", {}).get("defaultBackend") if data else None,
         "backendOrder": data.get("conversion", {}).get("backendOrder") if data else None,
     }
+
+
+def detect_wiki_type(config: dict[str, Any] | None) -> str:
+    if config and config.get("wikiType") in VALID_WIKI_TYPES:
+        return str(config["wikiType"])
+    return "vault"
+
+
+def required_folders_for_wiki_type(wiki_type: str) -> list[str]:
+    folders = list(BASE_REQUIRED_FOLDERS)
+    if wiki_type == "vault":
+        folders.extend(VAULT_REQUIRED_FOLDERS)
+    return folders
 
 
 def probe_import_link_config(wiki_root: Path) -> dict[str, Any]:
@@ -255,13 +273,13 @@ def probe_import_link_config(wiki_root: Path) -> dict[str, Any]:
     }
 
 
-def probe_folders(wiki_root: Path) -> dict[str, dict[str, Any]]:
+def probe_folders(wiki_root: Path, wiki_type: str) -> dict[str, dict[str, Any]]:
     return {
         folder: {
             "exists": (wiki_root / folder).is_dir(),
             "path": folder,
         }
-        for folder in REQUIRED_FOLDERS
+        for folder in required_folders_for_wiki_type(wiki_type)
     }
 
 
@@ -275,9 +293,12 @@ def probe_scripts(wiki_root: Path) -> dict[str, dict[str, Any]]:
 
 
 def build_report(wiki_root: Path) -> dict[str, Any]:
+    config = probe_config(wiki_root)
+    wiki_type = config["wikiType"]
     return {
         "schemaVersion": 1,
         "wikiRoot": str(wiki_root),
+        "wikiType": wiki_type,
         "mode": "check",
         "mutating": False,
         "platform": probe_platform(),
@@ -288,9 +309,9 @@ def build_report(wiki_root: Path) -> dict[str, Any]:
             "exists": (wiki_root / ".venv").is_dir(),
             "pythonExists": (wiki_root / ".venv/bin/python").exists(),
         },
-        "config": probe_config(wiki_root),
+        "config": config,
         "importLink": probe_import_link_config(wiki_root),
-        "folders": probe_folders(wiki_root),
+        "folders": probe_folders(wiki_root, wiki_type),
         "scripts": probe_scripts(wiki_root),
         "conversion": {
             "cli": {command: probe_cli(command) for command in CLI_CONVERTERS},
@@ -333,6 +354,7 @@ def missing_folder_names(report: dict[str, Any]) -> list[str]:
 
 def build_setup_questions(report: dict[str, Any]) -> str:
     missing_folders = missing_folder_names(report)
+    wiki_type = report.get("wikiType", "vault")
     python_commands = available_python_commands(report)
     preferred_python = preferred_python_command(report)
     has_config = bool(report["config"].get("exists"))
@@ -353,8 +375,8 @@ def build_setup_questions(report: dict[str, Any]) -> str:
     else:
         folder_summary = "all present"
     lines.extend([
-        f"1. Folders ({folder_summary})",
-        "   A. Create missing folders now. Recommended when you want the wiki ready for imports and compile runs.",
+        f"1. Folders ({wiki_type} mode, {folder_summary})",
+        "   A. Run agent-wiki init for this wiki type. Recommended when you want the wiki ready for source capture and compile runs.",
         "   B. Leave them for workflows to create later. Use this for a minimal checkout.",
         "   C. Skip folder setup for now.",
         "",
