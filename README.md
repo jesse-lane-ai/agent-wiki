@@ -89,6 +89,12 @@ Initialize a workspace wiki inside a larger project:
 agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
 ```
 
+Add `--with-template` when the initialized wiki should be runnable by a fresh agent immediately. It copies missing bundled docs, `_system/scripts/`, and root-level `skills/` into the wiki without overwriting existing files:
+
+```bash
+agent-wiki init --type vault --root /path/to/wiki --write-config --with-template
+```
+
 Check wiki health without changing files:
 
 ```bash

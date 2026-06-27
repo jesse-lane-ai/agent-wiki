@@ -490,6 +490,8 @@ agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir 
 
 When `--write-config` is supplied, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config.
 
+When `--with-template` is supplied, `init` SHOULD copy missing bundled root documentation, `_system/scripts/`, root-level `skills/`, and `_system/config.example.json` into the wiki. It MUST NOT overwrite existing files. This mode is intended for fresh agent-runnable wikis, while plain `init` remains a folder/config skeleton initializer.
+
 The lifecycle CLI SHOULD provide a read-only health check:
 
 ```bash

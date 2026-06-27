@@ -41,6 +41,31 @@ class LifecycleTests(unittest.TestCase):
             self.assertEqual(config["wikiType"], "workspace")
             self.assertEqual(config["workspace"]["wikiDir"], "wiki")
 
+    def test_init_with_template_copies_docs_scripts_and_skills(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "vault"
+
+            result = init_wiki(wiki_type="vault", root=root, write_config=True, with_template=True)
+
+            self.assertTrue(result.template_copied)
+            self.assertTrue((root / "AGENTS.md").is_file())
+            self.assertTrue((root / "WIKI.md").is_file())
+            self.assertTrue((root / "_system" / "scripts" / "create-page.py").is_file())
+            self.assertTrue((root / "skills" / "process-inbox" / "SKILL.md").is_file())
+            issues = doctor_wiki(wiki_root=root, wiki_type="vault")
+            self.assertFalse(any(issue.level in {"error", "warning"} for issue in issues))
+
+    def test_init_with_template_does_not_overwrite_existing_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "vault"
+            root.mkdir()
+            existing = root / "AGENTS.md"
+            existing.write_text("custom\n", encoding="utf-8")
+
+            init_wiki(wiki_type="vault", root=root, with_template=True)
+
+            self.assertEqual(existing.read_text(encoding="utf-8"), "custom\n")
+
     def test_doctor_reports_missing_template_files_as_warnings(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "vault"

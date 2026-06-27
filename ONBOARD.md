@@ -18,6 +18,8 @@ python3 -m agent_wiki.cli doctor --wiki-root /path/to/project/wiki --type worksp
 
 `agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. Use `_system/scripts/onboard.py --check` only after that, when you need a lower-level environment probe for Python, converter commands/packages, import-link config, or setup questions.
 
+Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, scripts, and skills needed for a fresh agent to operate it immediately.
+
 Before editing wiki content:
 
 1. Read [[AGENTS]] for the agent behavior contract.

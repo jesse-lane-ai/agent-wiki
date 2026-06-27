@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -44,6 +45,21 @@ REQUIRED_TEMPLATE_FILES: tuple[str, ...] = (
     "skills/compile-wiki/SKILL.md",
     "skills/extract-knowledge-primitives/SKILL.md",
 )
+TEMPLATE_ROOT_FILES: tuple[str, ...] = (
+    "AGENTS.md",
+    "WIKI.md",
+    "README.md",
+    "ONBOARD.md",
+    "INBOX.md",
+    "AGENT-WIKI-SPEC-v2.md",
+)
+TEMPLATE_DIRECTORIES: tuple[str, ...] = (
+    "_system/scripts",
+    "skills",
+)
+TEMPLATE_OPTIONAL_FILES: tuple[str, ...] = (
+    "_system/config.example.json",
+)
 
 
 @dataclass(frozen=True)
@@ -53,6 +69,7 @@ class InitResult:
     wiki_root: str
     created: tuple[str, ...]
     config_written: bool
+    template_copied: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -94,6 +111,8 @@ def init_wiki(
     workspace_root: Path | str | None = None,
     wiki_dir: str = DEFAULT_WORKSPACE_WIKI_DIR,
     write_config: bool = False,
+    with_template: bool = False,
+    template_root: Path | str | None = None,
 ) -> InitResult:
     workspace, wiki_root = resolve_init_paths(
         wiki_type=wiki_type,
@@ -106,12 +125,17 @@ def init_wiki(
     if write_config:
         write_local_config(wiki_root, wiki_type=wiki_type, workspace_root=workspace, wiki_dir=wiki_dir)
         config_written = True
+    template_copied: tuple[str, ...] = ()
+    if with_template:
+        source_root = Path(template_root) if template_root is not None else default_template_root()
+        template_copied = tuple(str(path) for path in copy_template_files(source_root=source_root, wiki_root=wiki_root))
     return InitResult(
         wiki_type=wiki_type,
         workspace_root=str(workspace) if workspace else None,
         wiki_root=str(wiki_root),
         created=tuple(str(path) for path in created),
         config_written=config_written,
+        template_copied=template_copied,
     )
 
 
@@ -145,6 +169,51 @@ def write_local_config(
     workspace["wikiDir"] = wiki_dir.strip().strip("/") or DEFAULT_WORKSPACE_WIKI_DIR
     existing["workspace"] = workspace
     config_path.write_text(json.dumps(existing, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def default_template_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def copy_template_files(*, source_root: Path, wiki_root: Path) -> list[Path]:
+    copied: list[Path] = []
+    for name in TEMPLATE_ROOT_FILES + TEMPLATE_OPTIONAL_FILES:
+        source = source_root / name
+        if source.is_file():
+            destination = wiki_root / name
+            if copy_file_if_missing(source, destination):
+                copied.append(destination)
+    for name in TEMPLATE_DIRECTORIES:
+        source = source_root / name
+        if source.is_dir():
+            copied.extend(copy_tree_if_missing(source, wiki_root / name))
+    return copied
+
+
+def copy_tree_if_missing(source: Path, destination: Path) -> list[Path]:
+    copied: list[Path] = []
+    for source_path in sorted(source.rglob("*")):
+        if source_path.is_dir():
+            continue
+        relative = source_path.relative_to(source)
+        destination_path = destination / relative
+        if should_skip_template_file(relative):
+            continue
+        if copy_file_if_missing(source_path, destination_path):
+            copied.append(destination_path)
+    return copied
+
+
+def should_skip_template_file(relative: Path) -> bool:
+    return "__pycache__" in relative.parts or relative.suffix == ".pyc"
+
+
+def copy_file_if_missing(source: Path, destination: Path) -> bool:
+    if destination.exists():
+        return False
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+    return True
 
 
 def doctor_wiki(*, wiki_root: Path | str, wiki_type: str | None = None) -> list[DoctorIssue]:

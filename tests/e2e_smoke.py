@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -13,14 +12,6 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_ROOT_FILES = (
-    "AGENTS.md",
-    "WIKI.md",
-    "README.md",
-    "ONBOARD.md",
-    "INBOX.md",
-    "AGENT-WIKI-SPEC-v2.md",
-)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -32,7 +23,18 @@ def main(argv: list[str] | None = None) -> int:
     workspace_root = run_root / "workspace"
     workspace_wiki = workspace_root / "wiki"
 
-    run([sys.executable, "-m", "agent_wiki.cli", "init", "--type", "vault", "--root", str(vault_root), "--write-config"])
+    run([
+        sys.executable,
+        "-m",
+        "agent_wiki.cli",
+        "init",
+        "--type",
+        "vault",
+        "--root",
+        str(vault_root),
+        "--write-config",
+        "--with-template",
+    ])
     run([
         sys.executable,
         "-m",
@@ -45,10 +47,8 @@ def main(argv: list[str] | None = None) -> int:
         "--wiki-dir",
         "wiki",
         "--write-config",
+        "--with-template",
     ])
-
-    install_template_files(vault_root)
-    install_template_files(workspace_wiki)
 
     vault_sources = process_vault_sources(vault_root, [Path(path) for path in args.vault_raw])
     workspace_sources = process_workspace_sources(
@@ -141,13 +141,6 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     if not args.workspace_file:
         parser.error("provide at least one --workspace-file")
     return args
-
-
-def install_template_files(wiki_root: Path) -> None:
-    for file_name in TEMPLATE_ROOT_FILES:
-        shutil.copy2(REPO_ROOT / file_name, wiki_root / file_name)
-    shutil.copytree(REPO_ROOT / "_system" / "scripts", wiki_root / "_system" / "scripts", dirs_exist_ok=True)
-    shutil.copytree(REPO_ROOT / "skills", wiki_root / "skills", dirs_exist_ok=True)
 
 
 def process_vault_sources(vault_root: Path, raw_files: list[Path]) -> list[dict[str, Any]]:

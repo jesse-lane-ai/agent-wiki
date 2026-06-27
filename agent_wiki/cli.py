@@ -40,6 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("--workspace-root", help="Workspace root for workspace mode.")
     init.add_argument("--wiki-dir", default="wiki", help="Wiki directory inside workspace roots.")
     init.add_argument("--write-config", action="store_true", help="Write local _system/config.json.")
+    init.add_argument("--with-template", action="store_true", help="Copy bundled docs, scripts, and skills into the wiki if missing.")
     init.set_defaults(func=cmd_init)
 
     doctor = subparsers.add_parser("doctor", help="Check wiki folder/config health without mutating files.")
@@ -78,6 +79,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         workspace_root=args.workspace_root,
         wiki_dir=args.wiki_dir,
         write_config=args.write_config,
+        with_template=args.with_template,
     )
     print(f"Initialized {result.wiki_type} wiki at {result.wiki_root}")
     if result.workspace_root:
@@ -85,6 +87,8 @@ def cmd_init(args: argparse.Namespace) -> int:
     print(f"Created folders: {len(result.created)}")
     if result.config_written:
         print("Wrote _system/config.json")
+    if result.template_copied:
+        print(f"Copied template files: {len(result.template_copied)}")
     return 0
 
 
