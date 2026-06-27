@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .config import load_config
+from .lifecycle import doctor_wiki, init_wiki, issues_to_json, issues_to_text
 from .workspace import (
     WorkspaceFile,
     default_workspace_root,
@@ -33,6 +34,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", default=".", help="Agent Wiki root or config root.")
     subparsers = parser.add_subparsers(dest="command")
 
+    init = subparsers.add_parser("init", help="Initialize a vault or workspace wiki folder skeleton.")
+    init.add_argument("--type", choices=("vault", "workspace"), required=True, help="Wiki operating mode.")
+    init.add_argument("--root", dest="init_root", help="Vault wiki root, or workspace root if --type workspace.")
+    init.add_argument("--workspace-root", help="Workspace root for workspace mode.")
+    init.add_argument("--wiki-dir", default="wiki", help="Wiki directory inside workspace roots.")
+    init.add_argument("--write-config", action="store_true", help="Write local _system/config.json.")
+    init.set_defaults(func=cmd_init)
+
+    doctor = subparsers.add_parser("doctor", help="Check wiki folder/config health without mutating files.")
+    doctor.add_argument("--wiki-root", help="Wiki root to inspect. Defaults to --root.")
+    doctor.add_argument("--type", choices=("vault", "workspace"), help="Expected wiki operating mode.")
+    doctor.add_argument("--json", action="store_true", help="Emit JSON issues.")
+    doctor.set_defaults(func=cmd_doctor)
+
     workspace = subparsers.add_parser("workspace", help="Workspace-mode discovery commands.")
     workspace_sub = workspace.add_subparsers(dest="workspace_command")
 
@@ -54,6 +69,30 @@ def build_parser() -> argparse.ArgumentParser:
     mark.set_defaults(func=cmd_workspace_mark_sourced)
 
     return parser
+
+
+def cmd_init(args: argparse.Namespace) -> int:
+    result = init_wiki(
+        wiki_type=args.type,
+        root=args.init_root or args.root,
+        workspace_root=args.workspace_root,
+        wiki_dir=args.wiki_dir,
+        write_config=args.write_config,
+    )
+    print(f"Initialized {result.wiki_type} wiki at {result.wiki_root}")
+    if result.workspace_root:
+        print(f"Workspace root: {result.workspace_root}")
+    print(f"Created folders: {len(result.created)}")
+    if result.config_written:
+        print("Wrote _system/config.json")
+    return 0
+
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    wiki_root = Path(args.wiki_root or args.root)
+    issues = doctor_wiki(wiki_root=wiki_root, wiki_type=args.type)
+    print(issues_to_json(issues) if args.json else issues_to_text(issues))
+    return 1 if any(issue.level == "error" for issue in issues) else 0
 
 
 def add_workspace_args(parser: argparse.ArgumentParser) -> None:

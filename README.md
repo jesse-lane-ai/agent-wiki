@@ -77,6 +77,24 @@ Install the local CLI during development:
 python3 -m pip install -e .
 ```
 
+Initialize a vault-style wiki folder:
+
+```bash
+agent-wiki init --type vault --root /path/to/wiki --write-config
+```
+
+Initialize a workspace wiki inside a larger project:
+
+```bash
+agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
+```
+
+Check wiki health without changing files:
+
+```bash
+agent-wiki doctor --wiki-root /path/to/wiki
+```
+
 Ingest text or markdown from `_inbox/` in a new agent session:
 
 ```text
