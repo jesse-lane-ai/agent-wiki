@@ -33,7 +33,7 @@ GENERATED_FOLDERS: tuple[str, ...] = (
 )
 SYSTEM_FOLDERS: tuple[str, ...] = (
     "_system/scripts",
-    "_system/skills",
+    "skills",
 )
 REQUIRED_TEMPLATE_FILES: tuple[str, ...] = (
     "AGENTS.md",
@@ -41,8 +41,8 @@ REQUIRED_TEMPLATE_FILES: tuple[str, ...] = (
     "README.md",
     "_system/scripts/create-page.py",
     "_system/scripts/onboard.py",
-    "_system/skills/compile-wiki/SKILL.md",
-    "_system/skills/extract-knowledge-primitives/SKILL.md",
+    "skills/compile-wiki/SKILL.md",
+    "skills/extract-knowledge-primitives/SKILL.md",
 )
 
 

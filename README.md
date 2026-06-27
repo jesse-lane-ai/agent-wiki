@@ -98,7 +98,7 @@ agent-wiki doctor --wiki-root /path/to/wiki
 Ingest text or markdown from `_inbox/` in a new agent session:
 
 ```text
-Read AGENTS.md, then run the local process-inbox skill from _system/skills/
+Read AGENTS.md, then run the local process-inbox skill from skills/
 ```
 
 *Text and markdown ingest works out of the box.*
@@ -106,25 +106,25 @@ Read AGENTS.md, then run the local process-inbox skill from _system/skills/
 Then run the `extract-knowledge-primitives` skill to extract claims, evidence, relations, questions, and contradictions. From a new agent session:
 
 ```text
-Read AGENTS.md and run the local extract-knowledge-primitives skill from _system/skills/
+Read AGENTS.md and run the local extract-knowledge-primitives skill from skills/
 ```
 
 Then compile the wiki:
 
 ```text
-Read AGENTS.md and run the local compile-wiki skill from _system/skills/
+Read AGENTS.md and run the local compile-wiki skill from skills/
 ```
 
 Write a durable synthesis when you need cross-source interpretation, a brief, a comparison, or a timeline narrative:
 
 ```text
-Read AGENTS.md and run the local write-synthesis skill from _system/skills/
+Read AGENTS.md and run the local write-synthesis skill from skills/
 ```
 
 Generate the overview landing page:
 
 ```text
-Read AGENTS.md and run the local update-overview skill from _system/skills/
+Read AGENTS.md and run the local update-overview skill from skills/
 ```
 
 For daily vault work, start a new agent session, then:
@@ -159,7 +159,7 @@ agent-wiki workspace pending --workspace-root /path/to/workspace --json
 
 The pending command reports files that are new or changed relative to local state. It returns path, modified time, size, extension, sha256, recommended source type, and any known source-page mapping. The command does not read files semantically, create pages, or modify source files.
 
-Agents should use `_system/skills/process-workspace-sources/SKILL.md` to review that worklist and create canonical source pages inside `wiki/sources/` with `originPath` pointing back to the workspace-relative source path. After source pages exist, the existing extraction and compile workflows apply unchanged.
+Agents should use `skills/process-workspace-sources/SKILL.md` to review that worklist and create canonical source pages inside `wiki/sources/` with `originPath` pointing back to the workspace-relative source path. After source pages exist, the existing extraction and compile workflows apply unchanged.
 
 After an agent creates a source page for a workspace file, it can record the local mapping:
 
@@ -246,7 +246,7 @@ Agent Wiki is built around a few strict rules:
 The compiler has no third-party Python dependencies. Run it with the system Python:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 It reads vault pages and emits generated artifacts such as:
@@ -265,10 +265,10 @@ These outputs are generated artifacts. Do not hand-edit them, and do not treat r
 
 ## Skills
 
-Skills live under `_system/skills/`:
+Skills live under `skills/`:
 
 - `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
-- `import-link` imports external links and captures into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
+- `import-link` imports external links and captures into canonical `source` pages after local configuration in `skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
 - `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `_system/scripts/create-page.py` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
 - `process-workspace-sources` promotes selected files discovered outside a workspace wiki into canonical `source` pages without modifying or moving the original workspace files.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `_system/scripts/create-page.py` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
@@ -281,8 +281,8 @@ The page scaffolder covers required frontmatter for `source`, `entity`, `concept
 
 This repo does not ship a scheduler, daemon, or task runner. For recurring maintenance, run an external scheduler that launches agents with narrow tasks:
 
-- inbox processing via `_system/skills/process-inbox/`
-- compile/regeneration via `_system/skills/compile-wiki/`
+- inbox processing via `skills/process-inbox/`
+- compile/regeneration via `skills/compile-wiki/`
 - extraction, synthesis, or cleanup via the relevant skill
 
 Re-run compile after meaningful vault changes so `index.md`, caches, indexes, logs, and reports stay current.
@@ -326,7 +326,7 @@ After updating, run the onboarding probe and compile pipeline:
 
 ```bash
 python3 _system/scripts/onboard.py --check
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 If the release notes mention a migration script, run its dry-run mode first and review the planned changes before applying it.

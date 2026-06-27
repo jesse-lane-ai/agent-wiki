@@ -17,6 +17,8 @@ class LifecycleTests(unittest.TestCase):
 
             self.assertEqual(result.wiki_type, "vault")
             self.assertTrue((root / "sources" / "parts").is_dir())
+            self.assertTrue((root / "skills").is_dir())
+            self.assertFalse((root / "_system" / "skills").exists())
             self.assertTrue((root / "_inbox" / "trash").is_dir())
             self.assertTrue((root / "raw").is_dir())
             config = json.loads((root / "_system" / "config.json").read_text(encoding="utf-8"))
@@ -31,6 +33,8 @@ class LifecycleTests(unittest.TestCase):
             wiki = workspace / "wiki"
             self.assertEqual(result.workspace_root, str(workspace.resolve()))
             self.assertTrue((wiki / "sources" / "parts").is_dir())
+            self.assertTrue((wiki / "skills").is_dir())
+            self.assertFalse((wiki / "_system" / "skills").exists())
             self.assertFalse((wiki / "_inbox").exists())
             self.assertFalse((wiki / "raw").exists())
             config = json.loads((wiki / "_system" / "config.json").read_text(encoding="utf-8"))

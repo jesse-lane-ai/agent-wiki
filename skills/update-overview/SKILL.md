@@ -34,7 +34,7 @@ Read `AGENT-WIKI-SPEC-v2.md` only when changing the project itself, resolving am
 Run compile before writing the overview so cache inputs are current:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 If compile reports validation issues, fix or report those issues before relying on generated cache data for the overview.

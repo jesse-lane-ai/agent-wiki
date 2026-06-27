@@ -35,6 +35,8 @@ class OnboardProbeTests(unittest.TestCase):
             self.assertIn("_inbox", report["folders"])
             self.assertIn("_inbox/trash", report["folders"])
             self.assertIn("raw", report["folders"])
+            self.assertIn("skills", report["folders"])
+            self.assertNotIn("_system/skills", report["folders"])
 
     def test_check_uses_workspace_folder_expectations_from_config(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -54,6 +56,8 @@ class OnboardProbeTests(unittest.TestCase):
             self.assertNotIn("_inbox", report["folders"])
             self.assertNotIn("_inbox/trash", report["folders"])
             self.assertNotIn("raw", report["folders"])
+            self.assertIn("skills", report["folders"])
+            self.assertNotIn("_system/skills", report["folders"])
 
     def test_questions_include_detected_workspace_mode(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

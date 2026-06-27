@@ -61,6 +61,7 @@ Current vault structure:
   syntheses/
   questions/
   reports/
+  skills/
 
   _inbox/
   raw/
@@ -72,7 +73,6 @@ Current vault structure:
     indexes/
     logs/
     scripts/
-    skills/
 ```
 
 Fresh template checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders as needed.
@@ -87,6 +87,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `syntheses/` | Maintained cross-source interpretations: overviews, analyses, comparisons, briefs, timelines |
 | `questions/` | Unresolved uncertainties and research gaps |
 | `reports/` | Generated maintenance views and dashboards |
+| `skills/` | Agent skill definitions and supporting skill files |
 | `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
 | `_system/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
@@ -532,7 +533,7 @@ The compile pipeline reads the vault, emits machine-readable caches to `_system/
 Run with:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 Required outputs:

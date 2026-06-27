@@ -26,7 +26,7 @@ Before editing wiki content:
 4. Run `agent-wiki doctor` for the target wiki root.
 5. Run `_system/scripts/onboard.py --check` only if local Python/converter/import-link setup is relevant.
 6. Configure local `_system/config.json` only through approved setup choices.
-7. Configure `_system/skills/import-link/config.json` before importing external material.
+7. Configure `skills/import-link/config.json` before importing external material.
 8. Run the compile pipeline and confirm it reports zero validation issues.
 9. Optionally run the `write-synthesis` skill when the wiki needs a durable cross-source brief, comparison, analysis, summary, or timeline narrative.
 10. Optionally run the `update-overview` skill when the wiki needs a human-facing root `overview.md` landing page.
@@ -115,7 +115,7 @@ Use whichever command resolves to Python 3.8 or newer. If neither command is ava
 Compile from the wiki root:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 ---
@@ -186,7 +186,7 @@ Agents must not create `.venv/` or install packages unless the user explicitly a
 
 The `import-link` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
 
-Edit `_system/skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
+Edit `skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
 
 Required first-run edits:
 

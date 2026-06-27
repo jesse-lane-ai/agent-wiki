@@ -42,7 +42,7 @@ Before writing or refreshing a synthesis, read:
 If the synthesis depends on current vault inventory, run compile first:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 If the user asks for a narrow synthesis over explicitly named files and the needed pages are already known, compile is optional. Do not rely on reports or logs as primary truth.

@@ -210,7 +210,7 @@ The compile pipeline reads the vault and emits:
 To run the compile pipeline:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 The compile pipeline MUST be run after meaningful vault changes to keep `index.md` and caches fresh. The compile pipeline writes one operational log entry to `_system/logs/log.md`.

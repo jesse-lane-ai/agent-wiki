@@ -207,6 +207,7 @@ A vault-mode wiki SHOULD use the following top-level structure when initialized.
   syntheses/
   questions/
   reports/
+  skills/
 
   _inbox/
   raw/
@@ -219,7 +220,6 @@ A vault-mode wiki SHOULD use the following top-level structure when initialized.
     indexes/
     logs/
     scripts/
-    skills/
 ```
 
 Fresh template repositories MAY omit empty runtime/content directories. Initialization tooling and workflows SHOULD create missing directories when they are needed.
@@ -247,6 +247,7 @@ A workspace-mode wiki is stored inside a larger workspace. The default wiki dire
     syntheses/
     questions/
     reports/
+    skills/
 
     _attachments/
     _archive/
@@ -259,7 +260,6 @@ A workspace-mode wiki is stored inside a larger workspace. The default wiki dire
       logs/
       state/
       scripts/
-      skills/
 ```
 
 Workspace mode MUST NOT require `_inbox/`, `_inbox/trash/`, or `raw/` inside the wiki root. Those folders MAY exist if an operator explicitly wants an inbox workflow inside a workspace wiki, but their absence MUST NOT make the workspace wiki non-compliant.
@@ -336,6 +336,9 @@ Stores open question pages.
 #### `reports/`
 Stores generated dashboard pages and maintenance views.
 
+#### `skills/`
+Stores agent skill definitions at the wiki root so the wiki follows common portable skill conventions. Skills are human-authored operational instructions and supporting files, not authored knowledge pages.
+
 #### `_inbox/`
 Vault mode only. Stores raw files waiting to be promoted into canonical source pages. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
@@ -349,7 +352,7 @@ Stores binary assets and attachments referenced by source pages or other pages (
 Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
 
 #### `_system/`
-Stores machine-generated runtime and compile artifacts, utility scripts, and the `skills/` directory for agent skill definitions.
+Stores machine-generated runtime and compile artifacts plus deterministic utility scripts.
 
 Sub-directories:
 - `cache/` — compiled artifact outputs (do not hand-edit)
@@ -357,12 +360,11 @@ Sub-directories:
 - `logs/` — compile run logs (do not hand-edit)
 - `state/` — local runtime state for deterministic workflows, including workspace source discovery (do not hand-edit)
 - `scripts/` — deterministic utility scripts for operational logging, generated catalog pages, onboarding checks, and page scaffolding
-- `skills/` — agent skill definitions; human-authored and NOT treated as vault content by the compile pipeline
 
 Files:
 - `config.example.json` — tracked example for optional local system configuration
 
-The compile pipeline reads from the vault and writes to `cache/`, `indexes/`, and `logs/`. Utility scripts in `scripts/` MAY update deterministic generated catalog pages or scaffold new authored pages when explicitly invoked. The `skills/` directory is not a compile output and is not scanned for page frontmatter.
+The compile pipeline reads from the wiki and writes to `_system/cache/`, `_system/indexes/`, and `_system/logs/`. Utility scripts in `_system/scripts/` MAY update deterministic generated catalog pages or scaffold new authored pages when explicitly invoked. The root `skills/` directory is not a compile output and is not scanned for page frontmatter.
 
 `_system/config.json`, when present, is local operational configuration, not canonical vault knowledge. It SHOULD be ignored by version control and SHOULD NOT be committed to shared template repositories. `_system/config.example.json` SHOULD be tracked when the project wants to document the supported shape of local configuration.
 
@@ -371,7 +373,7 @@ Local config SHOULD NOT contain secrets, API keys, access tokens, private creden
 Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
 
 ```text
-_system/skills/
+skills/
   compile-wiki/
     instructions.md
     scripts/
@@ -561,7 +563,7 @@ python3 _system/scripts/onboard.py --write-config --python-command python3 --con
 
 When `_system/config.example.json` exists, `--write-config` SHOULD start from the example shape and update only approved local policy fields. It SHOULD preserve unrelated existing config fields when updating an existing `_system/config.json`.
 
-`--write-config` MUST write operator policy and command preferences only. It MUST NOT write transient detection state such as whether a package or command is currently installed. It MUST NOT create `.venv/`, install packages, create folders, modify `_system/skills/import-link/config.json`, or run the compile pipeline.
+`--write-config` MUST write operator policy and command preferences only. It MUST NOT write transient detection state such as whether a package or command is currently installed. It MUST NOT create `.venv/`, install packages, create folders, modify `skills/import-link/config.json`, or run the compile pipeline.
 
 The config writer SHOULD require explicit flags for choices that materially change behavior, including:
 

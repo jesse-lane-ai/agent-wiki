@@ -22,7 +22,7 @@ from typing import Any
 
 SYSTEM_CONFIG = Path("_system/config.json")
 SYSTEM_CONFIG_EXAMPLE = Path("_system/config.example.json")
-IMPORT_LINK_CONFIG = Path("_system/skills/import-link/config.json")
+IMPORT_LINK_CONFIG = Path("skills/import-link/config.json")
 CREATE_PAGE_SCRIPT = Path("_system/scripts/create-page.py")
 VALID_WIKI_TYPES = {"vault", "workspace"}
 PYTHON_CANDIDATES = ["python3", "python", ".venv/bin/python"]
@@ -50,7 +50,7 @@ BASE_REQUIRED_FOLDERS = [
     "_system/indexes",
     "_system/logs",
     "_system/scripts",
-    "_system/skills",
+    "skills",
 ]
 VAULT_REQUIRED_FOLDERS = [
     "_inbox",

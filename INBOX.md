@@ -3,7 +3,7 @@
 The `_inbox/` folder is the active drop zone for raw files that still need to be promoted into canonical `source` pages.
 
 **Use the process-inbox skill to process the inbox.**
-`_system/skills/process-inbox/SKILL.md`
+`skills/process-inbox/SKILL.md`
 
 If inbox files are binary or non-markdown documents and local converter availability is unknown, run the read-only onboarding probe before processing:
 

@@ -6,16 +6,16 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 # Import Link
 
 ## Configuration
-- Before first use, read `ONBOARD.md` and `_system/skills/import-link/config.json`.
+- Before first use, read `ONBOARD.md` and `skills/import-link/config.json`.
 - If local setup is uncertain, run `python3 _system/scripts/onboard.py --check` and use the read-only probe output to guide setup questions.
 - For first-run setup, prefer `python3 _system/scripts/onboard.py --check --questions` so the user can answer with compact letter choices.
 - If the user approves persisting local Python or conversion policy, use `python3 _system/scripts/onboard.py --write-config` with the approved flags. The writer creates local `_system/config.json` from `_system/config.example.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, or external retrieval tool.
-- This checkout is the only wiki root. Write imports under this repository root using the relative directories in `_system/skills/import-link/config.json`.
-- If retrieval modes or attachment policy are unknown, stop and ask the user to configure `_system/skills/import-link/config.json`.
+- This checkout is the only wiki root. Write imports under this repository root using the relative directories in `skills/import-link/config.json`.
+- If retrieval modes or attachment policy are unknown, stop and ask the user to configure `skills/import-link/config.json`.
 - The default `manual_paste` retrieval mode requires no external tools. Other retrieval modes only apply when configured and available.
-- Do not create a virtual environment, install packages, write `_system/config.json`, or change `_system/skills/import-link/config.json` unless the user explicitly asks for setup changes. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
+- Do not create a virtual environment, install packages, write `_system/config.json`, or change `skills/import-link/config.json` unless the user explicitly asks for setup changes. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
 
 ## Wiki Root
 - Run this skill from the repository root.
@@ -50,7 +50,7 @@ Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status
 ## Deterministic Workflow
 1. **Deduplication Check:** Before capturing content, check existing source pages in `sources/` for a matching `originUrl`.
    - If a source with the matching URL already exists, stop and inform the user that it has already been imported or update the existing file if requested.
-2. Capture source content using the retrieval modes configured in `_system/skills/import-link/config.json`.
+2. Capture source content using the retrieval modes configured in `skills/import-link/config.json`.
    - If direct fetch is available, try it first.
    - If a transcript tool is configured and the source is a video, capture one English transcript when available and use it as the primary source body.
    - If browser automation is configured and direct retrieval is blocked or incomplete, use the configured browser automation.

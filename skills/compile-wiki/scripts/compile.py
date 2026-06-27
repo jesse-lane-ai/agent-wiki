@@ -5,7 +5,7 @@ Agent Wiki v2 Compile Pipeline
 Reads the vault, extracts structured data, and emits machine-facing cache artifacts.
 
 Usage:
-    python3 _system/skills/compile-wiki/scripts/compile.py [--verbose]
+    python3 skills/compile-wiki/scripts/compile.py [--verbose]
 
 Outputs (under _system/cache/):
     pages.json            - normalized page index
@@ -48,7 +48,7 @@ from typing import Any
 # Config
 # ---------------------------------------------------------------------------
 
-SKIP_DIRS = {".obsidian", "_system", "_archive", "_inbox", "_attachments", "raw", "reports"}
+SKIP_DIRS = {".obsidian", "_system", "skills", "_archive", "_inbox", "_attachments", "raw", "reports"}
 SKIP_FILES = {"AGENTS.md", "WIKI.md", "INBOX.md", "ONBOARD.md", "AGENT-WIKI-SPEC-v2.md"}
 CACHE_DIR = "_system/cache"
 INDEX_DIR = "_system/indexes"

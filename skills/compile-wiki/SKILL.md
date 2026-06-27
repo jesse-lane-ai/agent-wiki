@@ -29,13 +29,13 @@ The compile pipeline is **safe to run at any time**. It is fully regenerative. I
 From the wiki root:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+python3 skills/compile-wiki/scripts/compile.py
 ```
 
 With verbose output:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py --verbose
+python3 skills/compile-wiki/scripts/compile.py --verbose
 ```
 
 Run this command from the repository root. The compile pipeline does not accept an alternate vault or wiki root.
