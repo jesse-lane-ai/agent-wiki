@@ -93,6 +93,8 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
+Workspace-mode wikis use the same internal structure, but the wiki root is usually `workspace/wiki`. Source candidates live outside the wiki directory and are discovered by the CLI. They become canonical evidence only after an agent creates `source` pages inside `wiki/sources/`.
+
 `_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape. Optional `knownVaults` entries may map Obsidian vault names to absolute local paths so agents can resolve `obsidian://` cross-vault references for reading only.
 
 Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
@@ -659,6 +661,20 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 - Files in `raw/` are retained originals, not canonical source records.
 - Agents MUST NOT treat `_inbox/` or `raw/` items as authoritative source records.
 - Agents SHOULD process inbox items by converting them into proper `source` pages.
+
+### Workspace files are not canonical
+
+In workspace mode, files outside the wiki directory are discovery inputs. They may be project notes, docs, datasets, exports, or other artifacts worth promoting.
+
+Agents SHOULD use:
+
+```bash
+agent-wiki workspace pending --json
+```
+
+to get a deterministic worklist of new or changed files. The agent then decides which files deserve canonical source pages.
+
+Original workspace files MUST stay in place. A workspace source page SHOULD point back to the original file with `originPath`, using the workspace-relative path. The `process-workspace-sources` skill owns this workflow.
 
 ---
 

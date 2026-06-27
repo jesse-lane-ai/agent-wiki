@@ -104,6 +104,16 @@ When `_system/config.json` contains `knownVaults`, agents MAY use it only to res
 
 Agents MUST NOT create `.venv/`, install packages, write `_system/config.json`, or enable network/OCR/LLM/cloud conversion behavior unless explicitly instructed by the human operator.
 
+### 2.9 Respect workspace source files
+
+In workspace mode, the wiki lives inside a larger workspace, usually at `workspace/wiki`.
+
+Agents MAY use `agent-wiki workspace pending --json` to discover new or changed source candidates outside the wiki directory. Discovered workspace files are not canonical evidence until an agent creates a corresponding `source` page under the wiki's `sources/` directory.
+
+Agents MUST NOT move, rewrite, archive, delete, or otherwise modify original workspace files during workspace source processing unless the human operator explicitly asks for that separate workspace edit.
+
+Workspace source pages SHOULD record the original file using `originPath` with a workspace-relative path. Workspace mode does not use the `_inbox/` to `raw/` lifecycle unless the operator explicitly places files in `_inbox/`.
+
 ---
 
 ## 3. What agents may do

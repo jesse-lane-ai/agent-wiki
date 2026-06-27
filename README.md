@@ -4,6 +4,11 @@ An Obsidian-compatible knowledge vault that AI agents can safely maintain.
 
 Drop notes, PDFs, transcripts, links, or research into `_inbox/`. Agents promote them into source pages, extract claims and evidence, link entities and concepts, track open questions, flag contradictions, and compile the vault into machine-readable caches.
 
+Agent Wiki supports two operating modes:
+
+- **Vault wiki** — the current repository/vault structure. Raw files enter through `_inbox/`, agents promote them into `sources/`, and original raw files move to `raw/`.
+- **Workspace wiki** — the same wiki structure stored inside a larger workspace, defaulting to `workspace/wiki`. The CLI discovers new or changed non-code files outside `wiki/`; agents decide which files become canonical source pages. Original workspace files stay in place and are never modified by the wiki workflow.
+
 Most LLM wiki projects focus on generating and maintaining wiki pages.
 
 Agent Wiki focuses on evidence-aware structured knowledge:
@@ -66,6 +71,12 @@ Clone the repo and ask your agent:
 Read ONBOARD.md, then onboard me.
 ```
 
+Install the local CLI during development:
+
+```bash
+python3 -m pip install -e .
+```
+
 Ingest text or markdown from `_inbox/` in a new agent session:
 
 ```text
@@ -106,6 +117,41 @@ Use AGENT-WIKI-SPEC-v1.md only for project changes, ambiguity, or missing runtim
 ```
 
 These can all be scheduled as tasks for an agent.
+
+## Workspace Mode
+
+Workspace mode is for projects where the wiki lives inside a larger project or company folder:
+
+```text
+workspace/
+  docs/
+  research/
+  decisions/
+  wiki/
+    sources/
+    entities/
+    concepts/
+```
+
+Discover source candidates outside the wiki directory:
+
+```bash
+agent-wiki workspace pending --workspace-root /path/to/workspace --json
+```
+
+The pending command reports files that are new or changed relative to local state. It returns path, modified time, size, extension, sha256, recommended source type, and any known source-page mapping. The command does not read files semantically, create pages, or modify source files.
+
+Agents should use `_system/skills/process-workspace-sources/SKILL.md` to review that worklist and create canonical source pages inside `wiki/sources/` with `originPath` pointing back to the workspace-relative source path. After source pages exist, the existing extraction and compile workflows apply unchanged.
+
+After an agent creates a source page for a workspace file, it can record the local mapping:
+
+```bash
+agent-wiki workspace mark-sourced \
+  --workspace-root /path/to/workspace \
+  --path docs/customer-research.md \
+  --source-id source.2026-06-26.document.customer-research \
+  --source-path sources/2026-06-26-document-customer-research.md
+```
 
 ## Core documents
 
@@ -206,6 +252,7 @@ Skills live under `_system/skills/`:
 - `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
 - `import-link` imports external links and captures into canonical `source` pages after local configuration in `_system/skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
 - `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `_system/scripts/create-page.py` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
+- `process-workspace-sources` promotes selected files discovered outside a workspace wiki into canonical `source` pages without modifying or moving the original workspace files.
 - `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `_system/scripts/create-page.py` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
 - `write-synthesis` creates or refreshes durable synthesis pages for cross-source summaries, briefs, analyses, comparisons, and timeline narratives. It uses `_system/scripts/create-page.py` for new synthesis page files.
 - `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
