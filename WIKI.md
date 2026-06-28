@@ -30,7 +30,7 @@ It separates:
 |---|---|
 | [[AGENTS]] | Agent behavior contract: preservation, logging, linking, generated files, and editing boundaries |
 | [[WIKI#4.1 Common runtime schemas]] | Compact runtime schema and editorial reference for ordinary vault work |
-| [[INBOX]] | Raw inbox lifecycle |
+| [[INBOX]] | Short pointer to inbox rules and the `process-inbox` skill |
 | [[ONBOARD]] | First-run setup and local environment workflow |
 | [[AGENT-WIKI-SPEC-v2]] | Full project/development contract and detailed implementation reference |
 
@@ -520,7 +520,7 @@ Generated structured knowledge should live in frontmatter fields, claim/evidence
 
 Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
 
-`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI#1.1 Documentation layers]], [[INBOX]], or [[AGENTS]] instead.
+`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI#1.1 Documentation layers]], [[ONBOARD]], or [[AGENTS]] instead.
 
 `overview.md` is durable AI-maintained orientation prose. It should summarize the vault for a human reader, but it is not primary evidence and should not replace canonical source, claim, evidence, or page metadata records.
 
@@ -646,7 +646,7 @@ Extraction should run against source parts, not the parent source page. Evidence
 
 The `_inbox/` folder is the raw item intake queue. New unprocessed material should land here first.
 
-Raw inbox items are promoted into canonical `source` pages by the `process-inbox` skill. See [[INBOX]] for the full intake lifecycle.
+Raw inbox items are promoted into canonical `source` pages by the `process-inbox` skill. This section owns the durable lifecycle rules; the skill owns the exact operational commands.
 
 ### Intake lifecycle
 

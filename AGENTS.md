@@ -9,7 +9,7 @@ Version: v2Last updated: 2026-05-02
 
 This file is the authoritative description of how agents are expected to behave when reading, writing, or compiling this vault. It is not a style guide — it is a contract.
 
-Agents MUST read this file before making any edits to the vault. See also [[WIKI#4.1 Common runtime schemas]] for schema, [[WIKI#16 Editorial principles]] for editorial rules, and [[INBOX]] for the raw intake workflow.
+Agents MUST read this file before making any edits to the vault. See also [[WIKI#4.1 Common runtime schemas]] for schema, [[WIKI#14 Inbox intake strategy]] for raw intake rules, and [[WIKI#16 Editorial principles]] for editorial rules.
 
 For routine field-level schema details, use [[WIKI#4.1 Common runtime schemas]]. Use [[AGENT-WIKI-SPEC-v2]] when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient. This file only defines agent behavior.
 
@@ -73,7 +73,7 @@ Agents MUST NOT manually patch cache files, generated index files, generated log
 
 Agents MUST NOT read `_inbox/` or `raw/` files as primary data sources or treat them as evidence for claims.
 
-Agents SHOULD process inbox items by converting retained raw files into canonical `source` pages under `sources/`. See [[INBOX]] for the raw intake lifecycle rules.
+Agents SHOULD process inbox items by converting retained raw files into canonical `source` pages under `sources/`. See [[WIKI#14 Inbox intake strategy]] for lifecycle rules and `skills/process-inbox/SKILL.md` for the operational workflow.
 
 Large retained sources SHOULD be converted into a short parent source page under `sources/` and child source part pages under `sources/parts/`. Agents SHOULD extract knowledge primitives from source part pages, not from the parent source manifest.
 
@@ -303,7 +303,7 @@ This convention applies to:
 - page body content
 - `relatedPages` values in frontmatter (use wikilink strings)
 - skill instruction files
-- all root-level docs listed in WIKI.md Section 2, including AGENTS.md, the runtime guide itself, INBOX.md, CLAUDE.md, etc.
+- all root-level docs listed in WIKI.md Section 2, including AGENTS.md, the runtime guide itself, ONBOARD.md, INBOX.md, CLAUDE.md, etc.
 
 ---
 

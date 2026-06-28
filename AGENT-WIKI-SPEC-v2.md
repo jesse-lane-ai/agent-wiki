@@ -293,7 +293,7 @@ Typical contents:
 #### `index.md`
 SHOULD be the deterministic root-level page catalog.
 
-The file SHOULD be regenerated as a whole by `agent-wiki index` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
+The file SHOULD be regenerated as a whole by `agent-wiki index` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `ONBOARD.md`, or other root documentation for that.
 
 #### `overview.md`
 SHOULD be the human-facing landing page for the wiki.
@@ -303,7 +303,7 @@ The file SHOULD provide a long-form narrative overview of the wiki, including a 
 `overview.md` is not evidence, not a generated report, and not a replacement for compiled caches. Claims in `overview.md` SHOULD be treated as orientation unless they are represented in canonical pages, claims, evidence records, or source pages.
 
 #### `INBOX.md`
-MAY be used as an intake or triage surface for new notes, unresolved imports, and uncategorized material. In vault mode, it documents the `_inbox/` raw intake workflow for files that have not yet been promoted into canonical `source` pages. In workspace mode, it SHOULD clarify that source candidates normally remain outside the wiki root.
+SHOULD be a short navigation pointer to the durable inbox rules in `WIKI.md` and the operational `process-inbox` skill. It MUST NOT duplicate the full inbox workflow; `WIKI.md` owns lifecycle concepts and the skill owns exact commands.
 
 ### 6.3.1 Optional top-level files
 
@@ -857,7 +857,7 @@ The script SHOULD support:
 
 The generated page SHOULD include frontmatter and grouped page tables by `pageType`. It MAY include root documentation files as a separate documentation section when those files are intentionally outside the normal page catalog.
 
-Because the whole file is deterministic, agents and humans SHOULD NOT place durable manual prose in `index.md`. Durable orientation content belongs in root documentation files such as `README.md`, `WIKI.md`, `INBOX.md`, and `AGENTS.md`.
+Because the whole file is deterministic, agents and humans SHOULD NOT place durable manual prose in `index.md`. Durable orientation content belongs in root documentation files such as `README.md`, `WIKI.md`, `ONBOARD.md`, and `AGENTS.md`.
 
 ### 7.9 `overview.md`
 
@@ -2109,7 +2109,7 @@ Documentation layers:
 
 - `AGENTS.md` — agent behavior contract for editing, compiling, linking, logging, and preserving human content.
 - `WIKI.md` — compact runtime schema, editorial guide, page type summary, ID formats, status enums, and examples for ordinary vault operations.
-- `INBOX.md` — raw inbox workflow and raw-to-source lifecycle.
+- `INBOX.md` — short pointer to `WIKI.md` inbox rules and the `process-inbox` skill.
 - `ONBOARD.md` — first-run setup and local environment configuration workflow.
 - `AGENT-WIKI-SPEC-v2.md` — full project and development contract for maintainers, system changes, script behavior, validation rules, compatibility rules, and unresolved ambiguity.
 

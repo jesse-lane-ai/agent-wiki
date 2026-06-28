@@ -13,7 +13,7 @@ Before touching anything, read the vault's agent contract in this order:
 
 1. `AGENTS.md` - the behavioral contract.
 2. `WIKI.md` Sections 4.1, 5, 12, and 13 - the runtime source schema, status/source type enums, ID formats, examples, and large-source rules.
-3. `INBOX.md` - the raw inbox lifecycle.
+3. `WIKI.md` Section 14 - the durable raw inbox lifecycle.
 
 Key rules for this workflow:
 - Preserve raw content.
