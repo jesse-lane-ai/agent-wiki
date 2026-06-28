@@ -32,7 +32,7 @@ export function main(argv = process.argv.slice(2)): number {
     const command = global._[0];
     if (!command || global.help) {
       printHelp();
-      return command ? 0 : 2;
+      return global.help ? 0 : 2;
     }
     if (command === "init") return cmdInit(global);
     if (command === "doctor") return cmdDoctor(global);
@@ -99,7 +99,8 @@ function cmdWorkspace(args: Args): number {
     const config = loadConfig(stringOpt(args.root, "."));
     const workspaceRoot = defaultWorkspaceRoot(config, stringOpt(args["workspace-root"]));
     const wikiRoot = wikiRootForWorkspace(workspaceRoot, stringOpt(args["wiki-dir"], config.wikiDir));
-    markSourced(wikiRoot, loadState(wikiRoot), { relativePath: path, sourceId, sourcePath });
+    const state = markSourced(wikiRoot, loadState(wikiRoot), { relativePath: path, sourceId, sourcePath });
+    updateStateFromScan(wikiRoot, scanWorkspace(workspaceRoot, wikiRoot, config.workspaceScan, { state }), state);
     console.log(`Mapped ${path} -> ${sourceId}`);
     return 0;
   }

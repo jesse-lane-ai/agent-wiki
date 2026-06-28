@@ -5,6 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { WorkspaceScanConfig } from "../src/config.js";
 import { loadState, markSourced, scanWorkspace, updateStateFromScan } from "../src/workspace.js";
+import { main } from "../src/cli.js";
 
 const defaultScan: WorkspaceScanConfig = {
   includeExtensions: [".md", ".markdown", ".txt", ".pdf", ".docx", ".csv", ".json", ".yaml", ".yml"],
@@ -121,6 +122,40 @@ test("mark sourced records mapping", () => {
     assert.equal(stored.files["docs/research.md"].sourceId, "source.2026-06-26.document.research");
     assert.equal(stored.files["docs/research.md"].sourcePath, "sources/2026-06-26-document-research.md");
   } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("mark sourced CLI refreshes scan state so pending omits mapped unchanged files", () => {
+  const root = tempDir();
+  const originalArgv = process.argv;
+  const originalCwd = process.cwd();
+  try {
+    const wiki = join(root, "wiki");
+    mkdirSync(wiki, { recursive: true });
+    writeFileSync(join(root, "memo.md"), "memo", "utf8");
+    process.chdir(root);
+    const code = main([
+      "workspace",
+      "mark-sourced",
+      "--workspace-root",
+      root,
+      "--wiki-dir",
+      "wiki",
+      "--path",
+      "memo.md",
+      "--source-id",
+      "source.2026-06-28.document.memo",
+      "--source-path",
+      "sources/2026-06-28-document-memo.md"
+    ]);
+    assert.equal(code, 0);
+    const scan = scanWorkspace(root, wiki, defaultScan, { state: loadState(wiki) });
+    assert.equal(scan[0].alreadySourced, true);
+    assert.equal(scan[0].reason, "unchanged");
+  } finally {
+    process.chdir(originalCwd);
+    process.argv = originalArgv;
     rmSync(root, { recursive: true, force: true });
   }
 });

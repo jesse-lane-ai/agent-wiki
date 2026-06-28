@@ -19,6 +19,7 @@ test("packed npm tarball works through node_modules bin shim", () => {
     execFileSync("npm", ["install", tarball], { cwd: tmp, stdio: "ignore" });
     const bin = join(tmp, "node_modules/.bin/agent-wiki");
 
+    assert.match(execFileSync(bin, ["--help"], { cwd: tmp, encoding: "utf8" }), /Commands:/);
     const initOut = execFileSync(bin, ["init", "--type", "vault", "--root", "wiki", "--write-config", "--with-template"], { cwd: tmp, encoding: "utf8" });
     assert.match(initOut, /Initialized vault wiki/);
     assert.ok(existsSync(join(tmp, "wiki/package.json")));
