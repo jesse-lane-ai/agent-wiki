@@ -7,15 +7,15 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Configuration
 - Before first use, read `ONBOARD.md` and `skills/import-link/config.json`.
-- If local setup is uncertain, run `python3 _system/scripts/onboard.py --check` and use the read-only probe output to guide setup questions.
-- For first-run setup, prefer `python3 _system/scripts/onboard.py --check --questions` so the user can answer with compact letter choices.
-- If the user approves persisting local Python or conversion policy, use `python3 _system/scripts/onboard.py --write-config` with the approved flags. The writer creates local `_system/config.json` from `_system/config.example.json`.
+- If local setup is uncertain, run `agent-wiki onboard --check` and use the read-only probe output to guide setup questions.
+- For first-run setup, prefer `agent-wiki onboard --check --questions` so the user can answer with compact letter choices.
+- If the user approves persisting local Python or conversion policy, use `agent-wiki onboard --write-config` with the approved flags. The writer creates local `_system/config.json` from `_system/config.example.json`.
 - Confirm `configured` is `true` before importing.
 - Do not assume a default model, browser profile, or external retrieval tool.
 - This checkout is the only wiki root. Write imports under this repository root using the relative directories in `skills/import-link/config.json`.
 - If retrieval modes or attachment policy are unknown, stop and ask the user to configure `skills/import-link/config.json`.
 - The default `manual_paste` retrieval mode requires no external tools. Other retrieval modes only apply when configured and available.
-- Do not create a virtual environment, install packages, write `_system/config.json`, or change `skills/import-link/config.json` unless the user explicitly asks for setup changes. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
+- Do not create a virtual environment, install packages, write `_system/config.json`, or change `skills/import-link/config.json` unless the user explicitly asks for setup changes. Do not hand-edit `_system/config.json`; use `agent-wiki onboard --write-config` after approval.
 
 ## Wiki Root
 - Run this skill from the repository root.
@@ -27,7 +27,7 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 - If the incoming link is an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v2.md` Section 8.6: do not launch the URI; resolve it only through `_system/config.json` `knownVaults`, and treat it as an opaque external reference when the target vault is not configured.
 
 ## UUID Generation
-- Use `scripts/uuid.py` to generate a new UUID for each source attachment.
+- Use `agent-wiki uuid` to generate a new UUID for each source attachment.
 
 ## Source Slug
 - For any incoming URL or source, always generate a 4 word slug for the source note.
@@ -35,13 +35,13 @@ description: Import a URL, link-derived capture, transcript, or pasted source di
 
 ## Source Schema (required, strictly enforced)
 
-Create source files in `sources/` using `_system/scripts/create-page.py`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
+Create source files in `sources/` using `agent-wiki create-page`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
 
 Use `WIKI.md` Section 4.1 as the routine source of truth for page-type schemas, ID formats, and examples. Use `WIKI.md` Sections 5 and 12 for status and source type enums. This skill owns the import workflow, not the source frontmatter schema.
 
 Use `WIKI.md` Section 13 for large-source parent and part handling. Consult `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
 
-Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `create-page.py` option semantics.
+Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `agent-wiki create-page` option semantics.
 
 Newly imported ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -68,10 +68,10 @@ Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status
    - Target 8,000-15,000 words per source part.
    - Do not exceed 20,000 words per part unless preserving an indivisible structure requires it.
    - Avoid splitting inside tables, code blocks, quoted blocks, or list structures when possible.
-6. Save the prepared source body or source-part bodies to temporary Markdown files outside the vault, then call `_system/scripts/create-page.py` with `--no-log` for each canonical source page. The skill writes one batch log entry after the import succeeds.
+6. Save the prepared source body or source-part bodies to temporary Markdown files outside the vault, then call `agent-wiki create-page` with `--no-log` for each canonical source page. The skill writes one batch log entry after the import succeeds.
 7. For an ordinary source, call the scaffolder with:
    ```bash
-   python3 _system/scripts/create-page.py \
+   agent-wiki create-page \
      --type source \
      --subtype <sourceType> \
      --slug <sourceSlug> \
@@ -92,7 +92,7 @@ Large source parent pages MUST use `sourceRole: parent`. They SHOULD use `status
    - use `--no-log` on each scaffolder call and log the import once after all pages and attachments are written
 9. Write one operational log entry for the import:
    ```bash
-   python3 _system/scripts/log.py --message "import-link: imported source <sourceId> to sources/<filename>; attachments=<count>"
+   agent-wiki log --message "import-link: imported source <sourceId> to sources/<filename>; attachments=<count>"
    ```
    Log only after the source page and any attachments have been written successfully.
 10. Confirm in chat with:

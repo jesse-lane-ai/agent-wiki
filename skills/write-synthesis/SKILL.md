@@ -42,7 +42,7 @@ Before writing or refreshing a synthesis, read:
 If the synthesis depends on current vault inventory, run compile first:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 If the user asks for a narrow synthesis over explicitly named files and the needed pages are already known, compile is optional. Do not rely on reports or logs as primary truth.
@@ -92,7 +92,7 @@ If the synthesis surfaces a durable unresolved issue, create or update a questio
 For new synthesis pages, prepare the body prose in a temporary Markdown file outside the vault, then use the deterministic scaffolder:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type synthesis \
   --subtype brief \
   --slug <synthesis-slug> \
@@ -124,7 +124,7 @@ Do not regenerate a synthesis mechanically on every compile run.
 After successfully creating or refreshing one or more synthesis pages, write one operational log entry:
 
 ```bash
-python3 _system/scripts/log.py --message "write-synthesis: updated <count> syntheses; sources=<count> claims=<count>"
+agent-wiki log --message "write-synthesis: updated <count> syntheses; sources=<count> claims=<count>"
 ```
 
 Do not write a log entry when no synthesis page changed.
@@ -144,7 +144,7 @@ Report a concise summary:
 - [ ] Identify the synthesis scope, audience, and `synthesisType`
 - [ ] Select canonical source pages, source parts, claims, and related pages
 - [ ] Check for an existing synthesis before creating a new one
-- [ ] Use `_system/scripts/create-page.py --no-log` for new synthesis pages
+- [ ] Use `agent-wiki create-page --no-log` for new synthesis pages
 - [ ] Include required `--scope`
 - [ ] List source basis in `sourcePages` when sources are used
 - [ ] List tracked claim dependencies in `derivedClaims` when claims are used

@@ -98,9 +98,9 @@ Workspace-mode wikis use the same internal structure, but the wiki root is usual
 
 `_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape. Optional `knownVaults` entries may map Obsidian vault names to absolute local paths so agents can resolve `obsidian://` cross-vault references for reading only.
 
-Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
+Use `agent-wiki onboard --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `agent-wiki onboard --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `agent-wiki onboard --write-config` only after the user approves the exact local setup choices to persist.
 
-Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
+Use `agent-wiki create-page` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
 This project is scoped to one wiki per wiki root. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is usually `workspace/wiki`. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
 
@@ -383,7 +383,7 @@ New `entity`, `concept`, `claim`, `question`, and `synthesis` pages must include
 
 The body should be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It should not be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
 
-Agents should use `_system/scripts/create-page.py` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, synthesis judgment, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML. For synthesis pages, pass an explicit `--scope` and any known `--source-page` or `--derived-claim` values.
+Agents should use `agent-wiki create-page` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, synthesis judgment, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML. For synthesis pages, pass an explicit `--scope` and any known `--source-page` or `--derived-claim` values.
 
 Agents must preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
 
@@ -533,7 +533,7 @@ The compile pipeline reads the vault, emits machine-readable caches to `_system/
 Run with:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 Required outputs:
@@ -652,7 +652,7 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 
 1. Raw item arrives in `_inbox/`
 2. `process-inbox` reads the raw item
-3. If retained: `process-inbox` uses `_system/scripts/create-page.py` to write a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
+3. If retained: `process-inbox` uses `agent-wiki create-page` to write a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
 4. The original raw file moves to `raw/`
 5. If discarded: the raw file moves to `_inbox/trash/`
 

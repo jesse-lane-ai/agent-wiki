@@ -29,13 +29,13 @@ The compile pipeline is **safe to run at any time**. It is fully regenerative. I
 From the wiki root:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 With verbose output:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py --verbose
+agent-wiki compile --verbose
 ```
 
 Run this command from the repository root. The compile pipeline does not accept an alternate vault or wiki root.
@@ -72,15 +72,15 @@ Run this command from the repository root. The compile pipeline does not accept 
 The compile pipeline runs:
 
 ```bash
-python3 _system/scripts/index.py --write --no-log
+agent-wiki index --write --no-log
 ```
 
 This regenerates the full root `index.md` page catalog from `_system/cache/pages.json`.
 
-`index.py` also supports:
+`agent-wiki index` also supports:
 
 ```bash
-python3 _system/scripts/index.py --check
+agent-wiki index --check
 ```
 
 Use `--check` when you need to verify that `index.md` matches the compiled page metadata without rewriting it.
@@ -99,7 +99,7 @@ Use `--check` when you need to verify that `index.md` matches the compiled page 
 
 ### Logs (`_system/logs/`)
 
-The compile pipeline writes one operational log entry to `_system/logs/log.md` on each run through `_system/scripts/log.py`.
+The compile pipeline writes one operational log entry to `_system/logs/log.md` on each run through `agent-wiki log`.
 
 ---
 
@@ -115,7 +115,7 @@ When running compile:
 - validate large-source parent and source-part structure
 - detect duplicate IDs and malformed records
 - regenerate cache files, `_system/indexes/`, root `index.md`, and report artifacts
-- write a concise operational log entry through `_system/scripts/log.py`
+- write a concise operational log entry through `agent-wiki log`
 - report validation issues clearly
 
 If validation errors occur, fix the affected canonical page or structured frontmatter, then re-run this skill. Do not repair generated cache, index, report, or log files by hand.

@@ -34,7 +34,7 @@ Read `AGENT-WIKI-SPEC-v2.md` only when changing the project itself, resolving am
 Run compile before writing the overview so cache inputs are current:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 If compile reports validation issues, fix or report those issues before relying on generated cache data for the overview.
@@ -126,7 +126,7 @@ If the overview describes a substantive claim that should be tracked, create or 
 After successfully creating or refreshing `overview.md`, write one operational log entry:
 
 ```bash
-python3 _system/scripts/log.py --message "update-overview: refreshed root overview.md; pageTypes=<count> pages=<count>"
+agent-wiki log --message "update-overview: refreshed root overview.md; pageTypes=<count> pages=<count>"
 ```
 
 Do not write a log entry if no file was changed.

@@ -12,7 +12,7 @@ Runtime schema and common examples live in `WIKI.md` Section 4.1. Status enums l
 Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 do not contain enough detail. If this skill or those `WIKI.md` sections conflict with `AGENT-WIKI-SPEC-v2.md`, follow `AGENT-WIKI-SPEC-v2.md`.
 
 Authored body requirements for newly created `entity`, `concept`, `claim`, `question`, and `synthesis` pages live in `AGENT-WIKI-SPEC-v2.md` Section 7.10.
-Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v2.md` Section 6.10. Use `_system/scripts/create-page.py` when creating new primitive page files.
+Deterministic page scaffolding lives in `AGENT-WIKI-SPEC-v2.md` Section 6.10. Use `agent-wiki create-page` when creating new primitive page files.
 
 ## Core Principles
 
@@ -33,7 +33,7 @@ Before extracting anything, read:
 Read `AGENT-WIKI-SPEC-v2.md` only when changing the project itself, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 6, 7, 8, or 12.1 are insufficient.
 
 Do not copy schemas from this skill when creating pages. Use `WIKI.md` Section 4.1 as the routine source of truth for ordinary vault schemas.
-Use `_system/scripts/create-page.py` for new page files so IDs, filenames, required frontmatter, and body requirements stay deterministic.
+Use `agent-wiki create-page` for new page files so IDs, filenames, required frontmatter, and body requirements stay deterministic.
 Do not launch `obsidian://` URIs. Resolve them only through local `_system/config.json` `knownVaults`; if no mapping exists, treat the URI as an opaque external reference.
 
 ## Step 2: Find Source Pages Needing Extraction
@@ -182,7 +182,7 @@ Use predicates from `WIKI.md` Section 8. Relations are directional; record the d
 
 For each primitive, check for an existing page before creating a new one. Search the relevant folder and the compiled cache when available.
 
-Create new page files with `_system/scripts/create-page.py --no-log`. This skill writes one extraction batch log entry after all primitive creation and source metadata updates succeed.
+Create new page files with `agent-wiki create-page --no-log`. This skill writes one extraction batch log entry after all primitive creation and source metadata updates succeed.
 
 Create pages in the folder required by `AGENTS.md`:
 
@@ -200,7 +200,7 @@ Do not create `synthesis` pages as part of routine primitive extraction. If the 
 Prepare the body prose in a temporary Markdown file outside the vault, then call the scaffolder. Examples:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type entity \
   --subtype organization \
   --slug acme-corp \
@@ -211,7 +211,7 @@ python3 _system/scripts/create-page.py \
 ```
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type concept \
   --subtype workflow \
   --slug adaptive-reuse-review \
@@ -222,7 +222,7 @@ python3 _system/scripts/create-page.py \
 ```
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type claim \
   --subtype historical \
   --slug acme-founded-2010 \
@@ -236,7 +236,7 @@ python3 _system/scripts/create-page.py \
 ```
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type question \
   --subtype acquisition \
   --slug acme-founder-identity \
@@ -302,7 +302,7 @@ Do not modify the source body unless the user explicitly asks for prose changes.
 After successfully extracting primitives and updating source metadata, write one operational log entry for the batch:
 
 ```bash
-python3 _system/scripts/log.py --message "extract-knowledge-primitives: processed <sourceCount> sources; entities=<count> concepts=<count> claims=<count> questions=<count> relations=<count>"
+agent-wiki log --message "extract-knowledge-primitives: processed <sourceCount> sources; entities=<count> concepts=<count> claims=<count> questions=<count> relations=<count>"
 ```
 
 Do not write a log entry when no source pages were processed.
@@ -334,7 +334,7 @@ Created or updated:
 - [ ] Identify entities, concepts, claims, questions, and relations
 - [ ] Defer durable cross-source interpretation to the `write-synthesis` skill
 - [ ] Check for duplicates before creating pages
-- [ ] Use `_system/scripts/create-page.py --no-log` for newly created primitive page files
+- [ ] Use `agent-wiki create-page --no-log` for newly created primitive page files
 - [ ] Use runtime schemas and examples from `WIKI.md` Section 4.1
 - [ ] Write substantive Markdown body prose for every new entity, concept, claim, and question page
 - [ ] Mark source-extracted claims `unverified` with `confidence: 0.60`

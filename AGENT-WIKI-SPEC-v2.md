@@ -293,7 +293,7 @@ Typical contents:
 #### `index.md`
 SHOULD be the deterministic root-level page catalog.
 
-The file SHOULD be regenerated as a whole by `_system/scripts/index.py` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
+The file SHOULD be regenerated as a whole by `agent-wiki index` from compiled page metadata. It is not a place for durable human-authored prose; use `README.md`, `WIKI.md`, `INBOX.md`, or other root documentation for that.
 
 #### `overview.md`
 SHOULD be the human-facing landing page for the wiki.
@@ -352,19 +352,18 @@ Stores binary assets and attachments referenced by source pages or other pages (
 Stores deprecated or no-longer-maintained pages that have been removed from active content folders. Created on vault initialization; MAY be empty.
 
 #### `_system/`
-Stores machine-generated runtime and compile artifacts plus deterministic utility scripts.
+Stores machine-generated runtime and compile artifacts.
 
 Sub-directories:
 - `cache/` — compiled artifact outputs (do not hand-edit)
 - `indexes/` — generated index files (do not hand-edit)
 - `logs/` — compile run logs (do not hand-edit)
 - `state/` — local runtime state for deterministic workflows, including workspace source discovery (do not hand-edit)
-- `scripts/` — deterministic utility scripts for operational logging, generated catalog pages, onboarding checks, and page scaffolding
 
 Files:
 - `config.example.json` — tracked example for optional local system configuration
 
-The compile pipeline reads from the wiki and writes to `_system/cache/`, `_system/indexes/`, and `_system/logs/`. Utility scripts in `_system/scripts/` MAY update deterministic generated catalog pages or scaffold new authored pages when explicitly invoked. The root `skills/` directory is not a compile output and is not scanned for page frontmatter.
+The compile pipeline reads from the wiki and writes to `_system/cache/`, `_system/indexes/`, and `_system/logs/`. Utility commands exposed by `agent-wiki` MAY update deterministic generated catalog pages or scaffold new authored pages when explicitly invoked. The root `skills/` directory is not a compile output and is not scanned for page frontmatter.
 
 `_system/config.json`, when present, is local operational configuration, not canonical vault knowledge. It SHOULD be ignored by version control and SHOULD NOT be committed to shared template repositories. `_system/config.example.json` SHOULD be tracked when the project wants to document the supported shape of local configuration.
 
@@ -377,7 +376,7 @@ skills/
   compile-wiki/
     instructions.md
     scripts/
-      compile.py
+      agent-wiki compile
   process-inbox/
     instructions.md
 ```
@@ -468,10 +467,12 @@ If `.venv/` is used, it SHOULD be project-local and ignored by version control. 
 
 ### 6.6 Lifecycle CLI
 
-The system SHOULD provide an agent-independent lifecycle CLI. The command name MAY be installed as `agent-wiki`, and the Python module entry point SHOULD be invokable during development:
+The system SHOULD provide an agent-independent lifecycle CLI. The command name MAY be installed as `agent-wiki`, and the package SHOULD support Node/npm-based local development:
 
 ```bash
-python3 -m agent_wiki.cli
+npm install
+npm run build
+npm link
 ```
 
 The lifecycle CLI SHOULD support initializing a vault-mode wiki:
@@ -490,7 +491,7 @@ agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir 
 
 When `--write-config` is supplied, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config.
 
-When `--with-template` is supplied, `init` SHOULD copy missing bundled root documentation, `_system/scripts/`, root-level `skills/`, and `_system/config.example.json` into the wiki. It MUST NOT overwrite existing files. This mode is intended for fresh agent-runnable wikis, while plain `init` remains a folder/config skeleton initializer.
+When `--with-template` is supplied, `init` SHOULD copy missing bundled root documentation, root-level `skills/`, package metadata, and `_system/config.example.json` into the wiki. It MUST NOT overwrite existing files. This mode is intended for fresh agent-runnable wikis, while plain `init` remains a folder/config skeleton initializer.
 
 The lifecycle CLI SHOULD provide a read-only health check:
 
@@ -521,21 +522,21 @@ After an agent creates a canonical source page for a workspace file, `mark-sourc
 
 ### 6.8 Onboarding probe
 
-The system SHOULD provide a deterministic onboarding probe at `_system/scripts/onboard.py`.
+The system SHOULD provide a deterministic onboarding probe at `agent-wiki onboard`.
 
 The probe SHOULD support:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki onboard --check
 ```
 
 It MAY also support a read-only human question helper:
 
 ```bash
-python3 _system/scripts/onboard.py --check --questions
+agent-wiki onboard --check --questions
 ```
 
-`onboard.py --check` SHOULD inspect local environment capabilities and print a structured report. The report SHOULD be suitable for both human review and agent-guided setup.
+`agent-wiki onboard --check` SHOULD inspect local environment capabilities and print a structured report. The report SHOULD be suitable for both human review and agent-guided setup.
 
 The probe SHOULD check:
 
@@ -555,10 +556,10 @@ The probe MUST NOT install packages, create virtual environments, write `_system
 
 Onboarding decisions SHOULD remain operator-driven. Agents MAY use the probe output to ask the operator a short series of setup questions, then run lifecycle commands or write local config only after the operator has approved those actions.
 
-`onboard.py` MAY support an explicit mutating config writer:
+`agent-wiki onboard` MAY support an explicit mutating config writer:
 
 ```bash
-python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+agent-wiki onboard --write-config --python-command python3 --conversion disabled
 ```
 
 `--write-config` MAY create or update local `_system/config.json`. It MUST NOT be implied by `--check` or `--questions`. Agents MUST run it only after the operator has approved the specific local choices to persist.
@@ -627,7 +628,7 @@ Each step SHOULD be skipped when the change does not affect that surface. The sp
 
 ### 6.10 Deterministic page scaffolding
 
-The system SHOULD provide a deterministic page scaffolding utility at `_system/scripts/create-page.py`.
+The system SHOULD provide a deterministic page scaffolding utility at `agent-wiki create-page`.
 
 The page scaffolder exists to reduce schema drift when agents create new authored knowledge pages. It is an operational helper, not an authorship engine. It MUST NOT decide what a page means, invent claims, write interpretations, choose evidence, or synthesize source material on its own. The caller remains responsible for supplying the title, page type, subtype where applicable, body prose, source references, claim references, and other semantic fields.
 
@@ -647,7 +648,7 @@ For `source` pages, the scaffolder is only a deterministic source-page writer. I
 The scaffolder SHOULD provide a command-line interface shaped like:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type synthesis \
   --subtype analysis \
   --slug large-document-ingestion \
@@ -685,7 +686,7 @@ For each created page, the scaffolder MUST:
 
 The scaffolder SHOULD produce predictable, machine-readable console output for success and failure so skills can report results clearly. It SHOULD return a non-zero exit code when validation fails, when the target path already exists, or when the requested ID already exists elsewhere in the vault.
 
-Skills that use the scaffolder SHOULD still write one operational log entry after the meaningful skill run or change batch through `_system/scripts/log.py`. They SHOULD NOT rely on the scaffolder to log every individual page when multiple pages are created as part of one operation.
+Skills that use the scaffolder SHOULD still write one operational log entry after the meaningful skill run or change batch through `agent-wiki log`. They SHOULD NOT rely on the scaffolder to log every individual page when multiple pages are created as part of one operation.
 
 ---
 
@@ -741,7 +742,7 @@ The parent source page SHOULD use `status: partitioned` while one or more child 
 
 Raw inbox files MAY be converted to Markdown before source page creation. Conversion is an intake step that produces the text used for canonical `source` pages or source part pages.
 
-Plain text and Markdown inbox files SHOULD be treated as already prepared source body files. `process-inbox` SHOULD pass those files, or prepared source-part files derived from them, to `_system/scripts/create-page.py` with `--body-file` rather than copying the body into `--body`. This preserves formatting, avoids shell quoting failures, and lets the scaffolder validate canonical `source` pages from file-backed body content.
+Plain text and Markdown inbox files SHOULD be treated as already prepared source body files. `process-inbox` SHOULD pass those files, or prepared source-part files derived from them, to `agent-wiki create-page` with `--body-file` rather than copying the body into `--body`. This preserves formatting, avoids shell quoting failures, and lets the scaffolder validate canonical `source` pages from file-backed body content.
 
 In vault mode, original raw files SHOULD be retained in `raw/` after successful inbox promotion. Raw files in `_inbox/` or `raw/` are not canonical evidence. The converted source page or source part page is the canonical evidence surface.
 
@@ -847,7 +848,7 @@ It SHOULD have `pageType: index`. It MUST NOT be typed as `report`.
 
 The `index` page type is reserved for wiki-level navigation and page discovery. There is typically only one `index` page per wiki root.
 
-`index.md` SHOULD be regenerated as a whole by `_system/scripts/index.py` from `_system/cache/pages.json`. The script MUST NOT independently define page truth; it only renders a deterministic catalog from compiled page metadata.
+`index.md` SHOULD be regenerated as a whole by `agent-wiki index` from `_system/cache/pages.json`. The script MUST NOT independently define page truth; it only renders a deterministic catalog from compiled page metadata.
 
 The script SHOULD support:
 
@@ -904,8 +905,8 @@ Each page MUST have a stable `id`.
 - `id` SHOULD NOT depend on the page filename alone
 - `id` SHOULD use dotted lowercase namespace-style format
   - *Exception for Source Pages:* Source pages use the format `source.<yyyy-mm-dd>.<sourceType>.<sourceSlug>` to balance semantic density with chronological sorting and collision prevention.
-  - *Exception for attachments:* Attachment IDs are generated using `scripts/uuid.py` and stored in the frontmatter of the source page as the value of the `attachments` field. This allows for easy reference to attachments from the source page and ensures that attachments are properly linked to their sources.
-  - *Exception for evidence blocks:* Evidence block IDs are generated using `scripts/uuid.py` and stored in the frontmatter of the source page as the value of the `evidence` field. This allows for easy reference to evidence blocks from the source page and ensures that evidence blocks are properly linked to their sources.
+  - *Exception for attachments:* Attachment IDs are generated using `agent-wiki uuid` and stored in the frontmatter of the source page as the value of the `attachments` field. This allows for easy reference to attachments from the source page and ensures that attachments are properly linked to their sources.
+  - *Exception for evidence blocks:* Evidence block IDs are generated using `agent-wiki uuid` and stored in the frontmatter of the source page as the value of the `evidence` field. This allows for easy reference to evidence blocks from the source page and ensures that evidence blocks are properly linked to their sources.
 
 Examples:
 - `entity.place.riverside-community-garden`
@@ -958,11 +959,11 @@ derivedClaims: ["[[claim-descriptive-high-tide-risk|claim.descriptive.high-tide-
 originPath: "[[raw/2026-04-12-report|raw/2026-04-12-report.md]]"
 ```
 
-Writing the dotted ID directly as the target (`[[source.2026-04-12.webpage.tidal-flood-map]]`) does **not** resolve in Obsidian, because no file is named that. `create-page.py` wraps supported fields automatically; `migrate-refs-to-links.py` converts existing pages.
+Writing the dotted ID directly as the target (`[[source.2026-04-12.webpage.tidal-flood-map]]`) does **not** resolve in Obsidian, because no file is named that. `agent-wiki create-page` wraps supported fields automatically; `agent-wiki migrate-refs-to-links` converts existing pages.
 
 #### 8.4.2 Raw-ID fields (MUST NOT be wikilinked)
 
-The following frontmatter fields are resolved by **exact ID match** during compilation (`compile.py` builds an id→page map and looks these up). They MUST remain bare IDs — wrapping them in `[[ ]]` breaks resolution:
+The following frontmatter fields are resolved by **exact ID match** during compilation (`agent-wiki compile` builds an id→page map and looks these up). They MUST remain bare IDs — wrapping them in `[[ ]]` breaks resolution:
 
 - `id`, `parentSourceId`, `subjectPageId`, `sourceIds`, `sourceParts`
 - `evidence[].sourceId`, relation `sourceClaimIds`, timeline `sourceIds`
@@ -2322,12 +2323,12 @@ Trivial report/cache regeneration does not need a log entry unless it records a 
 
 ### 21.4 Log writer
 
-Operational log entries SHOULD be written through `_system/scripts/log.py`.
+Operational log entries SHOULD be written through `agent-wiki log`.
 
 The log writer MUST support:
 
 ```bash
-python3 _system/scripts/log.py --message "<message>"
+agent-wiki log --message "<message>"
 ```
 
 The log writer MUST prepend the new entry to `_system/logs/log.md`.
@@ -2443,7 +2444,7 @@ Agents MUST:
 - use stable IDs when generating claims or pages
 - update `updatedAt` when meaningfully changing structured content
 - avoid inventing unsupported certainty
-- update `_system/logs/log.md` through `_system/scripts/log.py` after each meaningful skill run or change batch
+- update `_system/logs/log.md` through `agent-wiki log` after each meaningful skill run or change batch
 
 Agents SHOULD:
 - create question pages for unresolved important unknowns

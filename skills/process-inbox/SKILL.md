@@ -22,20 +22,20 @@ Key rules for this workflow:
 - Use `WIKI.md` Section 4.1 for source page schema, examples, and conversion provenance fields.
 - Use `WIKI.md` Sections 5 and 12 for status values and source types.
 - Use `WIKI.md` Section 13 for large-source parent and part handling.
-- Use `_system/scripts/create-page.py` to write canonical source pages and source part pages.
+- Use `agent-wiki create-page` to write canonical source pages and source part pages.
 - Use `AGENT-WIKI-SPEC-v2.md` only when changing project behavior, resolving ambiguity, or when `WIKI.md` Sections 4.1, 5, 12, or 13 are insufficient.
-  Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `create-page.py` option semantics.
+  Use `AGENT-WIKI-SPEC-v2.md` Section 6.10 only when you need the page scaffolding contract or `agent-wiki create-page` option semantics.
 
 If local Python or converter availability is unknown, run the read-only onboarding probe before processing binary or non-markdown files:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki onboard --check
 ```
 
 For first-run setup decisions, prefer:
 
 ```bash
-python3 _system/scripts/onboard.py --check --questions
+agent-wiki onboard --check --questions
 ```
 
 Use the generated multiple-choice prompts so the user can answer with compact letter choices.
@@ -45,12 +45,12 @@ Use the probe output and `_system/config.json`, when present, to determine which
 If the user approves persisting local Python or conversion policy, write local config with explicit approved flags:
 
 ```bash
-python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+agent-wiki onboard --write-config --python-command python3 --conversion disabled
 ```
 
 This checkout is the only wiki root. Process `_inbox/`, write `sources/`, and move retained raw files to `raw/` relative to the repository root. Do not accept an alternate vault root or external destination for this workflow.
 
-Do not create a virtual environment, install packages, write `_system/config.json`, or create unrelated setup folders unless the user explicitly asks for that setup work. Creating the target source directories and `raw/` as part of an approved inbox promotion is allowed. Do not hand-edit `_system/config.json`; use `onboard.py --write-config` after approval.
+Do not create a virtual environment, install packages, write `_system/config.json`, or create unrelated setup folders unless the user explicitly asks for that setup work. Creating the target source directories and `raw/` as part of an approved inbox promotion is allowed. Do not hand-edit `_system/config.json`; use `agent-wiki onboard --write-config` after approval.
 
 If an inbox item contains an `obsidian://` URI, follow `AGENT-WIKI-SPEC-v2.md` Section 8.6. Do not launch the URI. Resolve it only through `_system/config.json` `knownVaults`, and otherwise preserve it as an opaque external reference.
 
@@ -68,7 +68,7 @@ For each raw file, work through files one at a time.
 
 Read the file fully. Preserve the original content exactly when writing the source body.
 
-If the raw file is plain text or Markdown, treat the raw file itself as the prepared source body file. Prefer passing that file directly to `_system/scripts/create-page.py` with `--body-file` unless the source needs partitioning. Do not copy text or Markdown inbox content into `--body`.
+If the raw file is plain text or Markdown, treat the raw file itself as the prepared source body file. Prefer passing that file directly to `agent-wiki create-page` with `--body-file` unless the source needs partitioning. Do not copy text or Markdown inbox content into `--body`.
 
 If the raw file is a binary or non-markdown document, use configured local conversion tools only when they are available. Read conversion policy from `_system/config.json` if it exists. Missing config means use conservative local-only defaults.
 
@@ -86,7 +86,7 @@ When conversion is used, record conversion provenance in the source frontmatter 
 
 ### 3b. Infer source metadata
 
-Create source pages using `_system/scripts/create-page.py`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
+Create source pages using `agent-wiki create-page`. The scaffolder writes schema-compliant source pages, validates source parent/part requirements, and prevents duplicate IDs or target path overwrites.
 
 Newly promoted ordinary source pages MUST use `status: unprocessed` and `sourceRole: whole`. The extraction workflow changes source pages to `status: processed` after knowledge primitives have been extracted.
 
@@ -149,7 +149,7 @@ For an ordinary source, save the prepared verbatim Markdown body to a temporary 
 For `.md` or `.txt` inbox files that do not need conversion or cleanup, the prepared source body may be the raw inbox file itself. For converted binary files, use the converted Markdown output file. Always prefer `--body-file` for source bodies.
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type source \
   --subtype <sourceType> \
   --slug <sourceSlug> \
@@ -169,7 +169,7 @@ For a large source, save each prepared segment body and the short parent manifes
 Part pages use:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type source \
   --subtype <sourceType> \
   --slug <sourceSlug> \
@@ -189,7 +189,7 @@ python3 _system/scripts/create-page.py \
 Parent pages use:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type source \
   --subtype <sourceType> \
   --slug <sourceSlug> \
@@ -231,7 +231,7 @@ If a raw file cannot be promoted, leave it in `_inbox/` and report the reason. D
 If one or more raw files were promoted, write one operational log entry for the processed batch:
 
 ```bash
-python3 _system/scripts/log.py --message "process-inbox: promoted <count> raw files to sources; skipped=<count> failed=<count>"
+agent-wiki log --message "process-inbox: promoted <count> raw files to sources; skipped=<count> failed=<count>"
 ```
 
 Do not write a log entry when no files were promoted.

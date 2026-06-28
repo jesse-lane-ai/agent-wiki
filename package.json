@@ -1,0 +1,35 @@
+{
+  "name": "agent-wiki",
+  "version": "0.1.0",
+  "description": "Obsidian-compatible evidence-aware wiki tooling for agents.",
+  "type": "module",
+  "bin": {
+    "agent-wiki": "./dist/src/cli.js"
+  },
+  "files": [
+    "dist/src",
+    "AGENTS.md",
+    "WIKI.md",
+    "README.md",
+    "ONBOARD.md",
+    "INBOX.md",
+    "AGENT-WIKI-SPEC-v2.md",
+    "_system/config.example.json",
+    "skills"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "check": "npm run test"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
+  }
+}

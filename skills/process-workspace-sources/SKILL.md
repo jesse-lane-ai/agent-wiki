@@ -20,7 +20,7 @@ Key rules:
 - The source files belong to the workspace owner. Leave them in place.
 - Workspace files are discovery inputs, not canonical evidence until represented by `sources/` pages.
 - Canonical source pages live inside the wiki directory, usually `wiki/sources/`.
-- Use `_system/scripts/create-page.py` from the wiki root to create source pages.
+- Use `agent-wiki create-page` from the wiki root to create source pages.
 - New source pages use `status: unprocessed` and `sourceRole: whole` unless partitioned.
 - Large source parent/part behavior matches the existing source schema.
 
@@ -32,10 +32,12 @@ From the project root, list new or changed non-code source candidates:
 agent-wiki workspace pending --workspace-root . --json
 ```
 
-If the console script is not installed yet, use:
+If the console script is not installed yet, build and link the local package first:
 
 ```bash
-python3 -m agent_wiki.cli workspace pending --workspace-root . --json
+npm install
+npm run build
+npm link
 ```
 
 The command returns an agent-readable list with:
@@ -71,14 +73,14 @@ For each selected file:
 
 1. Read the workspace file in place.
 2. Infer conservative metadata.
-3. Create a source page in the wiki with `_system/scripts/create-page.py`.
+3. Create a source page in the wiki with `agent-wiki create-page`.
 4. Set `originPath` to the workspace-relative path of the original file.
 5. Do not move or modify the original workspace file.
 
 For a normal text or Markdown source, from the wiki root:
 
 ```bash
-python3 _system/scripts/create-page.py \
+agent-wiki create-page \
   --type source \
   --subtype <sourceType> \
   --slug <sourceSlug> \
@@ -105,7 +107,7 @@ agent-wiki workspace mark-sourced \
   --source-path "sources/<source-file>.md"
 ```
 
-If the console script is not installed yet, use `python3 -m agent_wiki.cli workspace mark-sourced` with the same arguments.
+If the console script is not installed yet, build and link the local package with `npm install && npm run build && npm link`.
 
 The command writes `wiki/_system/state/workspace-sources.json`. This state file is local generated state and should not be treated as canonical knowledge.
 

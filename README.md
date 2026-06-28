@@ -74,7 +74,9 @@ Read ONBOARD.md, then onboard me.
 Install the local CLI during development:
 
 ```bash
-python3 -m pip install -e .
+npm install
+npm run build
+npm link
 ```
 
 Initialize a vault-style wiki folder:
@@ -89,7 +91,7 @@ Initialize a workspace wiki inside a larger project:
 agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
 ```
 
-Add `--with-template` when the initialized wiki should be runnable by a fresh agent immediately. It copies missing bundled docs, `_system/scripts/`, and root-level `skills/` into the wiki without overwriting existing files:
+Add `--with-template` when the initialized wiki should be runnable by a fresh agent immediately. It copies missing bundled docs and root-level `skills/` into the wiki without overwriting existing files:
 
 ```bash
 agent-wiki init --type vault --root /path/to/wiki --write-config --with-template
@@ -177,21 +179,6 @@ agent-wiki workspace mark-sourced \
   --source-path sources/2026-06-26-document-customer-research.md
 ```
 
-## E2E Smoke Test
-
-Use the temp-only smoke harness when you want to exercise both operating modes with real copied files:
-
-```bash
-python3 tests/e2e_smoke.py \
-  --vault-raw /path/to/source-one.md \
-  --vault-raw /path/to/source-two.md \
-  --workspace-root /path/to/workspace \
-  --workspace-file docs/source-one.md \
-  --workspace-file notes/source-two.md
-```
-
-The harness creates temporary vault and workspace wikis, copies the supplied files into those temp fixtures, promotes them to canonical `source` pages, runs workspace discovery and `mark-sourced`, compiles both wikis, runs `doctor`, and prints a JSON summary. It does not move or modify the original files.
-
 ## Core documents
 
 - [ONBOARD.md](ONBOARD.md) — first-run setup, onboarding probe, local configuration, and import-link setup.
@@ -267,7 +254,7 @@ Agent Wiki is built around a few strict rules:
 The compiler has no third-party Python dependencies. Run it with the system Python:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 It reads vault pages and emits generated artifacts such as:
@@ -289,11 +276,11 @@ These outputs are generated artifacts. Do not hand-edit them, and do not treat r
 Skills live under `skills/`:
 
 - `compile-wiki` regenerates the root page catalog, caches, indexes, logs, and reports.
-- `import-link` imports external links and captures into canonical `source` pages after local configuration in `skills/import-link/config.json`. It uses `_system/scripts/create-page.py` to write source pages. Large captures are partitioned into parent source pages and source parts.
-- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `_system/scripts/create-page.py` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
+- `import-link` imports external links and captures into canonical `source` pages after local configuration in `skills/import-link/config.json`. It uses `agent-wiki create-page` to write source pages. Large captures are partitioned into parent source pages and source parts.
+- `process-inbox` promotes raw files dropped into `_inbox/` into canonical `source` pages and moves originals to `raw/`. It uses `agent-wiki create-page` to write source pages. Large documents are represented by a short parent source page plus source part pages under `sources/parts/`.
 - `process-workspace-sources` promotes selected files discovered outside a workspace wiki into canonical `source` pages without modifying or moving the original workspace files.
-- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `_system/scripts/create-page.py` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
-- `write-synthesis` creates or refreshes durable synthesis pages for cross-source summaries, briefs, analyses, comparisons, and timeline narratives. It uses `_system/scripts/create-page.py` for new synthesis page files.
+- `extract-knowledge-primitives` extracts entities, concepts, claims, evidence, questions, and relations from sources. It uses `agent-wiki create-page` for new primitive page files. For large sources, extraction operates on source parts rather than the parent manifest.
+- `write-synthesis` creates or refreshes durable synthesis pages for cross-source summaries, briefs, analyses, comparisons, and timeline narratives. It uses `agent-wiki create-page` for new synthesis page files.
 - `update-overview` creates or refreshes root `overview.md` as the human-facing vault landing page.
 
 The page scaffolder covers required frontmatter for `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages. It does not invent optional metadata, evidence, relationships, body prose, source capture, synthesis judgment, or large-document split decisions.
@@ -346,8 +333,8 @@ Do not overwrite local `_system/config.json`; it is local-only operator policy. 
 After updating, run the onboarding probe and compile pipeline:
 
 ```bash
-python3 _system/scripts/onboard.py --check
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki onboard --check
+agent-wiki compile
 ```
 
 If the release notes mention a migration script, run its dry-run mode first and review the planned changes before applying it.

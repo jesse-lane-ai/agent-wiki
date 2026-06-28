@@ -65,7 +65,7 @@ Root `overview.md`, if present, is human-facing orientation prose. It is NOT pri
 
 Files in `_system/cache/`, `_system/indexes/`, `_system/logs/`, and root `index.md` are generated artifacts.
 
-Agents MUST NOT manually patch cache files, generated index files, generated log files, or root `index.md`. Agents MUST write operational log entries through `_system/scripts/log.py`.
+Agents MUST NOT manually patch cache files, generated index files, generated log files, or root `index.md`. Agents MUST write operational log entries through `agent-wiki log`.
 
 ### 2.8 Respect the inbox boundary
 
@@ -77,27 +77,27 @@ Agents SHOULD process inbox items by converting retained raw files into canonica
 
 Large retained sources SHOULD be converted into a short parent source page under `sources/` and child source part pages under `sources/parts/`. Agents SHOULD extract knowledge primitives from source part pages, not from the parent source manifest.
 
-When creating new canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` page files, agents SHOULD use `_system/scripts/create-page.py` unless a skill gives a more specific source-capture workflow. The script scaffolds required frontmatter and paths; it does not replace agent judgment about body prose, evidence, relationships, source capture, conversion, or large-source split decisions.
+When creating new canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` page files, agents SHOULD use `agent-wiki create-page` unless a skill gives a more specific source-capture workflow. The script scaffolds required frontmatter and paths; it does not replace agent judgment about body prose, evidence, relationships, source capture, conversion, or large-source split decisions.
 
 When asked for durable cross-source interpretation, comparison, brief, analysis, summary, or timeline narrative, agents SHOULD use the local `write-synthesis` skill. Synthesis pages MUST identify their source basis, preserve uncertainty, and avoid treating unsupported interpretation as established fact.
 
 When local setup or converter availability is uncertain, agents SHOULD run the read-only onboarding probe:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki onboard --check
 ```
 
 For first-run setup questions, agents SHOULD use:
 
 ```bash
-python3 _system/scripts/onboard.py --check --questions
+agent-wiki onboard --check --questions
 ```
 
 Agents SHOULD ask setup questions as compact multiple-choice prompts so the user can reply with letter choices.
 
 This checkout is the only wiki root. Agents MUST read and write project paths relative to the repository root.
 
-If the operator approves persisting local setup choices, agents SHOULD write local `_system/config.json` through `_system/scripts/onboard.py --write-config` with the approved flags. Agents MUST NOT hand-edit `_system/config.json`.
+If the operator approves persisting local setup choices, agents SHOULD write local `_system/config.json` through `agent-wiki onboard --write-config` with the approved flags. Agents MUST NOT hand-edit `_system/config.json`.
 
 When `_system/config.json` contains `knownVaults`, agents MAY use it only to resolve `obsidian://` cross-vault references for reading. Agents MUST NOT treat `knownVaults` entries as alternate wiki roots or write destinations.
 
@@ -123,7 +123,7 @@ Workspace source pages SHOULD record the original file using `originPath` with a
 - Add or update relations in frontmatter
 - Update page body prose when explicitly instructed
 - Write substantive body prose for newly created authored knowledge pages
-- Use `_system/scripts/create-page.py` to scaffold new canonical page files
+- Use `agent-wiki create-page` to scaffold new canonical page files
 - Create question pages for unresolved unknowns
 - Run the compile pipeline to regenerate the root page catalog, caches, and reports
 - Create or refresh root `overview.md` when explicitly asked for a human-facing vault overview
@@ -210,7 +210,7 @@ The compile pipeline reads the vault and emits:
 To run the compile pipeline:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 The compile pipeline MUST be run after meaningful vault changes to keep `index.md` and caches fresh. The compile pipeline writes one operational log entry to `_system/logs/log.md`.
@@ -223,7 +223,7 @@ There is one canonical operational log:
 
 - `_system/logs/log.md` contains generated compile/runtime and skill-run entries. Agents MUST NOT hand-edit this file.
 
-Agents MUST use `_system/scripts/log.py` to write one operational log entry after each meaningful skill run or change batch, such as schema updates, new workflows, import configuration changes, or significant content migrations.
+Agents MUST use `agent-wiki log` to write one operational log entry after each meaningful skill run or change batch, such as schema updates, new workflows, import configuration changes, or significant content migrations.
 
 Agents SHOULD NOT log trivial report/cache regeneration unless it records a meaningful vault change or operational incident.
 
@@ -237,7 +237,7 @@ Entries are prepended so the most recent entry appears first. Each entry SHOULD 
 Operational log entries SHOULD be written with:
 
 ```bash
-python3 _system/scripts/log.py --message "<message>"
+agent-wiki log --message "<message>"
 ```
 
 Logs are not authoritative truth records. Agents MUST NOT treat `_system/logs/log.md` as primary evidence for claims unless the relevant material has been promoted into a canonical `source` page.

@@ -5,18 +5,18 @@ Use this file when setting up a fresh Agent Wiki or when a new agent needs to or
 Start with the lifecycle CLI:
 
 ```bash
-python3 -m agent_wiki.cli init --type vault --root /path/to/wiki --write-config
-python3 -m agent_wiki.cli doctor --wiki-root /path/to/wiki
+agent-wiki init --type vault --root /path/to/wiki --write-config
+agent-wiki doctor --wiki-root /path/to/wiki
 ```
 
 For a project workspace with an embedded wiki:
 
 ```bash
-python3 -m agent_wiki.cli init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
-python3 -m agent_wiki.cli doctor --wiki-root /path/to/project/wiki --type workspace
+agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
+agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
 ```
 
-`agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. Use `_system/scripts/onboard.py --check` only after that, when you need a lower-level environment probe for Python, converter commands/packages, import-link config, or setup questions.
+`agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. Use `agent-wiki onboard --check` only after that, when you need a lower-level environment probe for Python, converter commands/packages, import-link config, or setup questions.
 
 Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, scripts, and skills needed for a fresh agent to operate it immediately.
 
@@ -26,7 +26,7 @@ Before editing wiki content:
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v2]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run `agent-wiki doctor` for the target wiki root.
-5. Run `_system/scripts/onboard.py --check` only if local Python/converter/import-link setup is relevant.
+5. Run `agent-wiki onboard --check` only if local Python/converter/import-link setup is relevant.
 6. Configure local `_system/config.json` only through approved setup choices.
 7. Configure `skills/import-link/config.json` before importing external material.
 8. Run the compile pipeline and confirm it reports zero validation issues.
@@ -47,13 +47,13 @@ Vault mode preserves the classic Agent Wiki layout. The wiki root is the working
 Initialize a vault wiki:
 
 ```bash
-python3 -m agent_wiki.cli init --type vault --root /path/to/wiki --write-config
+agent-wiki init --type vault --root /path/to/wiki --write-config
 ```
 
 Check it:
 
 ```bash
-python3 -m agent_wiki.cli doctor --wiki-root /path/to/wiki --type vault
+agent-wiki doctor --wiki-root /path/to/wiki --type vault
 ```
 
 Use vault mode when the wiki itself is the primary repository and source material enters through `_inbox/`, `import-link`, or direct source-page creation.
@@ -74,13 +74,13 @@ Workspace mode does not require `_inbox/`, `_inbox/trash/`, or `raw/`. Source ca
 Initialize a workspace wiki:
 
 ```bash
-python3 -m agent_wiki.cli init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
+agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
 ```
 
 Check it:
 
 ```bash
-python3 -m agent_wiki.cli doctor --wiki-root /path/to/project/wiki --type workspace
+agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
 ```
 
 Use workspace mode when Agent Wiki is documenting or synthesizing an existing project without moving or owning that project's files.
@@ -92,15 +92,15 @@ Use workspace mode when Agent Wiki is documenting or synthesizing an existing pr
 Run the lower-level onboarding probe from the wiki root only when environment details matter:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki onboard --check
 ```
 
-The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the wiki root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, mode-specific required folders, key script availability such as `_system/scripts/create-page.py`, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate wiki content.
+The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the wiki root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, mode-specific required folders, key script availability such as `agent-wiki create-page`, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate wiki content.
 
 To generate user-friendly setup prompts, run:
 
 ```bash
-python3 _system/scripts/onboard.py --check --questions
+agent-wiki onboard --check --questions
 ```
 
 Use those prompts when asking the user for setup decisions. The user should be able to reply with compact letter choices such as `1A 2B 3A 4C 5A`. Do not ask long open-ended setup questions unless the user needs to provide a specific path or command.
@@ -112,12 +112,12 @@ python3 --version
 python --version
 ```
 
-Use whichever command resolves to Python 3.8 or newer. If neither command is available, warn the user that Python 3 must be installed and available on the agent's path before running the wiki scripts. If only `python` works, substitute `python` anywhere this repo shows `python3`.
+Use whichever command resolves to Python 3.8 or newer. If neither command is available, warn the user that Python 3 is only needed for optional local document conversion backends. If only `python` works, substitute `python` anywhere this repo shows `python3`.
 
 Compile from the wiki root:
 
 ```bash
-python3 skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 ---
@@ -142,7 +142,7 @@ Prefer `agent-wiki init --write-config` for initial `wikiType` and workspace set
 When local Python or conversion policy is needed, use the onboarding config writer so only approved local policy fields are persisted:
 
 ```bash
-python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+agent-wiki onboard --write-config --python-command python3 --conversion disabled
 ```
 
 Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
@@ -227,7 +227,7 @@ If any required value is unknown, the agent should ask the user before running `
 
 The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill in vault mode. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
 
-For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `_system/scripts/onboard.py --check` first when converter availability is unknown, then ask the user which conversion policy to use before running `_system/scripts/onboard.py --write-config` or installing anything.
+For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `agent-wiki onboard --check` first when converter availability is unknown, then ask the user which conversion policy to use before running `agent-wiki onboard --write-config` or installing anything.
 
 Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
 
