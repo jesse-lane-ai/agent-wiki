@@ -8,6 +8,7 @@ import { doctorWiki, initWiki, issuesToJson, issuesToText } from "./lifecycle.js
 import { migrateRefs } from "./migrate.js";
 import { onboard } from "./onboard.js";
 import { createPage } from "./page.js";
+import { migrateWiki } from "./upgrade.js";
 import { writeOperationalLog } from "./wiki-utils.js";
 import { randomBytes } from "node:crypto";
 import {
@@ -42,6 +43,7 @@ export function main(argv = process.argv.slice(2)): number {
     if (command === "index") return renderIndexCommand(global);
     if (command === "log") return cmdLog(global);
     if (command === "migrate-refs-to-links") return migrateRefs(global);
+    if (command === "migrate") return migrateWiki(global);
     if (command === "compile") return compileWiki(global);
     if (command === "uuid") return cmdUuid(global);
     throw new Error(`Unknown command: ${command}`);
@@ -187,6 +189,7 @@ Commands:
   log --message TEXT
   uuid [--length N]
   migrate-refs-to-links --dry-run|--write
+  migrate --from v1 --check|--write
   workspace scan [--workspace-root PATH] [--wiki-dir wiki] [--json] [--since-hours N] [--write-state]
   workspace pending [--workspace-root PATH] [--wiki-dir wiki] [--json] [--since-hours N]
   workspace mark-sourced --path PATH --source-id ID --source-path PATH [--workspace-root PATH] [--wiki-dir wiki]

@@ -65,7 +65,21 @@ Structured evidence, relations, contradictions, and timeline events are stored i
 
 ## Quick Start
 
-Clone the repo and ask your agent:
+Create a fresh vault wiki:
+
+```bash
+npx agent-wiki init --type vault --root /path/to/wiki --write-config --with-template
+npx agent-wiki doctor --wiki-root /path/to/wiki
+```
+
+Create a workspace wiki inside an existing project:
+
+```bash
+npx agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config --with-template
+npx agent-wiki doctor --wiki-root /path/to/workspace/wiki --type workspace
+```
+
+Then ask your agent:
 
 ```text
 Read ONBOARD.md, then onboard me.
@@ -79,22 +93,12 @@ npm run build
 npm link
 ```
 
-Initialize a vault-style wiki folder:
+Upgrade an existing v1.x wiki to the npm/TypeScript CLI layout:
 
 ```bash
-agent-wiki init --type vault --root /path/to/wiki --write-config
-```
-
-Initialize a workspace wiki inside a larger project:
-
-```bash
-agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
-```
-
-Add `--with-template` when the initialized wiki should be runnable by a fresh agent immediately. It copies missing bundled docs and root-level `skills/` into the wiki without overwriting existing files:
-
-```bash
-agent-wiki init --type vault --root /path/to/wiki --write-config --with-template
+cd /path/to/wiki
+npx agent-wiki migrate --from v1 --check
+npx agent-wiki migrate --from v1 --write
 ```
 
 Check wiki health without changing files:

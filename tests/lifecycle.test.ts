@@ -47,7 +47,7 @@ test("init workspace creates wiki inside workspace without raw lifecycle", () =>
   }
 });
 
-test("init with template copies docs scripts and skills", () => {
+test("init with template copies docs and skills", () => {
   const tmp = tempDir();
   try {
     const root = join(tmp, "vault");

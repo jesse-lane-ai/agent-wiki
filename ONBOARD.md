@@ -87,6 +87,28 @@ Use workspace mode when Agent Wiki is documenting or synthesizing an existing pr
 
 ---
 
+## Upgrade From v1.x
+
+Agent Wiki v2 moves the installable CLI from Python to npm/TypeScript. Existing content pages usually do not need data conversion, but older checkouts may still contain Python-era helper scripts and docs that point to them.
+
+From the wiki root, preview the migration:
+
+```bash
+agent-wiki migrate --from v1 --check
+```
+
+Apply the safe migration:
+
+```bash
+agent-wiki migrate --from v1 --write
+```
+
+The writer backs up changed and removed files under `_archive/migrations/v1-to-v2/`, removes obsolete Python helper paths, refreshes missing v2 template files, rewrites old helper-command references where safe, runs `agent-wiki doctor`, and runs `agent-wiki compile`.
+
+Review the printed summary after migration. Existing canonical content pages under `sources/`, `entities/`, `concepts/`, `claims/`, `questions/`, and `syntheses/` should remain in place.
+
+---
+
 ## Environment Probe
 
 Run the lower-level onboarding probe from the wiki root only when environment details matter:
