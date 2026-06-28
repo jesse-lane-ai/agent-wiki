@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
 import { renderIndexCommand } from "./catalog.js";
 import { compileWiki } from "./compile.js";
@@ -190,6 +192,6 @@ Commands:
 `);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   process.exitCode = main();
 }

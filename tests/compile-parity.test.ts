@@ -156,10 +156,12 @@ function createFixture(root: string): void {
 }
 
 function installOldScripts(root: string): void {
+  const rewriteCommit = execFileSync("git", ["rev-list", "-n", "1", "HEAD", "--", "skills/compile-wiki/scripts/compile.py"], { cwd: REPO_ROOT, encoding: "utf8" }).trim();
+  const oldTree = `${rewriteCommit}^`;
   for (const path of ["skills/compile-wiki/scripts/compile.py", "_system/scripts/index.py", "_system/scripts/log.py"]) {
     const destination = join(root, path);
     mkdirSync(destination.slice(0, destination.lastIndexOf("/")), { recursive: true });
-    writeFileSync(destination, execFileSync("git", ["show", `HEAD^:${path}`], { cwd: REPO_ROOT, encoding: "utf8" }), "utf8");
+    writeFileSync(destination, execFileSync("git", ["show", `${oldTree}:${path}`], { cwd: REPO_ROOT, encoding: "utf8" }), "utf8");
   }
 }
 
