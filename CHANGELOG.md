@@ -15,7 +15,7 @@
 ### Compatibility
 
 - Backward-compatible with existing v1 vaults.
-- Existing vaults can run `_system/scripts/migrate-refs-to-links.py --write` to convert soft reference fields.
+- Existing vaults can run `agent-wiki migrate-refs-to-links --write` to convert soft reference fields.
 
 ## v1.4.1 - 2026-05-28
 

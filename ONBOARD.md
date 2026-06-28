@@ -18,7 +18,7 @@ agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
 
 `agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. Use `agent-wiki onboard --check` only after that, when you need a lower-level environment probe for Python, converter commands/packages, import-link config, or setup questions.
 
-Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, scripts, and skills needed for a fresh agent to operate it immediately.
+Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately.
 
 Before editing wiki content:
 

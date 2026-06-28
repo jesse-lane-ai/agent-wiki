@@ -8,20 +8,20 @@ The `_inbox/` folder is the active drop zone for raw files that still need to be
 If inbox files are binary or non-markdown documents and local converter availability is unknown, run the read-only onboarding probe before processing:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki onboard --check
 ```
 
 Use the probe output to choose a local conversion policy with the user. If the user approves persisting local policy, write `_system/config.json` through the onboarding config writer:
 
 ```bash
-python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+agent-wiki onboard --write-config --python-command python3 --conversion disabled
 ```
 
 Do not install packages, create `.venv/`, hand-edit `_system/config.json`, or call network/OCR/LLM/cloud conversion services unless the user explicitly approves that setup.
 
 Process `_inbox/`, write source pages, and move retained raw files relative to the repository root. This project does not route inbox processing to another vault or wiki.
 
-`process-inbox` should use `_system/scripts/create-page.py` to write canonical source pages and source part pages after it has prepared the source body, metadata, retained raw path, and any conversion provenance. The scaffolder validates source frontmatter and paths; it does not convert files, move raw files, choose split points, or decide what metadata means.
+`process-inbox` should use `agent-wiki create-page` to write canonical source pages and source part pages after it has prepared the source body, metadata, retained raw path, and any conversion provenance. The scaffolder validates source frontmatter and paths; it does not convert files, move raw files, choose split points, or decide what metadata means.
 
 ### Folder meaning
 
@@ -33,8 +33,8 @@ Process `_inbox/`, write source pages, and move retained raw files relative to t
 
 1. A user or tool drops a raw file into `_inbox/`.
 2. `process-inbox` reads the raw file.
-3. If retained, `process-inbox` uses `_system/scripts/create-page.py` to create a canonical source page in `sources/` with `status: unprocessed`.
-4. If the retained file is large, `process-inbox` uses `_system/scripts/create-page.py` to create a short parent source page in `sources/` and source part pages in `sources/parts/` instead of one giant markdown file.
+3. If retained, `process-inbox` uses `agent-wiki create-page` to create a canonical source page in `sources/` with `status: unprocessed`.
+4. If the retained file is large, `process-inbox` uses `agent-wiki create-page` to create a short parent source page in `sources/` and source part pages in `sources/parts/` instead of one giant markdown file.
 5. After successful promotion, `process-inbox` moves the original raw file to `raw/`.
 6. If a raw file cannot be processed or should be discarded, leave it in `_inbox/` for operator review or move it to `_inbox/trash/` when explicitly discarded.
 
