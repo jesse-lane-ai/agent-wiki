@@ -16,9 +16,26 @@ agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wi
 agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
 ```
 
-`agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. Use `agent-wiki onboard --check` only after that, when you need a lower-level environment probe for Python, converter commands/packages, import-link config, or setup questions.
+`agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. `agent-wiki onboard --check` is the deterministic first-run report for agents and automation. It emits structured JSON with wiki type, config state, doctor issues, required docs/skills, optional tool availability, import-link state, and next steps.
 
 Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately.
+
+Before editing wiki content, run the deterministic CLI onboarding sequence:
+
+```bash
+agent-wiki doctor --wiki-root /path/to/wiki
+agent-wiki onboard --check --wiki-root /path/to/wiki
+agent-wiki compile
+agent-wiki index --check
+```
+
+When a human needs to choose local setup policy, generate stable prompts:
+
+```bash
+agent-wiki onboard --check --questions --wiki-root /path/to/wiki
+```
+
+Agents should treat the CLI output as the onboarding source of truth. Read this file for explanation, not as an interactive onboarding substitute.
 
 Before editing wiki content:
 
@@ -26,7 +43,7 @@ Before editing wiki content:
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v2]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
 4. Run `agent-wiki doctor` for the target wiki root.
-5. Run `agent-wiki onboard --check` only if local Python/converter/import-link setup is relevant.
+5. Run `agent-wiki onboard --check --wiki-root /path/to/wiki`.
 6. Configure local `_system/config.json` only through approved setup choices.
 7. Configure `skills/import-link/config.json` before importing external material.
 8. Run the compile pipeline and confirm it reports zero validation issues.

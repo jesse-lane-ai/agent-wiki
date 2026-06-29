@@ -81,16 +81,16 @@ When creating new canonical `source`, `entity`, `concept`, `claim`, `question`, 
 
 When asked for durable cross-source interpretation, comparison, brief, analysis, summary, or timeline narrative, agents SHOULD use the local `write-synthesis` skill. Synthesis pages MUST identify their source basis, preserve uncertainty, and avoid treating unsupported interpretation as established fact.
 
-When local setup or converter availability is uncertain, agents SHOULD run the read-only onboarding probe:
+Before first editing a checkout, agents SHOULD run the deterministic read-only onboarding probe:
 
 ```bash
-agent-wiki onboard --check
+agent-wiki onboard --check --wiki-root .
 ```
 
-For first-run setup questions, agents SHOULD use:
+For first-run setup questions, agents SHOULD use the stable numbered CLI prompts:
 
 ```bash
-agent-wiki onboard --check --questions
+agent-wiki onboard --check --questions --wiki-root .
 ```
 
 Agents SHOULD ask setup questions as compact multiple-choice prompts so the user can reply with letter choices.

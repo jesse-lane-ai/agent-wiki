@@ -183,7 +183,8 @@ Commands:
   init --type vault|workspace [--root PATH] [--workspace-root PATH] [--wiki-dir wiki] [--write-config] [--with-template]
   doctor [--wiki-root PATH] [--type vault|workspace] [--json]
   create-page --type TYPE --subtype SUBTYPE --slug SLUG --title TITLE (--body-file PATH|--body TEXT)
-  onboard --check|--write-config [--questions]
+  onboard --check [--wiki-root PATH] [--questions] [--compact]
+  onboard --write-config [--type vault|workspace] [--wiki-dir wiki] [--python-command CMD] [--conversion disabled|available-local]
   compile [--verbose]
   index --write|--check
   log --message TEXT

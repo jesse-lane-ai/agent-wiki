@@ -79,11 +79,14 @@ npx agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-
 npx agent-wiki doctor --wiki-root /path/to/workspace/wiki --type workspace
 ```
 
-Then ask your agent:
+Run deterministic onboarding:
 
-```text
-Read ONBOARD.md, then onboard me.
+```bash
+npx agent-wiki onboard --check --wiki-root /path/to/wiki
+npx agent-wiki onboard --check --questions --wiki-root /path/to/wiki
 ```
+
+Use the JSON report for automation and the numbered questions only when a human needs to choose local setup policy.
 
 Install the local CLI during development:
 
