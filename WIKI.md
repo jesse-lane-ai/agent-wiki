@@ -106,6 +106,8 @@ Each wiki root remains a single Agent Wiki. In vault mode, the repository or sel
 
 Use `agent-wiki list` to list registered wikis and paths. Use `agent-wiki check --all` for a light read-only registry health check across all registered wikis. Use `agent-wiki check --all --full` when compile and index validation should also run. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
 
+Use `agent-wiki schedule prompt process-inbox`, `agent-wiki schedule prompt extract-primitives`, and `agent-wiki schedule prompt update-overview` to print scheduled-agent prompts from the registry. These prompts are meant for external scheduled-task harnesses and remain skill-based; the CLI does not execute those workflows. By default they target all registered wikis. Pass wiki names or `--wiki NAME` to target a subset. Scheduled agents should log failures for one wiki and continue to the next.
+
 ---
 
 ## 3. Page types

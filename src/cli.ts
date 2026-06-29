@@ -12,6 +12,7 @@ import { migrateWiki } from "./upgrade.js";
 import { writeOperationalLog } from "./wiki-utils.js";
 import { randomBytes } from "node:crypto";
 import { addRegistryEntry, getRegistryEntry, listRegistryEntries, registryPath, removeRegistryEntry } from "./registry.js";
+import { schedulePrompt } from "./schedule-prompts.js";
 import {
   defaultWorkspaceRoot,
   filesToJson,
@@ -40,6 +41,7 @@ export function main(argv = process.argv.slice(2)): number {
     if (command === "list") return cmdList(global);
     if (command === "registry") return cmdRegistry(global);
     if (command === "check") return cmdCheck(global);
+    if (command === "schedule") return schedulePrompt(global);
     if (command === "init") return cmdInit(global);
     if (command === "doctor") return cmdDoctor(global, wikiRoot);
     if (command === "workspace") return withWikiRoot(wikiRoot, () => cmdWorkspace(global));
@@ -299,6 +301,7 @@ Commands:
   list [--json]
   registry list|add|show|remove
   check WIKI|--all [--full] [--json]
+  schedule prompt process-inbox|extract-primitives|update-overview [WIKI...] [--wiki NAME]
   --wiki NAME <command>
   init --type vault|workspace [--root PATH] [--workspace-root PATH] [--wiki-dir wiki] [--no-config] [--no-template]
   doctor [--wiki-root PATH] [--type vault|workspace] [--json]

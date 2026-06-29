@@ -1,6 +1,12 @@
 ## First-Run Onboarding
 
-Use this file when setting up a fresh Agent Wiki or when a new agent needs to orient itself before editing one.
+This file is an operator guide, not the onboarding engine. The lifecycle CLI is the deterministic source of truth for setup status:
+
+```bash
+agent-wiki onboard --check
+```
+
+Use this file to understand the flow, explain setup choices, and orient a new agent before it edits a wiki. Do not replace the CLI report with freeform interpretation of this document.
 
 Start with the lifecycle CLI and register the wiki by name:
 
@@ -43,7 +49,7 @@ When a human needs to choose local setup policy, generate stable prompts:
 agent-wiki onboard --check --questions --wiki-root /path/to/wiki
 ```
 
-Agents should treat the CLI output as the onboarding source of truth. Read this file for explanation, not as an interactive onboarding substitute.
+Agents must treat the CLI output as the onboarding source of truth. Read this file for explanation, not as an interactive onboarding substitute.
 
 When the machine tracks more than one Agent Wiki root, register each root locally:
 
@@ -65,6 +71,23 @@ agent-wiki registry add Research --root ./Research --type vault
 agent-wiki list
 agent-wiki check --all
 ```
+
+For scheduled maintenance in an external agent harness, generate prompts from the registry instead of hardcoding wiki paths:
+
+```bash
+agent-wiki schedule prompt process-inbox
+agent-wiki schedule prompt extract-primitives
+agent-wiki schedule prompt update-overview
+```
+
+Each prompt defaults to all registered wikis. Pass wiki names to target a subset:
+
+```bash
+agent-wiki schedule prompt process-inbox Business Research
+agent-wiki schedule prompt update-overview --wiki Business
+```
+
+These commands print scheduled-agent prompts only. They do not execute the skill workflows. The scheduled agent should log per-wiki failures and continue to the next registered wiki.
 
 Before editing wiki content:
 

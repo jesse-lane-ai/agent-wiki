@@ -98,7 +98,7 @@ npx agent-wiki onboard --check --wiki-root /path/to/wiki
 npx agent-wiki onboard --check --questions --wiki-root /path/to/wiki
 ```
 
-Use the JSON report for automation and the numbered questions only when a human needs to choose local setup policy.
+Use the JSON report for automation and the numbered questions only when a human needs to choose local setup policy. `ONBOARD.md` is the operator guide that explains this flow; the CLI report is the source of truth.
 
 Track machine-local Agent Wiki roots:
 
@@ -330,11 +330,34 @@ The page scaffolder covers required frontmatter for `source`, `entity`, `concept
 
 ## Scheduled Work
 
-This repo does not ship a scheduler, daemon, or task runner. For recurring maintenance, run an external scheduler that launches agents with narrow tasks:
+This repo does not ship a scheduler, daemon, or background task runner. For recurring maintenance, use an external scheduled-agent harness such as Claude Desktop/Cowork, Cody, OpenClaw cron, or an OS scheduler that launches an agent task.
 
-- inbox processing via `skills/process-inbox/`
-- compile/regeneration via `skills/compile-wiki/`
-- extraction, synthesis, or cleanup via the relevant skill
+Generate ready-to-paste scheduled prompts from the local registry:
+
+```bash
+agent-wiki schedule prompt process-inbox
+agent-wiki schedule prompt extract-primitives
+agent-wiki schedule prompt update-overview
+```
+
+By default, each prompt targets all registered Agent Wiki roots from `agent-wiki list --json`. Target a subset by passing names:
+
+```bash
+agent-wiki schedule prompt process-inbox Business Research
+agent-wiki schedule prompt update-overview --wiki Business
+```
+
+These commands only print prompts. They do not run the workflows. The scheduled agent should read each target wiki's `AGENTS.md` and `WIKI.md`, then follow the local skill:
+
+- `skills/process-inbox/SKILL.md`
+- `skills/extract-knowledge-primitives/SKILL.md`
+- `skills/update-overview/SKILL.md`
+
+Recommended cadences:
+
+- process inbox daily around 1:00 AM
+- extract knowledge primitives daily around 7:00 AM
+- update overview daily around 5:30 PM
 
 Re-run compile after meaningful vault changes so `index.md`, caches, indexes, logs, and reports stay current.
 

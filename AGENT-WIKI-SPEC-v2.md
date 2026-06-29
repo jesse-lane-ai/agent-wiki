@@ -520,6 +520,18 @@ agent-wiki check --all --full
 
 `agent-wiki list` SHOULD list registered wiki names, types, and paths. `agent-wiki check --all` SHOULD run a light read-only check across registered wikis using `doctor` and the deterministic onboarding summary. `agent-wiki check --all --full` MAY also run compile and index validation and therefore MAY write generated cache/index files.
 
+The lifecycle CLI SHOULD provide scheduled-agent prompt generation for recurring skill-based maintenance:
+
+```bash
+agent-wiki schedule prompt process-inbox
+agent-wiki schedule prompt extract-primitives
+agent-wiki schedule prompt update-overview
+agent-wiki schedule prompt process-inbox MyWiki OtherWiki
+agent-wiki schedule prompt update-overview --wiki MyWiki
+```
+
+Schedule prompt commands MUST print prompts for an external scheduled-agent harness. They MUST NOT execute the skill workflow themselves. By default, schedule prompt commands SHOULD target all registered Agent Wiki roots. Operators MAY target one or more registered wikis by name. Generated prompts SHOULD instruct the scheduled agent to read each wiki's `AGENTS.md` and `WIKI.md`, follow the local skill instructions, log per-wiki failures, and continue to the next wiki.
+
 ### 6.7 Workspace Discovery CLI
 
 Workspace mode SHOULD provide deterministic discovery commands that operate from the workspace root while storing local state under the wiki root.
