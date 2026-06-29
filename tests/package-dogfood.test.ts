@@ -7,17 +7,19 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const NPM = process.platform === "win32" ? "npm.cmd" : "npm";
+const BIN = process.platform === "win32" ? "agent-wiki.cmd" : "agent-wiki";
 
 test("packed npm tarball works through node_modules bin shim", () => {
   const tmp = mkdtempSync(join(tmpdir(), "agent-wiki-pack-"));
   let tarball = "";
   try {
-    const tarballName = execFileSync("npm", ["pack", "--silent"], { cwd: REPO_ROOT, encoding: "utf8" }).trim().split("\n").at(-1);
+    const tarballName = execFileSync(NPM, ["pack", "--silent"], { cwd: REPO_ROOT, encoding: "utf8" }).trim().split("\n").at(-1);
     assert.ok(tarballName);
     tarball = join(REPO_ROOT, tarballName);
-    execFileSync("npm", ["init", "-y"], { cwd: tmp, stdio: "ignore" });
-    execFileSync("npm", ["install", tarball], { cwd: tmp, stdio: "ignore" });
-    const bin = join(tmp, "node_modules/.bin/agent-wiki");
+    execFileSync(NPM, ["init", "-y"], { cwd: tmp, stdio: "ignore" });
+    execFileSync(NPM, ["install", tarball], { cwd: tmp, stdio: "ignore" });
+    const bin = join(tmp, "node_modules/.bin", BIN);
 
     assert.match(execFileSync(bin, ["--help"], { cwd: tmp, encoding: "utf8" }), /Commands:/);
     const initOut = execFileSync(bin, ["init", "--type", "vault", "--root", "wiki", "--write-config", "--with-template"], { cwd: tmp, encoding: "utf8" });
