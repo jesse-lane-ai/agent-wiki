@@ -2,7 +2,7 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync,
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileWiki } from "./compile.js";
-import { detectWikiType, doctorWiki, requiredFoldersForDoctor } from "./lifecycle.js";
+import { detectWikiType, doctorWiki, requiredFoldersForDoctor, writeLocalConfig } from "./lifecycle.js";
 import { readJsonObject } from "./config.js";
 import { writeJson } from "./wiki-utils.js";
 
@@ -20,6 +20,8 @@ const OBSOLETE_PATHS = [
   "_system/scripts/log.py",
   "_system/scripts/migrate-refs-to-links.py",
   "_system/scripts/onboard.py",
+  "_system/skills/compile-wiki/scripts/compile.py",
+  "_system/skills/import-link/scripts/uuid.py",
   "skills/compile-wiki/scripts/compile.py",
   "skills/import-link/scripts/uuid.py",
   "tests/e2e_smoke.py",
@@ -42,11 +44,14 @@ const TEMPLATE_FILES = [
 const TEMPLATE_DIRS = ["skills"];
 
 const REWRITES: Array<[RegExp, string]> = [
+  [/AGENT-WIKI-SPEC-v1\.md/g, "AGENT-WIKI-SPEC-v2.md"],
+  [/AGENT-WIKI-SPEC-v1/g, "AGENT-WIKI-SPEC-v2"],
   [/python3 -m agent_wiki\.cli/g, "agent-wiki"],
   [/python -m agent_wiki\.cli/g, "agent-wiki"],
   [/python3 _system\/scripts\/create-page\.py/g, "agent-wiki create-page"],
   [/python _system\/scripts\/create-page\.py/g, "agent-wiki create-page"],
   [/_system\/scripts\/create-page\.py/g, "agent-wiki create-page"],
+  [/create-page\.py/g, "agent-wiki create-page"],
   [/python3 _system\/scripts\/onboard\.py/g, "agent-wiki onboard"],
   [/python _system\/scripts\/onboard\.py/g, "agent-wiki onboard"],
   [/_system\/scripts\/onboard\.py/g, "agent-wiki onboard"],
@@ -61,8 +66,11 @@ const REWRITES: Array<[RegExp, string]> = [
   [/_system\/scripts\/migrate-refs-to-links\.py/g, "agent-wiki migrate-refs-to-links"],
   [/python3 skills\/compile-wiki\/scripts\/compile\.py/g, "agent-wiki compile"],
   [/python skills\/compile-wiki\/scripts\/compile\.py/g, "agent-wiki compile"],
+  [/_system\/skills\/compile-wiki\/scripts\/compile\.py/g, "agent-wiki compile"],
   [/skills\/compile-wiki\/scripts\/compile\.py/g, "agent-wiki compile"],
-  [/skills\/import-link\/scripts\/uuid\.py/g, "agent-wiki uuid"]
+  [/skills\/import-link\/scripts\/uuid\.py/g, "agent-wiki uuid"],
+  [/_system\/skills\/import-link\/scripts\/uuid\.py/g, "agent-wiki uuid"],
+  [/scripts\/uuid\.py/g, "agent-wiki uuid"]
 ];
 
 export function migrateWiki(args: Record<string, unknown>): number {
@@ -100,6 +108,7 @@ export function migrateWiki(args: Record<string, unknown>): number {
         mkdirSync(join(root, action.path), { recursive: true });
       }
     }
+    writeLocalConfig(root, detectWikiType(readJsonObject(join(root, "_system/config.json"))), null, "wiki");
     writeJson(join(backupRoot, "migration-summary.json"), summary);
     const doctorIssues = doctorWiki(root);
     const originalLog = console.log;
@@ -137,7 +146,7 @@ function planMigration(root: string, templateRoot: string): MigrationAction[] {
 }
 
 function rewriteCandidateFiles(root: string): string[] {
-  const dirs = [".", "skills"];
+  const dirs = [".", "skills", "_system/skills"];
   const files: string[] = [];
   for (const dir of dirs) collectMarkdown(root, dir, files);
   return Array.from(new Set(files)).sort();
