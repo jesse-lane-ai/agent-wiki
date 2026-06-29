@@ -29,7 +29,7 @@ test("init vault creates expected folders, config, and template by default", () 
   }
 });
 
-test("init workspace creates wiki inside workspace without raw lifecycle", () => {
+test("init workspace creates wiki inside workspace with inbox lifecycle", () => {
   const tmp = tempDir();
   try {
     const workspace = join(tmp, "project");
@@ -39,8 +39,8 @@ test("init workspace creates wiki inside workspace without raw lifecycle", () =>
     assert.ok(isDir(join(wiki, "sources/parts")));
     assert.ok(isDir(join(wiki, "skills")));
     assert.ok(!isDir(join(wiki, "_system/skills")));
-    assert.ok(!isDir(join(wiki, "_inbox")));
-    assert.ok(!isDir(join(wiki, "raw")));
+    assert.ok(isDir(join(wiki, "_inbox/trash")));
+    assert.ok(isDir(join(wiki, "raw")));
     const config = readJson(join(wiki, "_system/config.json"));
     assert.equal(config.wikiType, "workspace");
     assert.equal(config.workspace.wikiDir, "wiki");

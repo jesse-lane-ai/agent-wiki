@@ -62,7 +62,7 @@ export function initWiki(options: {
   templateRoot?: string;
 }): InitResult {
   const { workspaceRoot, wikiRoot } = resolveInitPaths(options);
-  const created = createRequiredFolders(wikiRoot, options.wikiType === "vault");
+  const created = createRequiredFolders(wikiRoot);
   let configWritten = false;
   if (options.writeConfig) {
     writeLocalConfig(wikiRoot, options.wikiType, workspaceRoot, options.wikiDir ?? DEFAULT_WORKSPACE_WIKI_DIR);
@@ -74,11 +74,8 @@ export function initWiki(options: {
   return { wikiType: options.wikiType, workspaceRoot, wikiRoot, created, configWritten, templateCopied };
 }
 
-export function createRequiredFolders(wikiRoot: string, includeVaultRuntime: boolean): string[] {
-  const folders = [...CONTENT_FOLDERS, ...GENERATED_FOLDERS, ...SYSTEM_FOLDERS];
-  if (includeVaultRuntime) {
-    folders.push(...VAULT_RUNTIME_FOLDERS);
-  }
+export function createRequiredFolders(wikiRoot: string): string[] {
+  const folders = [...CONTENT_FOLDERS, ...VAULT_RUNTIME_FOLDERS, ...GENERATED_FOLDERS, ...SYSTEM_FOLDERS];
   const created: string[] = [];
   for (const folder of folders) {
     const path = join(wikiRoot, folder);
@@ -166,11 +163,7 @@ export function doctorWiki(wikiRoot: string, wikiType?: string): DoctorIssue[] {
 }
 
 export function requiredFoldersForDoctor(wikiType: string | null | undefined): string[] {
-  const folders = [...CONTENT_FOLDERS, ...GENERATED_FOLDERS, ...SYSTEM_FOLDERS];
-  if (wikiType === "vault") {
-    folders.push(...VAULT_RUNTIME_FOLDERS);
-  }
-  return folders;
+  return [...CONTENT_FOLDERS, ...VAULT_RUNTIME_FOLDERS, ...GENERATED_FOLDERS, ...SYSTEM_FOLDERS];
 }
 
 export function detectWikiType(config: Record<string, unknown> | null): WikiType {

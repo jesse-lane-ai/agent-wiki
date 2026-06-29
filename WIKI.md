@@ -94,7 +94,7 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
-Workspace-mode wikis use the same internal structure, but the wiki root is usually `workspace/wiki`. Source candidates live outside the wiki directory and are discovered by the CLI. They become canonical evidence only after an agent creates `source` pages inside `wiki/sources/`.
+Workspace-mode wikis use the same internal structure, but the wiki root is usually `workspace/wiki`. Source candidates can live outside the wiki directory and be discovered by the CLI, while deliberate captures can still land in the wiki's `_inbox/`. They become canonical evidence only after an agent creates `source` pages inside `wiki/sources/`.
 
 `_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape. Optional `knownVaults` entries may map Obsidian vault names to absolute local paths so agents can resolve `obsidian://` cross-vault references for reading only.
 

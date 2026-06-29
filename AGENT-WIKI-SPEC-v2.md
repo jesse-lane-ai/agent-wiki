@@ -184,7 +184,7 @@ Optional quantitative or stateful information. Not a required first-class author
 Agent Wiki supports two operating modes.
 
 - **Vault mode**: the wiki root is the primary repository or folder. Source material enters through `_inbox/`, `import-link`, or direct source-page creation. Original inbox files are retained in `raw/` after promotion.
-- **Workspace mode**: the wiki root is embedded inside a larger workspace, normally at `workspace/wiki`. Source candidates live outside the wiki directory. Original workspace files stay in place and are referenced by canonical source pages through workspace-relative `originPath` values.
+- **Workspace mode**: the wiki root is embedded inside a larger workspace, normally at `workspace/wiki`. Source candidates may live outside the wiki directory and are discovered by workspace scanning, while deliberate captures may still enter through the wiki's `_inbox/`. Original workspace files stay in place and are referenced by canonical source pages through workspace-relative `originPath` values.
 
 A v2-compliant wiki MUST have a `wikiType` of `vault` or `workspace`. If `_system/config.json` is absent, tools SHOULD default to `vault` mode for backward compatibility.
 
@@ -262,7 +262,7 @@ A workspace-mode wiki is stored inside a larger workspace. The default wiki dire
       scripts/
 ```
 
-Workspace mode MUST NOT require `_inbox/`, `_inbox/trash/`, or `raw/` inside the wiki root. Those folders MAY exist if an operator explicitly wants an inbox workflow inside a workspace wiki, but their absence MUST NOT make the workspace wiki non-compliant.
+Workspace mode MUST include `_inbox/`, `_inbox/trash/`, and `raw/` inside the wiki root for deliberate external captures and notes. Workspace discovery MUST still exclude the wiki directory itself, so these inbox/raw folders are not treated as workspace source candidates.
 
 Workspace discovery state SHOULD live under `_system/state/` or another deterministic local runtime location inside the wiki root. It is local operational state, not canonical wiki knowledge.
 
@@ -340,10 +340,10 @@ Stores generated dashboard pages and maintenance views.
 Stores agent skill definitions at the wiki root so the wiki follows common portable skill conventions. Skills are human-authored operational instructions and supporting files, not authored knowledge pages.
 
 #### `_inbox/`
-Vault mode only. Stores raw files waiting to be promoted into canonical source pages. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
+Stores raw files waiting to be promoted into canonical source pages. This folder exists in both vault and workspace mode. Files in `_inbox/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
 #### `raw/`
-Vault mode only. Stores retained original raw files after inbox promotion. Files in `raw/` are not canonical source pages and MUST NOT be treated as evidence for claims.
+Stores retained original raw files after inbox promotion. This folder exists in both vault and workspace mode. Files in `raw/` are not canonical source pages and MUST NOT be treated as evidence for claims.
 
 #### `_attachments/`
 Stores binary assets and attachments referenced by source pages or other pages (PDFs, images, raw files). Created on vault initialization; MAY be empty.
@@ -491,7 +491,7 @@ agent-wiki registry add MyProject --root /path/to/workspace/wiki --type workspac
 agent-wiki --wiki MyProject onboard --check
 ```
 
-`init` SHOULD create the required content, generated, and system directories for the selected mode. Vault mode SHOULD create `_inbox/`, `_inbox/trash/`, and `raw/`. Workspace mode MUST NOT create those folders by default.
+`init` SHOULD create the required content, generated, system, and inbox lifecycle directories for the selected mode. Both vault mode and workspace mode SHOULD create `_inbox/`, `_inbox/trash/`, and `raw/`.
 
 By default, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config. A `--no-config` flag MAY suppress this for advanced bare-skeleton setup or tests.
 

@@ -133,12 +133,14 @@ Use vault mode when the wiki itself is the primary repository and source materia
 
 Workspace mode embeds the wiki inside an existing project. By default the wiki lives at `workspace/wiki`, and original workspace files stay where they are.
 
-Workspace mode does not require `_inbox/`, `_inbox/trash/`, or `raw/`. Source capture is reference-based:
+Workspace mode includes `_inbox/`, `_inbox/trash/`, and `raw/` for deliberate external captures and notes. Workspace source capture is still reference-based:
 
 - `agent-wiki workspace pending` finds candidate workspace files.
 - The agent reads selected workspace files in place.
 - Canonical `sources/` pages cite workspace-relative `originPath` values.
 - `agent-wiki workspace mark-sourced ...` records which workspace files have been captured.
+
+The workspace scanner excludes the wiki directory itself, so `_inbox/` items are handled by the inbox workflow rather than rediscovered as workspace files.
 
 Initialize a workspace wiki:
 
