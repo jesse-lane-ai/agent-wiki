@@ -2,12 +2,13 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync,
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileWiki } from "./compile.js";
+import { renderIndexCommand } from "./catalog.js";
 import { detectWikiType, doctorWiki, requiredFoldersForDoctor, writeLocalConfig } from "./lifecycle.js";
 import { readJsonObject } from "./config.js";
 import { writeJson } from "./wiki-utils.js";
 
 interface MigrationAction {
-  action: "remove" | "rewrite" | "copy" | "mkdir" | "doctor" | "compile";
+  action: "remove" | "rewrite" | "copy" | "mkdir" | "doctor" | "compile" | "index";
   path?: string;
   message: string;
 }
@@ -115,11 +116,13 @@ export function migrateWiki(args: Record<string, unknown>): number {
     try {
       console.log = () => undefined;
       compileWiki({});
+      renderIndexCommand({ write: true, "no-log": true });
     } finally {
       console.log = originalLog;
     }
     summary.actions.push({ action: "doctor", message: `doctor completed with ${doctorIssues.length} issue(s)` });
     summary.actions.push({ action: "compile", message: "compile completed" });
+    summary.actions.push({ action: "index", message: "index completed" });
   }
 
   console.log(JSON.stringify(summary, null, 2));

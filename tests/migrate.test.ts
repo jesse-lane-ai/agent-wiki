@@ -34,6 +34,7 @@ test("migrate v1 reports and applies safe v2 upgrade changes", () => {
     assert.match(readFileSync(join(root, "_system/skills/legacy/SKILL.md"), "utf8"), /AGENT-WIKI-SPEC-v2/);
     assert.ok(existsSync(join(root, "_archive/migrations/v1-to-v2")));
     assert.ok(existsSync(join(root, "_system/cache/pages.json")));
+    assert.match(execFileSync("node", [CLI, "index", "--check"], { cwd: root, encoding: "utf8" }), /index\.md is current/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
