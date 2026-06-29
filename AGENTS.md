@@ -97,6 +97,8 @@ Agents SHOULD ask setup questions as compact multiple-choice prompts so the user
 
 This checkout is the only wiki root. Agents MUST read and write project paths relative to the repository root.
 
+When the operator has registered multiple local Agent Wiki roots, agents MAY use `agent-wiki list` to inspect the machine-local registry and `agent-wiki --wiki NAME <command>` to target a registered wiki. Agents MUST NOT infer or create registry entries without explicit operator intent.
+
 If the operator approves persisting local setup choices, agents SHOULD write local `_system/config.json` through `agent-wiki onboard --write-config` with the approved flags. Agents MUST NOT hand-edit `_system/config.json`.
 
 When `_system/config.json` contains `knownVaults`, agents MAY use it only to resolve `obsidian://` cross-vault references for reading. Agents MUST NOT treat `knownVaults` entries as alternate wiki roots or write destinations.

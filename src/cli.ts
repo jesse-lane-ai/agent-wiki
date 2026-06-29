@@ -6,11 +6,12 @@ import { renderIndexCommand } from "./catalog.js";
 import { compileWiki } from "./compile.js";
 import { doctorWiki, initWiki, issuesToJson, issuesToText } from "./lifecycle.js";
 import { migrateRefs } from "./migrate.js";
-import { onboard } from "./onboard.js";
+import { buildOnboardingReport, onboard } from "./onboard.js";
 import { createPage } from "./page.js";
 import { migrateWiki } from "./upgrade.js";
 import { writeOperationalLog } from "./wiki-utils.js";
 import { randomBytes } from "node:crypto";
+import { addRegistryEntry, getRegistryEntry, listRegistryEntries, registryPath, removeRegistryEntry } from "./registry.js";
 import {
   defaultWorkspaceRoot,
   filesToJson,
@@ -35,16 +36,20 @@ export function main(argv = process.argv.slice(2)): number {
       printHelp();
       return global.help ? 0 : 2;
     }
+    const wikiRoot = resolveWikiRoot(global);
+    if (command === "list") return cmdList(global);
+    if (command === "registry") return cmdRegistry(global);
+    if (command === "check") return cmdCheck(global);
     if (command === "init") return cmdInit(global);
-    if (command === "doctor") return cmdDoctor(global);
-    if (command === "workspace") return cmdWorkspace(global);
-    if (command === "create-page") return createPage(global);
-    if (command === "onboard") return onboard(global);
-    if (command === "index") return renderIndexCommand(global);
-    if (command === "log") return cmdLog(global);
-    if (command === "migrate-refs-to-links") return migrateRefs(global);
-    if (command === "migrate") return migrateWiki(global);
-    if (command === "compile") return compileWiki(global);
+    if (command === "doctor") return cmdDoctor(global, wikiRoot);
+    if (command === "workspace") return withWikiRoot(wikiRoot, () => cmdWorkspace(global));
+    if (command === "create-page") return withWikiRoot(wikiRoot, () => createPage(global));
+    if (command === "onboard") return onboard({ ...global, "wiki-root": wikiRoot ?? global["wiki-root"] });
+    if (command === "index") return withWikiRoot(wikiRoot, () => renderIndexCommand(global));
+    if (command === "log") return withWikiRoot(wikiRoot, () => cmdLog(global));
+    if (command === "migrate-refs-to-links") return withWikiRoot(wikiRoot, () => migrateRefs(global));
+    if (command === "migrate") return withWikiRoot(wikiRoot, () => migrateWiki(global));
+    if (command === "compile") return withWikiRoot(wikiRoot, () => compileWiki(global));
     if (command === "uuid") return cmdUuid(global);
     throw new Error(`Unknown command: ${command}`);
   } catch (error) {
@@ -63,8 +68,8 @@ function cmdInit(args: Args): number {
     root: stringOpt(args["root"], "."),
     workspaceRoot: stringOpt(args["workspace-root"]),
     wikiDir: stringOpt(args["wiki-dir"], "wiki"),
-    writeConfig: Boolean(args["write-config"]),
-    withTemplate: Boolean(args["with-template"])
+    writeConfig: args["no-config"] ? false : true,
+    withTemplate: args["no-template"] ? false : true
   });
   console.log(`Initialized ${result.wikiType} wiki at ${result.wikiRoot}`);
   if (result.workspaceRoot) console.log(`Workspace root: ${result.workspaceRoot}`);
@@ -74,12 +79,107 @@ function cmdInit(args: Args): number {
   return 0;
 }
 
-function cmdDoctor(args: Args): number {
-  const root = stringOpt(args["wiki-root"], stringOpt(args.root, ".")) ?? ".";
+function cmdDoctor(args: Args, wikiRoot?: string): number {
+  const root = wikiRoot ?? stringOpt(args["wiki-root"], stringOpt(args.root, ".")) ?? ".";
   const type = stringOpt(args.type);
   const issues = doctorWiki(root, type);
   console.log(args.json ? issuesToJson(issues) : issuesToText(issues));
   return issues.some((issue) => issue.level === "error") ? 1 : 0;
+}
+
+function cmdList(args: Args): number {
+  const entries = listRegistryEntries();
+  if (args.json) {
+    console.log(JSON.stringify({ schemaVersion: 1, registryPath: registryPath(), wikis: entries }, null, 2));
+    return 0;
+  }
+  if (entries.length === 0) {
+    console.log("No Agent Wiki roots registered.");
+    return 0;
+  }
+  const width = Math.max(...entries.map((entry) => entry.name.length), 4);
+  for (const entry of entries) console.log(`${entry.name.padEnd(width)}  ${entry.type.padEnd(9)}  ${entry.root}`);
+  return 0;
+}
+
+function cmdRegistry(args: Args): number {
+  const subcommand = args._[1];
+  if (subcommand === "list") return cmdList(args);
+  if (subcommand === "add") {
+    const name = stringOpt(args.name, args._[2]);
+    if (!name) throw new Error("registry add requires a wiki name");
+    const root = required(args, "root");
+    const entry = addRegistryEntry(name, root, stringOpt(args.type));
+    console.log(args.json ? JSON.stringify(entry, null, 2) : `Registered ${entry.name}: ${entry.root}`);
+    return 0;
+  }
+  if (subcommand === "show") {
+    const name = stringOpt(args.name, args._[2]);
+    if (!name) throw new Error("registry show requires a wiki name");
+    const entry = getRegistryEntry(name);
+    console.log(args.json ? JSON.stringify(entry, null, 2) : `${entry.name}  ${entry.type}  ${entry.root}`);
+    return 0;
+  }
+  if (subcommand === "remove") {
+    const name = stringOpt(args.name, args._[2]);
+    if (!name) throw new Error("registry remove requires a wiki name");
+    const removed = removeRegistryEntry(name);
+    console.log(removed ? `Removed ${name}` : `No registered wiki named ${name}`);
+    return removed ? 0 : 1;
+  }
+  throw new Error("registry requires list, add, show, or remove");
+}
+
+function cmdCheck(args: Args): number {
+  const name = args._[1] && !String(args._[1]).startsWith("--") ? String(args._[1]) : undefined;
+  const entries = args.all ? listRegistryEntries() : [getRegistryEntry(name ?? required(args, "wiki"))];
+  const results = entries.map((entry) => checkEntry(entry, Boolean(args.full)));
+  if (args.json) {
+    console.log(JSON.stringify({ schemaVersion: 1, full: Boolean(args.full), results }, null, 2));
+  } else {
+    for (const result of results) {
+      const status = result.ok ? "ok" : "fail";
+      console.log(`${status.padEnd(5)} ${result.name} (${result.root})`);
+      if (!result.ok) {
+        for (const issue of result.doctorIssues) console.log(`  ${issue.level}: ${issue.code} ${issue.message}`);
+        if (result.indexStatus) console.log(`  index: ${result.indexStatus}`);
+      }
+    }
+  }
+  return results.every((result) => result.ok) ? 0 : 1;
+}
+
+function checkEntry(entry: ReturnType<typeof getRegistryEntry>, full: boolean) {
+  const doctorIssues = doctorWiki(entry.root, entry.type);
+  const onboarding = buildOnboardingReport(entry.root);
+  const errors = doctorIssues.filter((issue) => issue.level === "error");
+  let compileStatus: "skipped" | "passed" | "failed" = "skipped";
+  let indexStatus: "skipped" | "current" | "out-of-date" | "failed" = "skipped";
+  if (full && errors.length === 0) {
+    const originalLog = console.log;
+    try {
+      console.log = () => undefined;
+      withWikiRoot(entry.root, () => compileWiki({}));
+      const indexCode = withWikiRoot(entry.root, () => renderIndexCommand({ check: true }));
+      compileStatus = "passed";
+      indexStatus = indexCode === 0 ? "current" : "out-of-date";
+    } catch {
+      compileStatus = "failed";
+      indexStatus = "failed";
+    } finally {
+      console.log = originalLog;
+    }
+  }
+  return {
+    name: entry.name,
+    root: entry.root,
+    type: entry.type,
+    ok: errors.length === 0 && onboarding.summary.ready && (!full || (compileStatus === "passed" && indexStatus === "current")),
+    doctorIssues,
+    onboardingSummary: onboarding.summary,
+    compileStatus,
+    indexStatus
+  };
 }
 
 function cmdWorkspace(args: Args): number {
@@ -176,11 +276,31 @@ function stringOpt(value: string | boolean | string[] | undefined, fallback?: st
   return typeof value === "string" ? value : fallback;
 }
 
+function resolveWikiRoot(args: Args): string | undefined {
+  const name = stringOpt(args.wiki);
+  return name ? getRegistryEntry(name).root : undefined;
+}
+
+function withWikiRoot(root: string | undefined, fn: () => number): number {
+  if (!root) return fn();
+  const previous = process.cwd();
+  process.chdir(root);
+  try {
+    return fn();
+  } finally {
+    process.chdir(previous);
+  }
+}
+
 function printHelp(): void {
   console.log(`agent-wiki
 
 Commands:
-  init --type vault|workspace [--root PATH] [--workspace-root PATH] [--wiki-dir wiki] [--write-config] [--with-template]
+  list [--json]
+  registry list|add|show|remove
+  check WIKI|--all [--full] [--json]
+  --wiki NAME <command>
+  init --type vault|workspace [--root PATH] [--workspace-root PATH] [--wiki-dir wiki] [--no-config] [--no-template]
   doctor [--wiki-root PATH] [--type vault|workspace] [--json]
   create-page --type TYPE --subtype SUBTYPE --slug SLUG --title TITLE (--body-file PATH|--body TEXT)
   onboard --check [--wiki-root PATH] [--questions] [--compact]

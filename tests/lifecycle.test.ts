@@ -9,16 +9,18 @@ function tempDir(): string {
   return mkdtempSync(join(tmpdir(), "agent-wiki-test-"));
 }
 
-test("init vault creates expected folders and config", () => {
+test("init vault creates expected folders, config, and template by default", () => {
   const tmp = tempDir();
   try {
     const root = join(tmp, "vault");
-    const result = initWiki({ wikiType: "vault", root, writeConfig: true });
+    const result = initWiki({ wikiType: "vault", root, writeConfig: true, withTemplate: true });
     assert.equal(result.wikiType, "vault");
     assert.ok(readJson(join(root, "_system/config.json")).wikiType === "vault");
     assert.doesNotThrow(() => readFileSync(join(root, "_system/config.json"), "utf8"));
     assert.ok(isDir(join(root, "sources/parts")));
     assert.ok(isDir(join(root, "skills")));
+    assert.ok(isFile(join(root, "AGENTS.md")));
+    assert.ok(isFile(join(root, "skills/process-inbox/SKILL.md")));
     assert.ok(!isDir(join(root, "_system/skills")));
     assert.ok(isDir(join(root, "_inbox/trash")));
     assert.ok(isDir(join(root, "raw")));
@@ -86,6 +88,20 @@ test("doctor reports missing template files as warnings", () => {
     const issues = doctorWiki(root, "vault");
     assert.equal(issues.some((issue) => issue.level === "error"), false);
     assert.equal(issues.some((issue) => issue.code === "missing_template_file"), true);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("init can create a bare skeleton without config or template", () => {
+  const tmp = tempDir();
+  try {
+    const root = join(tmp, "vault");
+    initWiki({ wikiType: "vault", root, writeConfig: false, withTemplate: false });
+    assert.ok(isDir(join(root, "sources/parts")));
+    assert.ok(!isFile(join(root, "_system/config.json")));
+    assert.ok(!isFile(join(root, "AGENTS.md")));
+    assert.ok(!isFile(join(root, "skills/process-inbox/SKILL.md")));
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

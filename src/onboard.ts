@@ -40,7 +40,7 @@ function writeConfig(root: string, args: Record<string, unknown>): number {
   return 0;
 }
 
-function buildOnboardingReport(root: string) {
+export function buildOnboardingReport(root: string) {
   const config = loadConfig(root);
   const doctorIssues = doctorWiki(root, config.wikiType);
   const configPath = join(root, "_system/config.json");
@@ -138,7 +138,7 @@ function nextSteps(input: {
 }): string[] {
   const steps: string[] = [];
   if (input.doctorIssues.some((issue) => issue.level === "error")) steps.push("Fix doctor errors, then rerun agent-wiki onboard --check.");
-  if (input.missingDocs.length || input.missingSkills.length) steps.push("Run agent-wiki init --with-template or migrate to restore missing docs/skills.");
+  if (input.missingDocs.length || input.missingSkills.length) steps.push("Run agent-wiki init or migrate to restore missing docs/skills.");
   if (!input.configExists) steps.push("Persist local setup with agent-wiki onboard --write-config after choosing wiki type and policy.");
   if (!input.importLinkConfigured) steps.push("Configure skills/import-link/config.json before importing external links.");
   steps.push("Run agent-wiki compile and agent-wiki index --check before handing the wiki to another agent.");

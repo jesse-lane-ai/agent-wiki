@@ -2,32 +2,40 @@
 
 Use this file when setting up a fresh Agent Wiki or when a new agent needs to orient itself before editing one.
 
-Start with the lifecycle CLI:
+Start with the lifecycle CLI and register the wiki by name:
 
 ```bash
-agent-wiki init --type vault --root /path/to/wiki --write-config
-agent-wiki doctor --wiki-root /path/to/wiki
+agent-wiki init --type vault --root ./Business
+agent-wiki registry add Business --root ./Business --type vault
+agent-wiki --wiki Business onboard --check
+agent-wiki --wiki Business compile
+agent-wiki --wiki Business index --check
 ```
 
 For a project workspace with an embedded wiki:
 
 ```bash
-agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
-agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
+cd /path/to/project
+agent-wiki init --type workspace --workspace-root . --wiki-dir wiki
+agent-wiki registry add MyProject --root ./wiki --type workspace
+agent-wiki --wiki MyProject onboard --check
+agent-wiki --wiki MyProject workspace pending --workspace-root . --json
 ```
 
-`agent-wiki init` owns folder creation and optional local config creation. `agent-wiki doctor` is the read-only lifecycle check. `agent-wiki onboard --check` is the deterministic first-run report for agents and automation. It emits structured JSON with wiki type, config state, doctor issues, required docs/skills, optional tool availability, import-link state, and next steps.
+`agent-wiki init` owns folder creation, local config creation, and bundled template installation by default. `agent-wiki doctor` is the read-only lifecycle check. `agent-wiki onboard --check` is the deterministic first-run report for agents and automation. It emits structured JSON with wiki type, config state, doctor issues, required docs/skills, optional tool availability, import-link state, and next steps.
 
-Use `agent-wiki init --with-template` when a newly initialized wiki should include the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately.
+Use plain `agent-wiki init` for normal fresh wikis. It includes the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately. Use `--no-config` or `--no-template` only for advanced bare-skeleton setup or tests.
 
 Before editing wiki content, run the deterministic CLI onboarding sequence:
 
 ```bash
-agent-wiki doctor --wiki-root /path/to/wiki
-agent-wiki onboard --check --wiki-root /path/to/wiki
-agent-wiki compile
-agent-wiki index --check
+agent-wiki --wiki Business doctor
+agent-wiki --wiki Business onboard --check
+agent-wiki --wiki Business compile
+agent-wiki --wiki Business index --check
 ```
+
+If the wiki has not been registered yet, use `--wiki-root /path/to/wiki` for `doctor` and `onboard`, then run `compile` and `index --check` from the wiki root.
 
 When a human needs to choose local setup policy, generate stable prompts:
 
@@ -37,14 +45,35 @@ agent-wiki onboard --check --questions --wiki-root /path/to/wiki
 
 Agents should treat the CLI output as the onboarding source of truth. Read this file for explanation, not as an interactive onboarding substitute.
 
+When the machine tracks more than one Agent Wiki root, register each root locally:
+
+```bash
+agent-wiki registry add Business --root /path/to/wiki --type vault
+agent-wiki list
+agent-wiki --wiki Business onboard --check
+```
+
+The registry is machine-local operator state at `~/.config/agent-wiki/registry.json`. It should contain only Agent Wiki roots created or migrated by this CLI.
+
+For multiple fresh vault wikis:
+
+```bash
+agent-wiki init --type vault --root ./Business
+agent-wiki registry add Business --root ./Business --type vault
+agent-wiki init --type vault --root ./Research
+agent-wiki registry add Research --root ./Research --type vault
+agent-wiki list
+agent-wiki check --all
+```
+
 Before editing wiki content:
 
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
 3. Read [[AGENT-WIKI-SPEC-v2]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
-4. Run `agent-wiki doctor` for the target wiki root.
-5. Run `agent-wiki onboard --check --wiki-root /path/to/wiki`.
-6. Configure local `_system/config.json` only through approved setup choices.
+4. Run `agent-wiki --wiki NAME doctor` for the target registered wiki, or `agent-wiki doctor --wiki-root /path/to/wiki` before registration.
+5. Run `agent-wiki --wiki NAME onboard --check`, or `agent-wiki onboard --check --wiki-root /path/to/wiki` before registration.
+6. Keep local `_system/config.json` limited to local operator policy and command preferences.
 7. Configure `skills/import-link/config.json` before importing external material.
 8. Run the compile pipeline and confirm it reports zero validation issues.
 9. Optionally run the `write-synthesis` skill when the wiki needs a durable cross-source brief, comparison, analysis, summary, or timeline narrative.
@@ -64,7 +93,7 @@ Vault mode preserves the classic Agent Wiki layout. The wiki root is the working
 Initialize a vault wiki:
 
 ```bash
-agent-wiki init --type vault --root /path/to/wiki --write-config
+agent-wiki init --type vault --root /path/to/wiki
 ```
 
 Check it:
@@ -91,7 +120,7 @@ Workspace mode does not require `_inbox/`, `_inbox/trash/`, or `raw/`. Source ca
 Initialize a workspace wiki:
 
 ```bash
-agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki --write-config
+agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki
 ```
 
 Check it:
@@ -176,7 +205,7 @@ Use it when the user wants persistent local preferences such as:
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 - optional `knownVaults` mappings from Obsidian vault names to absolute local paths for resolving `obsidian://` references
 
-Prefer `agent-wiki init --write-config` for initial `wikiType` and workspace settings. Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults and default to vault mode.
+Prefer `agent-wiki init` for initial `wikiType` and workspace settings. Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults and default to vault mode.
 
 When local Python or conversion policy is needed, use the onboarding config writer so only approved local policy fields are persisted:
 

@@ -12,7 +12,7 @@ const CLI = join(REPO_ROOT, "dist/src/cli.js");
 test("onboard check emits deterministic JSON report", () => {
   const root = mkdtempSync(join(tmpdir(), "agent-wiki-onboard-"));
   try {
-    execFileSync("node", [CLI, "init", "--type", "vault", "--root", root, "--write-config", "--with-template"], { encoding: "utf8" });
+    execFileSync("node", [CLI, "init", "--type", "vault", "--root", root], { encoding: "utf8" });
     const report = JSON.parse(execFileSync("node", [CLI, "onboard", "--check", "--wiki-root", root], { encoding: "utf8" }));
     assert.equal(report.schemaVersion, 1);
     assert.equal(report.command, "agent-wiki onboard --check");
@@ -30,7 +30,7 @@ test("onboard check emits deterministic JSON report", () => {
 test("onboard questions emits stable numbered prompts", () => {
   const root = mkdtempSync(join(tmpdir(), "agent-wiki-onboard-"));
   try {
-    execFileSync("node", [CLI, "init", "--type", "vault", "--root", root, "--write-config", "--with-template"], { encoding: "utf8" });
+    execFileSync("node", [CLI, "init", "--type", "vault", "--root", root], { encoding: "utf8" });
     const out = execFileSync("node", [CLI, "onboard", "--check", "--questions", "--wiki-root", root], { encoding: "utf8" });
     assert.match(out, /1\. Wiki type: vault/);
     assert.match(out, /2\. Local config: present/);

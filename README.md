@@ -65,21 +65,33 @@ Structured evidence, relations, contradictions, and timeline events are stored i
 
 ## Quick Start
 
-Create a fresh vault wiki:
+Create and register a fresh vault wiki:
 
 ```bash
-npx agent-wiki init --type vault --root /path/to/wiki --write-config --with-template
-npx agent-wiki doctor --wiki-root /path/to/wiki
+npx agent-wiki init --type vault --root ./Business
+npx agent-wiki registry add Business --root ./Business --type vault
+npx agent-wiki --wiki Business onboard --check
+npx agent-wiki --wiki Business compile
+npx agent-wiki --wiki Business index --check
 ```
 
-Create a workspace wiki inside an existing project:
+Confirm registered wikis:
 
 ```bash
-npx agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config --with-template
-npx agent-wiki doctor --wiki-root /path/to/workspace/wiki --type workspace
+npx agent-wiki list
 ```
 
-Run deterministic onboarding:
+Create and register a workspace wiki inside an existing project:
+
+```bash
+cd /path/to/workspace
+npx agent-wiki init --type workspace --workspace-root . --wiki-dir wiki
+npx agent-wiki registry add MyProject --root ./wiki --type workspace
+npx agent-wiki --wiki MyProject onboard --check
+npx agent-wiki --wiki MyProject workspace pending --workspace-root . --json
+```
+
+Run deterministic onboarding directly against a path when a wiki is not registered:
 
 ```bash
 npx agent-wiki onboard --check --wiki-root /path/to/wiki
@@ -87,6 +99,29 @@ npx agent-wiki onboard --check --questions --wiki-root /path/to/wiki
 ```
 
 Use the JSON report for automation and the numbered questions only when a human needs to choose local setup policy.
+
+Track machine-local Agent Wiki roots:
+
+```bash
+agent-wiki registry add Business --root /path/to/wiki --type vault
+agent-wiki list
+agent-wiki --wiki Business onboard --check
+agent-wiki check --all
+agent-wiki check --all --full
+```
+
+The registry is local to the machine and stored outside any wiki at `~/.config/agent-wiki/registry.json`. `check --all` is light and read-only. `check --all --full` also runs compile and index validation.
+
+For multiple fresh vault wikis:
+
+```bash
+npx agent-wiki init --type vault --root ./Business
+npx agent-wiki registry add Business --root ./Business --type vault
+npx agent-wiki init --type vault --root ./Research
+npx agent-wiki registry add Research --root ./Research --type vault
+npx agent-wiki list
+npx agent-wiki check --all
+```
 
 Install the local CLI during development:
 
@@ -108,6 +143,7 @@ Check wiki health without changing files:
 
 ```bash
 agent-wiki doctor --wiki-root /path/to/wiki
+agent-wiki --wiki Business doctor
 ```
 
 Ingest text or markdown from `_inbox/` in a new agent session:

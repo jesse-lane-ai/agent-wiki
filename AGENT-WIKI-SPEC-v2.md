@@ -451,9 +451,9 @@ Recommended shape:
 
 `pythonCommand` MAY be `null` to use the active environment, `python3`, `python`, or a project-local virtual environment path such as `.venv/bin/python`.
 
-This project is scoped to one wiki per wiki root. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is the configured wiki directory inside a larger workspace. Skills, scripts, and config files MUST read and write wiki content relative to the wiki root unless a workspace-mode command explicitly reads source candidates from the workspace root.
+Each wiki root remains a single Agent Wiki. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is the configured wiki directory inside a larger workspace. Skills, scripts, and config files MUST read and write wiki content relative to the selected wiki root unless a workspace-mode command explicitly reads source candidates from the workspace root.
 
-Multiple active wiki roots in one command invocation are outside the scope of this project. Operators who want multiple independent wikis SHOULD initialize each wiki separately and handle cross-wiki routing or selection outside this project.
+The lifecycle CLI MAY track multiple local Agent Wiki roots through a machine-local registry outside any wiki root, conventionally `~/.config/agent-wiki/registry.json`. Registry entries MUST refer only to Agent Wiki roots created or migrated by the CLI. The registry is local operator state, not canonical wiki knowledge, and MUST NOT be stored inside a wiki. Operators MAY target a registered wiki with `agent-wiki --wiki NAME <command>`.
 
 Obsidian is an optional editor for the wiki root. Opening the wiki root as an Obsidian vault MUST NOT change where skills or scripts read and write content.
 
@@ -478,29 +478,47 @@ npm link
 The lifecycle CLI SHOULD support initializing a vault-mode wiki:
 
 ```bash
-agent-wiki init --type vault --root /path/to/wiki --write-config
+agent-wiki init --type vault --root /path/to/wiki
+agent-wiki registry add MyWiki --root /path/to/wiki --type vault
+agent-wiki --wiki MyWiki onboard --check
 ```
 
 It SHOULD support initializing a workspace-mode wiki:
 
 ```bash
-agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki --write-config
+agent-wiki init --type workspace --workspace-root /path/to/workspace --wiki-dir wiki
+agent-wiki registry add MyProject --root /path/to/workspace/wiki --type workspace
+agent-wiki --wiki MyProject onboard --check
 ```
 
 `init` SHOULD create the required content, generated, and system directories for the selected mode. Vault mode SHOULD create `_inbox/`, `_inbox/trash/`, and `raw/`. Workspace mode MUST NOT create those folders by default.
 
-When `--write-config` is supplied, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config.
+By default, `init` SHOULD write `_system/config.json` with `schemaVersion`, `wikiType`, and workspace settings appropriate to the selected mode. It SHOULD preserve unrelated existing config fields when updating an existing local config. A `--no-config` flag MAY suppress this for advanced bare-skeleton setup or tests.
 
-When `--with-template` is supplied, `init` SHOULD copy missing bundled root documentation, root-level `skills/`, package metadata, and `_system/config.example.json` into the wiki. It MUST NOT overwrite existing files. This mode is intended for fresh agent-runnable wikis, while plain `init` remains a folder/config skeleton initializer.
+By default, `init` SHOULD copy missing bundled root documentation, root-level `skills/`, package metadata, and `_system/config.example.json` into the wiki. It MUST NOT overwrite existing files. A `--no-template` flag MAY suppress this for advanced bare-skeleton setup or tests.
 
 The lifecycle CLI SHOULD provide a read-only health check:
 
 ```bash
 agent-wiki doctor --wiki-root /path/to/wiki --type vault
 agent-wiki doctor --wiki-root /path/to/workspace/wiki --type workspace
+agent-wiki --wiki MyWiki doctor
 ```
 
 `doctor` SHOULD verify mode-specific required folders, local config sanity, required template script/skill availability, and whether `wikiType` is valid. It MUST NOT create files, write config, install packages, run conversion, or mutate wiki content. It SHOULD return a non-zero exit code only for errors, not warnings or informational findings.
+
+The lifecycle CLI SHOULD provide machine-local registry commands:
+
+```bash
+agent-wiki registry add MyWiki --root /path/to/wiki --type vault
+agent-wiki registry show MyWiki
+agent-wiki registry remove MyWiki
+agent-wiki list
+agent-wiki check --all
+agent-wiki check --all --full
+```
+
+`agent-wiki list` SHOULD list registered wiki names, types, and paths. `agent-wiki check --all` SHOULD run a light read-only check across registered wikis using `doctor` and the deterministic onboarding summary. `agent-wiki check --all --full` MAY also run compile and index validation and therefore MAY write generated cache/index files.
 
 ### 6.7 Workspace Discovery CLI
 

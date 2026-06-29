@@ -102,7 +102,9 @@ Use `agent-wiki onboard --check --wiki-root PATH` for deterministic first-run on
 
 Use `agent-wiki create-page` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
-This project is scoped to one wiki per wiki root. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is usually `workspace/wiki`. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
+Each wiki root remains a single Agent Wiki. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is usually `workspace/wiki`. The CLI may track multiple local Agent Wiki roots through the machine-local registry at `~/.config/agent-wiki/registry.json`. Registry entries are named Agent Wiki roots and can be selected with `agent-wiki --wiki NAME <command>`. The registry is local operator state, not canonical wiki knowledge, and should not be stored inside a wiki.
+
+Use `agent-wiki list` to list registered wikis and paths. Use `agent-wiki check --all` for a light read-only registry health check across all registered wikis. Use `agent-wiki check --all --full` when compile and index validation should also run. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
 
 ---
 
