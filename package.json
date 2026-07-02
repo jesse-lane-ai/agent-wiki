@@ -1,5 +1,5 @@
 {
-  "name": "@jesse-lane-ai/agent-wiki",
+  "name": "@creativeaitools/agent-wiki",
   "version": "2.0.0",
   "description": "Obsidian-compatible evidence-aware wiki tooling for agents.",
   "type": "module",
