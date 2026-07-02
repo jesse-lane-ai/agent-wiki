@@ -219,7 +219,6 @@ A vault-mode wiki SHOULD use the following top-level structure when initialized.
     cache/
     indexes/
     logs/
-    scripts/
 ```
 
 Fresh template repositories MAY omit empty runtime/content directories. Initialization tooling and workflows SHOULD create missing directories when they are needed.
@@ -259,7 +258,6 @@ A workspace-mode wiki is stored inside a larger workspace. The default wiki dire
       indexes/
       logs/
       state/
-      scripts/
 ```
 
 Workspace mode MUST include `_inbox/`, `_inbox/trash/`, and `raw/` inside the wiki root for deliberate external captures and notes. Workspace discovery MUST still exclude the wiki directory itself, so these inbox/raw folders are not treated as workspace source candidates.
@@ -369,16 +367,14 @@ The compile pipeline reads from the wiki and writes to `_system/cache/`, `_syste
 
 Local config SHOULD NOT contain secrets, API keys, access tokens, private credentials, or machine-specific state that changes on every run. Detection results such as whether a converter is currently installed SHOULD be checked at runtime rather than stored as durable truth.
 
-Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file and any supporting scripts. Example layout:
+Each skill SHOULD live in its own sub-directory under `skills/`, containing at minimum an instruction file. Deterministic operations SHOULD be exposed through the TypeScript `agent-wiki` CLI instead of bundled Python-era script folders. Example layout:
 
 ```text
 skills/
   compile-wiki/
-    instructions.md
-    scripts/
-      agent-wiki compile
+    SKILL.md
   process-inbox/
-    instructions.md
+    SKILL.md
 ```
 
 ### 6.5 Local system configuration

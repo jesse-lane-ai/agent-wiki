@@ -72,7 +72,6 @@ Current vault structure:
     cache/
     indexes/
     logs/
-    scripts/
 ```
 
 Fresh template checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders as needed.
