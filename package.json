@@ -1,5 +1,5 @@
 {
-  "name": "agent-wiki",
+  "name": "@jesse-lane-ai/agent-wiki",
   "version": "2.0.0",
   "description": "Obsidian-compatible evidence-aware wiki tooling for agents.",
   "type": "module",
@@ -31,5 +31,24 @@
   },
   "dependencies": {
     "yaml": "^2.9.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jesse-lane-ai/agent-wiki.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jesse-lane-ai/agent-wiki/issues"
+  },
+  "homepage": "https://github.com/jesse-lane-ai/agent-wiki#readme",
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "wiki",
+    "obsidian",
+    "knowledge-management",
+    "cli"
+  ]
 }
