@@ -33,7 +33,8 @@ export function renderIndex(pages: any[]): string {
     const type = String(page.pageType || "other");
     byType.set(type, [...(byType.get(type) ?? []), page]);
   }
-  const lines = ["---", "id: index.root", "pageType: index", "title: Page Index", "status: active", `updatedAt: ${new Date().toISOString().slice(0, 10)}`, "---", "", "# Page Index", ""];
+  const today = new Date().toISOString().slice(0, 10);
+  const lines = ["---", "id: index.root", "pageType: index", "title: Page Index", "status: active", `createdAt: ${today}`, `updatedAt: ${today}`, "---", "", "# Page Index", ""];
   for (const type of ["overview", "source", "entity", "concept", "claim", "synthesis", "question", "report", "index"]) {
     const rows = (byType.get(type) ?? []).sort((a, b) => String(a.title).localeCompare(String(b.title)));
     if (!rows.length) continue;
@@ -47,7 +48,18 @@ export function renderIndex(pages: any[]): string {
 }
 
 function label(type: string): string {
-  return type.charAt(0).toUpperCase() + type.slice(1).replaceAll("-", " ") + "s";
+  const labels: Record<string, string> = {
+    overview: "Overviews",
+    source: "Sources",
+    entity: "Entities",
+    concept: "Concepts",
+    claim: "Claims",
+    synthesis: "Syntheses",
+    question: "Questions",
+    report: "Reports",
+    index: "Indexes"
+  };
+  return labels[type] ?? `${type.charAt(0).toUpperCase()}${type.slice(1).replaceAll("-", " ")}s`;
 }
 
 function esc(value: unknown): string {

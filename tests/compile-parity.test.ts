@@ -8,26 +8,36 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
-test("TypeScript compile matches old Python compiler for core fixture artifacts", { skip: !hasCommand("python3") }, () => {
-  const tmp = mkdtempSync(join(tmpdir(), "agent-wiki-parity-"));
+test("TypeScript compile emits the core wiki artifact contract", () => {
+  const tmp = mkdtempSync(join(tmpdir(), "agent-wiki-compile-"));
   try {
-    const oldRoot = join(tmp, "old");
-    const newRoot = join(tmp, "new");
-    createFixture(oldRoot);
-    createFixture(newRoot);
-    installOldScripts(oldRoot);
+    const root = join(tmp, "wiki");
+    createFixture(root);
 
-    execFileSync("python3", ["skills/compile-wiki/scripts/compile.py"], { cwd: oldRoot, stdio: "pipe" });
-    execFileSync("node", [join(REPO_ROOT, "dist/src/cli.js"), "compile"], { cwd: newRoot, stdio: "pipe" });
+    execFileSync("node", [join(REPO_ROOT, "dist/src/cli.js"), "compile"], { cwd: root, stdio: "pipe" });
 
-    assert.deepEqual(corePages(newRoot), corePages(oldRoot));
-    assert.deepEqual(readJson(join(newRoot, "_system/indexes/id-to-path.json")).data, readJson(join(oldRoot, "_system/indexes/id-to-path.json")).data);
-    assert.deepEqual(readJson(join(newRoot, "_system/indexes/path-to-id.json")).data, readJson(join(oldRoot, "_system/indexes/path-to-id.json")).data);
-    assert.deepEqual(readJson(join(newRoot, "_system/indexes/pagetype-index.json")).data, readJson(join(oldRoot, "_system/indexes/pagetype-index.json")).data);
-    assert.deepEqual(coreSourceIndex(newRoot), coreSourceIndex(oldRoot));
-    assert.deepEqual(coreQuestions(newRoot), coreQuestions(oldRoot));
-    assert.equal(readJsonLines(join(newRoot, "_system/cache/claims.jsonl")).length, readJsonLines(join(oldRoot, "_system/cache/claims.jsonl")).length);
-    assert.equal(readJsonLines(join(newRoot, "_system/cache/relations.jsonl")).length, readJsonLines(join(oldRoot, "_system/cache/relations.jsonl")).length);
+    assert.deepEqual(corePages(root), [
+      { id: "claim.descriptive.cli-shipped", path: "claims/descriptive-cli-shipped.md", pageType: "claim", title: "CLI Shipped", status: "supported", updatedAt: "2026-06-28" },
+      { id: "concept.method.typescript-cli", path: "concepts/typescript-cli.md", pageType: "concept", title: "TypeScript CLI", status: "active", updatedAt: "2026-06-28" },
+      { id: "entity.project.test-project", path: "entities/test-project.md", pageType: "entity", title: "Test Project", status: "active", updatedAt: "2026-06-28" },
+      { id: "question.testing.cli-parity", path: "questions/cli-parity.md", pageType: "question", title: "CLI Parity", status: "open", updatedAt: "2026-06-28" },
+      { id: "source.2026-06-28.document.test-source", path: "sources/2026-06-28-document-test-source.md", pageType: "source", title: "Test Source", status: "processed", updatedAt: "2026-06-28" },
+      { id: "synthesis.summary.cli-rewrite-summary", path: "syntheses/cli-rewrite-summary.md", pageType: "synthesis", title: "CLI Rewrite Summary", status: "active", updatedAt: "2026-06-28" }
+    ]);
+    assert.deepEqual(readJson(join(root, "_system/indexes/id-to-path.json")).data["entity.project.test-project"], "entities/test-project.md");
+    assert.deepEqual(readJson(join(root, "_system/indexes/path-to-id.json")).data["entities/test-project.md"], "entity.project.test-project");
+    assert.deepEqual(readJson(join(root, "_system/indexes/pagetype-index.json")).data.source, ["source.2026-06-28.document.test-source"]);
+    assert.deepEqual(coreSourceIndex(root), [{ id: "source.2026-06-28.document.test-source", path: "sources/2026-06-28-document-test-source.md", sourceType: "document", sourceRole: "whole", status: "processed" }]);
+    assert.deepEqual(coreQuestions(root), [{ id: "question.testing.cli-parity", path: "questions/cli-parity.md", status: "open", priority: "medium" }]);
+    assert.equal(readJsonLines(join(root, "_system/cache/claims.jsonl")).length, 1);
+    assert.equal(readJsonLines(join(root, "_system/cache/relations.jsonl")).length, 0);
+    assert.deepEqual(readJson(join(root, "_system/cache/validation-issues.json")).issues, []);
+
+    const index = readFileSync(join(root, "index.md"), "utf8");
+    assert.match(index, /^createdAt: \d{4}-\d{2}-\d{2}$/m);
+    assert.match(index, /^updatedAt: \d{4}-\d{2}-\d{2}$/m);
+    assert.match(index, /^## Entities$/m);
+    assert.match(index, /^## Syntheses$/m);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -155,16 +165,6 @@ function createFixture(root: string): void {
   );
 }
 
-function installOldScripts(root: string): void {
-  const rewriteCommit = execFileSync("git", ["rev-list", "-n", "1", "HEAD", "--", "skills/compile-wiki/scripts/compile.py"], { cwd: REPO_ROOT, encoding: "utf8" }).trim();
-  const oldTree = `${rewriteCommit}^`;
-  for (const path of ["skills/compile-wiki/scripts/compile.py", "_system/scripts/index.py", "_system/scripts/log.py"]) {
-    const destination = join(root, path);
-    mkdirSync(destination.slice(0, destination.lastIndexOf("/")), { recursive: true });
-    writeFileSync(destination, execFileSync("git", ["show", `${oldTree}:${path}`], { cwd: REPO_ROOT, encoding: "utf8" }), "utf8");
-  }
-}
-
 function page(frontmatter: Record<string, unknown>, body: string): string {
   return `---\n${yaml(frontmatter)}---\n\n${body}\n`;
 }
@@ -233,13 +233,4 @@ function readJson(path: string): any {
 function readJsonLines(path: string): any[] {
   const text = readFileSync(path, "utf8").trim();
   return text ? text.split("\n").map((line) => JSON.parse(line)) : [];
-}
-
-function hasCommand(command: string): boolean {
-  try {
-    execFileSync(command, ["--version"], { stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
 }

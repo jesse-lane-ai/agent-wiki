@@ -294,7 +294,7 @@ Agent Wiki is built around a few strict rules:
 
 ## Compile
 
-The compiler has no third-party Python dependencies. Run it with the system Python:
+The compiler is built into the TypeScript CLI:
 
 ```bash
 agent-wiki compile
