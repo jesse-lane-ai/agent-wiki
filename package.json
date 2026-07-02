@@ -4,7 +4,7 @@
   "description": "Obsidian-compatible evidence-aware wiki tooling for agents.",
   "type": "module",
   "bin": {
-    "agent-wiki": "./dist/src/cli.js"
+    "agent-wiki": "dist/src/cli.js"
   },
   "files": [
     "dist/src",
