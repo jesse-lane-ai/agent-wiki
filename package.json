@@ -1,6 +1,6 @@
 {
   "name": "@creativeaitools/agent-wiki",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Obsidian-compatible evidence-aware wiki tooling for agents.",
   "type": "module",
   "bin": {

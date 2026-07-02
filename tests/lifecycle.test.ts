@@ -57,7 +57,7 @@ test("init with template copies docs and skills", () => {
     assert.ok(result.templateCopied.length > 0);
     assert.ok(isFile(join(root, "AGENTS.md")));
     assert.ok(isFile(join(root, "WIKI.md")));
-    assert.ok(isFile(join(root, "package.json")));
+    assert.ok(!isFile(join(root, "package.json")));
     assert.ok(isFile(join(root, "skills/process-inbox/SKILL.md")));
     const issues = doctorWiki(root, "vault");
     assert.equal(issues.some((issue) => issue.level === "error" || issue.level === "warning"), false);

@@ -25,7 +25,7 @@ test("packed npm tarball works through node_modules bin shim", () => {
     assert.match(execFileSync(bin, ["--help"], { cwd: tmp, encoding: "utf8", ...WINDOWS_EXEC }), /Commands:/);
     const initOut = execFileSync(bin, ["init", "--type", "vault", "--root", "wiki"], { cwd: tmp, encoding: "utf8", ...WINDOWS_EXEC });
     assert.match(initOut, /Initialized vault wiki/);
-    assert.ok(existsSync(join(tmp, "wiki/package.json")));
+    assert.ok(!existsSync(join(tmp, "wiki/package.json")));
     assert.ok(!existsSync(join(tmp, "wiki/_system/scripts")));
 
     const bodyPath = join(tmp, "body.md");

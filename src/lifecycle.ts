@@ -11,11 +11,10 @@ export const REQUIRED_TEMPLATE_FILES = [
   "AGENTS.md",
   "WIKI.md",
   "README.md",
-  "package.json",
   "skills/compile-wiki/SKILL.md",
   "skills/extract-knowledge-primitives/SKILL.md"
 ];
-export const TEMPLATE_ROOT_FILES = ["AGENTS.md", "WIKI.md", "README.md", "ONBOARD.md", "INBOX.md", "AGENT-WIKI-SPEC-v2.md", "package.json"];
+export const TEMPLATE_ROOT_FILES = ["AGENTS.md", "WIKI.md", "README.md", "ONBOARD.md", "INBOX.md", "AGENT-WIKI-SPEC-v2.md"];
 export const TEMPLATE_DIRECTORIES = ["skills"];
 export const TEMPLATE_OPTIONAL_FILES = ["_system/config.example.json"];
 

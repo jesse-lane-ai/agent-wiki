@@ -38,7 +38,6 @@ const TEMPLATE_FILES = [
   "ONBOARD.md",
   "INBOX.md",
   "AGENT-WIKI-SPEC-v2.md",
-  "package.json",
   "_system/config.example.json"
 ];
 
@@ -134,6 +133,9 @@ function planMigration(root: string, templateRoot: string): MigrationAction[] {
   for (const path of OBSOLETE_PATHS) {
     if (existsSync(join(root, path))) actions.push({ action: "remove", path, message: `Remove obsolete Python-era path: ${path}` });
   }
+  if (isCopiedAgentWikiPackage(join(root, "package.json"))) {
+    actions.push({ action: "remove", path: "package.json", message: "Remove copied Agent Wiki npm package metadata from wiki root" });
+  }
   const wikiType = detectWikiType(readJsonObject(join(root, "_system/config.json")));
   for (const path of requiredFoldersForDoctor(wikiType)) {
     if (!existsSync(join(root, path))) actions.push({ action: "mkdir", path, message: `Create missing required folder: ${path}` });
@@ -146,6 +148,13 @@ function planMigration(root: string, templateRoot: string): MigrationAction[] {
     if (rewriteText(text) !== text) actions.push({ action: "rewrite", path, message: `Rewrite old helper command references in ${path}` });
   }
   return actions.sort((a, b) => `${a.action}:${a.path ?? ""}`.localeCompare(`${b.action}:${b.path ?? ""}`));
+}
+
+function isCopiedAgentWikiPackage(path: string): boolean {
+  const packageJson = readJsonObject(path);
+  if (!packageJson) return false;
+  const name = String(packageJson.name ?? "");
+  return name === "@creativeaitools/agent-wiki" || name === "@jesse-lane-ai/agent-wiki" || name === "agent-wiki";
 }
 
 function rewriteCandidateFiles(root: string): string[] {

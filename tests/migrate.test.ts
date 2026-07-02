@@ -27,6 +27,7 @@ test("migrate v1 reports and applies safe v2 upgrade changes", () => {
     assert.ok(!existsSync(join(root, "_system/skills/import-link/scripts/uuid.py")));
     assert.ok(!existsSync(join(root, "skills/compile-wiki/scripts/compile.py")));
     assert.ok(!existsSync(join(root, "agent_wiki")));
+    assert.ok(!existsSync(join(root, "package.json")));
     assert.equal(JSON.parse(readFileSync(join(root, "_system/config.json"), "utf8")).wikiType, "vault");
     assert.match(readFileSync(join(root, "README.md"), "utf8"), /agent-wiki create-page/);
     assert.match(readFileSync(join(root, "README.md"), "utf8"), /AGENT-WIKI-SPEC-v2/);
@@ -45,6 +46,7 @@ function createOldWiki(root: string): void {
     mkdirSync(join(root, dir), { recursive: true });
   }
   writeFileSync(join(root, "pyproject.toml"), "[project]\nname = \"agent-wiki\"\n", "utf8");
+  writeFileSync(join(root, "package.json"), "{\"name\":\"@creativeaitools/agent-wiki\",\"version\":\"2.0.0\"}\n", "utf8");
   writeFileSync(join(root, "_system/config.json"), "{\"schemaVersion\":1,\"pythonCommand\":\"python\"}\n", "utf8");
   writeFileSync(join(root, "agent_wiki/cli.py"), "print('old')\n", "utf8");
   writeFileSync(join(root, "_system/scripts/create-page.py"), "print('old')\n", "utf8");

@@ -30,7 +30,7 @@ agent-wiki --wiki MyProject workspace pending --workspace-root . --json
 
 `agent-wiki init` owns folder creation, local config creation, and bundled template installation by default. `agent-wiki doctor` is the read-only lifecycle check. `agent-wiki onboard --check` is the deterministic first-run report for agents and automation. It emits structured JSON with wiki type, config state, doctor issues, required docs/skills, optional tool availability, import-link state, and next steps.
 
-Use plain `agent-wiki init` for normal fresh wikis. It includes the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately. Use `--no-config` or `--no-template` only for advanced bare-skeleton setup or tests.
+Use plain `agent-wiki init` for normal fresh wikis. It includes the bundled docs and skills needed for a fresh agent to operate it immediately. Use `--no-config` or `--no-template` only for advanced bare-skeleton setup or tests.
 
 Before editing wiki content, run the deterministic CLI onboarding sequence:
 
