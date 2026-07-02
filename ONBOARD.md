@@ -1,31 +1,199 @@
 ## First-Run Onboarding
 
-Use this file when setting up a fresh checkout or when a new agent needs to orient itself before editing the vault.
+This file is an operator guide, not the onboarding engine. The lifecycle CLI is the deterministic source of truth for setup status:
+
+```bash
+agent-wiki onboard --check
+```
+
+Use this file to understand the flow, explain setup choices, and orient a new agent before it edits a wiki. Do not replace the CLI report with freeform interpretation of this document.
+
+Start with the lifecycle CLI and register the wiki by name:
+
+```bash
+agent-wiki init --type vault --root ./Business
+agent-wiki registry add Business --root ./Business --type vault
+agent-wiki --wiki Business onboard --check
+agent-wiki --wiki Business compile
+agent-wiki --wiki Business index --check
+```
+
+For a project workspace with an embedded wiki:
+
+```bash
+cd /path/to/project
+agent-wiki init --type workspace --workspace-root . --wiki-dir wiki
+agent-wiki registry add MyProject --root ./wiki --type workspace
+agent-wiki --wiki MyProject onboard --check
+agent-wiki --wiki MyProject workspace pending --workspace-root . --json
+```
+
+`agent-wiki init` owns folder creation, local config creation, and bundled template installation by default. `agent-wiki doctor` is the read-only lifecycle check. `agent-wiki onboard --check` is the deterministic first-run report for agents and automation. It emits structured JSON with wiki type, config state, doctor issues, required docs/skills, optional tool availability, import-link state, and next steps.
+
+Use plain `agent-wiki init` for normal fresh wikis. It includes the bundled docs, package metadata, and skills needed for a fresh agent to operate it immediately. Use `--no-config` or `--no-template` only for advanced bare-skeleton setup or tests.
+
+Before editing wiki content, run the deterministic CLI onboarding sequence:
+
+```bash
+agent-wiki --wiki Business doctor
+agent-wiki --wiki Business onboard --check
+agent-wiki --wiki Business compile
+agent-wiki --wiki Business index --check
+```
+
+If the wiki has not been registered yet, use `--wiki-root /path/to/wiki` for `doctor` and `onboard`, then run `compile` and `index --check` from the wiki root.
+
+When a human needs to choose local setup policy, generate stable prompts:
+
+```bash
+agent-wiki onboard --check --questions --wiki-root /path/to/wiki
+```
+
+Agents must treat the CLI output as the onboarding source of truth. Read this file for explanation, not as an interactive onboarding substitute.
+
+When the machine tracks more than one Agent Wiki root, register each root locally:
+
+```bash
+agent-wiki registry add Business --root /path/to/wiki --type vault
+agent-wiki list
+agent-wiki --wiki Business onboard --check
+```
+
+The registry is machine-local operator state at `~/.config/agent-wiki/registry.json`. It should contain only Agent Wiki roots created or migrated by this CLI.
+
+For multiple fresh vault wikis:
+
+```bash
+agent-wiki init --type vault --root ./Business
+agent-wiki registry add Business --root ./Business --type vault
+agent-wiki init --type vault --root ./Research
+agent-wiki registry add Research --root ./Research --type vault
+agent-wiki list
+agent-wiki check --all
+```
+
+For scheduled maintenance in an external agent harness, generate prompts from the registry instead of hardcoding wiki paths:
+
+```bash
+agent-wiki schedule prompt process-inbox
+agent-wiki schedule prompt extract-primitives
+agent-wiki schedule prompt update-overview
+```
+
+Each prompt defaults to all registered wikis. Pass wiki names to target a subset:
+
+```bash
+agent-wiki schedule prompt process-inbox Business Research
+agent-wiki schedule prompt update-overview --wiki Business
+```
+
+These commands print scheduled-agent prompts only. They do not execute the skill workflows. The scheduled agent should log per-wiki failures and continue to the next registered wiki.
+
+Before editing wiki content:
 
 1. Read [[AGENTS]] for the agent behavior contract.
 2. Read [[WIKI#4.1 Common runtime schemas]] for the runtime schema and examples; [[WIKI#5 Status vocabularies]] for status enums; [[WIKI#3 Page types]] for page types.
-3. Read [[AGENT-WIKI-SPEC-v1]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
-4. Run the read-only onboarding probe.
-5. Ask compact multiple-choice setup questions based on the probe output before writing config, creating folders, creating a virtual environment, or installing packages.
-6. Configure local `_system/config.json` from `_system/config.example.json` if local tool policy or conversion backend preferences are needed.
-7. Configure `_system/skills/import-link/config.json` before importing external material.
-8. Create any missing runtime or content folders required for the task. The compile pipeline creates `_system/cache/`, `_system/indexes/`, `_system/logs/`, `reports/`, and regenerates root `index.md`; operational logging uses `_system/scripts/log.py`; page scaffolding uses `_system/scripts/create-page.py`; import workflows create `_inbox/`, `_inbox/trash/`, `raw/`, `sources/`, `sources/parts/`, and `_attachments/`.
-9. Run the compile pipeline and confirm it reports zero validation issues.
-10. Optionally run the `write-synthesis` skill when the vault needs a durable cross-source brief, comparison, analysis, summary, or timeline narrative.
-11. Optionally run the `update-overview` skill when the vault needs a human-facing root `overview.md` landing page.
+3. Read [[AGENT-WIKI-SPEC-v2]] only when changing project behavior, resolving ambiguity, or when [[WIKI#4.1 Common runtime schemas]] is insufficient.
+4. Run `agent-wiki --wiki NAME doctor` for the target registered wiki, or `agent-wiki doctor --wiki-root /path/to/wiki` before registration.
+5. Run `agent-wiki --wiki NAME onboard --check`, or `agent-wiki onboard --check --wiki-root /path/to/wiki` before registration.
+6. Keep local `_system/config.json` limited to local operator policy and command preferences.
+7. Configure `skills/import-link/config.json` before importing external material.
+8. Run the compile pipeline and confirm it reports zero validation issues.
+9. Optionally run the `write-synthesis` skill when the wiki needs a durable cross-source brief, comparison, analysis, summary, or timeline narrative.
+10. Optionally run the `update-overview` skill when the wiki needs a human-facing root `overview.md` landing page.
 
-Run the onboarding probe from the wiki root:
+---
+
+## Vault Wiki Onboarding
+
+Vault mode preserves the classic Agent Wiki layout. The wiki root is the working root. It includes the raw inbox lifecycle:
+
+- `_inbox/` is the active drop zone.
+- `_inbox/trash/` holds rejected inbox material.
+- `raw/` retains original raw captures after promotion.
+- `sources/` and `sources/parts/` hold canonical source pages.
+
+Initialize a vault wiki:
 
 ```bash
-python3 _system/scripts/onboard.py --check
+agent-wiki init --type vault --root /path/to/wiki
 ```
 
-The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the repository root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, required folders, key script availability such as `_system/scripts/create-page.py`, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate vault content.
+Check it:
+
+```bash
+agent-wiki doctor --wiki-root /path/to/wiki --type vault
+```
+
+Use vault mode when the wiki itself is the primary repository and source material enters through `_inbox/`, `import-link`, or direct source-page creation.
+
+---
+
+## Workspace Wiki Onboarding
+
+Workspace mode embeds the wiki inside an existing project. By default the wiki lives at `workspace/wiki`, and original workspace files stay where they are.
+
+Workspace mode includes `_inbox/`, `_inbox/trash/`, and `raw/` for deliberate external captures and notes. Workspace source capture is still reference-based:
+
+- `agent-wiki workspace pending` finds candidate workspace files.
+- The agent reads selected workspace files in place.
+- Canonical `sources/` pages cite workspace-relative `originPath` values.
+- `agent-wiki workspace mark-sourced ...` records which workspace files have been captured.
+
+The workspace scanner excludes the wiki directory itself, so `_inbox/` items are handled by the inbox workflow rather than rediscovered as workspace files.
+
+Initialize a workspace wiki:
+
+```bash
+agent-wiki init --type workspace --workspace-root /path/to/project --wiki-dir wiki
+```
+
+Check it:
+
+```bash
+agent-wiki doctor --wiki-root /path/to/project/wiki --type workspace
+```
+
+Use workspace mode when Agent Wiki is documenting or synthesizing an existing project without moving or owning that project's files.
+
+---
+
+## Upgrade From v1.x
+
+Agent Wiki v2 moves the installable CLI from Python to npm/TypeScript. Existing content pages usually do not need data conversion, but older checkouts may still contain Python-era helper scripts and docs that point to them.
+
+From the wiki root, preview the migration:
+
+```bash
+agent-wiki migrate --from v1 --check
+```
+
+Apply the safe migration:
+
+```bash
+agent-wiki migrate --from v1 --write
+```
+
+The writer backs up changed and removed files under `_archive/migrations/v1-to-v2/`, removes obsolete Python helper paths, refreshes missing v2 template files, rewrites old helper-command references where safe, runs `agent-wiki doctor`, and runs `agent-wiki compile`.
+
+Review the printed summary after migration. Existing canonical content pages under `sources/`, `entities/`, `concepts/`, `claims/`, `questions/`, and `syntheses/` should remain in place.
+
+---
+
+## Environment Probe
+
+Run the lower-level onboarding probe from the wiki root only when environment details matter:
+
+```bash
+agent-wiki onboard --check
+```
+
+The probe is read-only. It reports OS/platform details, whether `.obsidian/` is present at the wiki root, local Python commands, `.venv/` status, `_system/config.json`, `_system/config.example.json`, import-link configuration, mode-specific required folders, key script availability such as `agent-wiki create-page`, converter command availability, and importable Python converter packages. It does not install packages, create folders, write config, or mutate wiki content.
 
 To generate user-friendly setup prompts, run:
 
 ```bash
-python3 _system/scripts/onboard.py --check --questions
+agent-wiki onboard --check --questions
 ```
 
 Use those prompts when asking the user for setup decisions. The user should be able to reply with compact letter choices such as `1A 2B 3A 4C 5A`. Do not ask long open-ended setup questions unless the user needs to provide a specific path or command.
@@ -37,20 +205,24 @@ python3 --version
 python --version
 ```
 
-Use whichever command resolves to Python 3.8 or newer. If neither command is available, warn the user that Python 3 must be installed and available on the agent's path before running the vault scripts. If only `python` works, substitute `python` anywhere this repo shows `python3`.
+Use whichever command resolves to Python 3.8 or newer. If neither command is available, warn the user that Python 3 is only needed for optional local document conversion backends. If only `python` works, substitute `python` anywhere this repo shows `python3`.
+
+Compile from the wiki root:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 ---
 
 ## Local System Configuration
 
-`_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
+`_system/config.json` is optional local operational configuration for wiki type, workspace mode, tool policy, and command preferences. It is not canonical wiki knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape.
 
 Use it when the user wants persistent local preferences such as:
 
+- whether this root is a `vault` or `workspace` wiki
+- workspace root and wiki directory
 - which Python command to use
 - whether inbox conversion is enabled
 - automatic conversion backend order
@@ -58,15 +230,15 @@ Use it when the user wants persistent local preferences such as:
 - whether network, OCR, LLM, transcription, or hosted document-intelligence behavior is allowed
 - optional `knownVaults` mappings from Obsidian vault names to absolute local paths for resolving `obsidian://` references
 
-Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults. When a local config is needed, use the onboarding config writer so only approved local policy fields are persisted:
+Prefer `agent-wiki init` for initial `wikiType` and workspace settings. Do not write `_system/config.json` until the user has approved the setup choices. Missing config means tools should use conservative local-only defaults and default to vault mode.
+
+When local Python or conversion policy is needed, use the onboarding config writer so only approved local policy fields are persisted:
 
 ```bash
-python3 _system/scripts/onboard.py --write-config --python-command python3 --conversion disabled
+agent-wiki onboard --write-config --python-command python3 --conversion disabled
 ```
 
 Use `--conversion available-local` only when the user wants inbox conversion enabled with already installed local backends. Use explicit flags such as `--allow-ocr` only when the user has approved that behavior.
-
-This checkout is the only wiki root. `_system/config.json` does not store alternate write roots, target vaults, or routing choices. `knownVaults` is only a local read-resolution map for `obsidian://` cross-vault references. Users who want multiple independent wikis should clone this repository into multiple folders and onboard each checkout separately.
 
 ---
 
@@ -74,13 +246,13 @@ This checkout is the only wiki root. `_system/config.json` does not store altern
 
 Obsidian is optional. The wiki can be used as a plain Markdown repository, and onboarding does not require an Obsidian vault to already exist.
 
-After onboarding, if the user wants to use this wiki in Obsidian, recommend opening the repository root as an Obsidian vault:
+After onboarding, if the user wants to use this wiki in Obsidian, recommend opening the wiki root as an Obsidian vault:
 
 1. Open Obsidian.
 2. Click the current vault name at the bottom of the file explorer pane, or use Obsidian's vault switcher if the control is not visible.
 3. Click "Manage vaults..."
 4. Click "Open folder as vault".
-5. Navigate to the root of this wiki.
+5. Navigate to the wiki root.
 6. Click "Select Folder".
 
 Obsidian may create a local `.obsidian/` folder. That folder is local application state and should not be committed.
@@ -109,7 +281,7 @@ Agents must not create `.venv/` or install packages unless the user explicitly a
 
 The `import-link` skill needs local setup before first use. Do not assume another user's Obsidian path, browser profile, model, or retrieval tools are valid for this checkout.
 
-Edit `_system/skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
+Edit `skills/import-link/config.json` before importing. The checked-in file is intentionally not configured for a specific user.
 
 Required first-run edits:
 
@@ -146,9 +318,9 @@ Config fields:
 
 If any required value is unknown, the agent should ask the user before running `import-link`.
 
-The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
+The `_inbox/` workflow is handled by [[INBOX]] and the `process-inbox` skill in vault mode. Raw files dropped into `_inbox/` are promoted into canonical source pages and then moved to `raw/`.
 
-For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `_system/scripts/onboard.py --check` first when converter availability is unknown, then ask the user which conversion policy to use before running `_system/scripts/onboard.py --write-config` or installing anything.
+For binary or non-markdown inbox files, `process-inbox` may use configured local conversion backends. Run `agent-wiki onboard --check` first when converter availability is unknown, then ask the user which conversion policy to use before running `agent-wiki onboard --write-config` or installing anything.
 
 Large raw files should be promoted as a short parent source page plus source part pages under `sources/parts/`, not as one giant markdown file.
 
@@ -156,9 +328,9 @@ Source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]
 
 ---
 
-## Recommended v1 Implementation Sequence
+## Recommended v2 Implementation Sequence
 
-1. Create vault skeleton
+1. Create wiki lifecycle commands
 2. Add universal frontmatter handling
 3. Add page-type-specific validation
 4. Implement claim extraction
@@ -171,13 +343,13 @@ Source pages use the source status vocabulary from [[WIKI#5 Status vocabularies]
 11. Regenerate root `index.md`
 12. Generate required reports
 13. Add contradiction/question caches
-14. Add or refresh root `overview.md` when the vault needs a human-facing landing page
+14. Add or refresh root `overview.md` when the wiki needs a human-facing landing page
 
 ---
 
-## Out of Scope for v1
+## Out of Scope for v2
 
-The following are out of scope for strict v1 compliance:
+The following are out of scope for strict v2 compliance:
 
 - automatic ontology learning from prose
 - autonomous contradiction resolution
@@ -191,9 +363,9 @@ The following are out of scope for strict v1 compliance:
 
 ## Philosophy
 
-The v1 model has three layers:
+The v2 model has four layers:
 
-- The vault is the container: markdown pages, folders, human notes, and generated artifacts.
+- The wiki is the container: markdown pages, folders, human notes, and generated artifacts.
 - The ontology is the truth model: entities, concepts, sources, claims, evidence, relations, contradictions, questions, and syntheses.
 - The compile layer is the bridge: stable machine-facing cache files, the deterministic root page catalog, and generated maintenance reports.
 - The overview layer is the human landing page: durable prose that orients readers without replacing canonical evidence or compiled data.

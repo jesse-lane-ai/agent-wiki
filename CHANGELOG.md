@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.0.0 - 2026-06-28
+
+### Added
+
+- Rewrote the installable Agent Wiki CLI as an npm/TypeScript package.
+- Added npm CLI commands for lifecycle, page scaffolding, onboarding, compile, index rendering, logging, workspace discovery, reference migration, UUID generation, and v1 migration.
+- Added `agent-wiki migrate --from v1 --check|--write` to help existing Python-era checkouts upgrade to the v2 layout.
+- Added package install dogfood coverage, compile parity coverage, and fresh real-source verification for vault and workspace modes.
+
+### Changed
+
+- `agent-wiki init --with-template` now copies docs, package metadata, config example, and root-level skills without copying Python helper scripts.
+- Skill docs and root docs now call npm CLI commands instead of Python helper scripts.
+- `INBOX.md` is now a short pointer; durable inbox lifecycle rules live in `WIKI.md`, and operational steps live in `skills/process-inbox/SKILL.md`.
+
+### Removed
+
+- Removed the Python package entrypoint (`agent_wiki/`) and `pyproject.toml`.
+- Removed Python helper scripts under `_system/scripts/`, `skills/compile-wiki/scripts/compile.py`, and `skills/import-link/scripts/uuid.py`.
+
+### Compatibility
+
+- This is a breaking distribution/runtime change for Python-era installations.
+- Existing canonical wiki content pages are expected to remain compatible. Run `agent-wiki migrate --from v1 --check` before applying the v2 migration.
+
 ## v1.4.2 - 2026-06-10
 
 ### Added
@@ -15,7 +40,7 @@
 ### Compatibility
 
 - Backward-compatible with existing v1 vaults.
-- Existing vaults can run `_system/scripts/migrate-refs-to-links.py --write` to convert soft reference fields.
+- Existing vaults can run `agent-wiki migrate-refs-to-links --write` to convert soft reference fields.
 
 ## v1.4.1 - 2026-05-28
 

@@ -1,9 +1,12 @@
 .obsidian/
 .venv/
+node_modules/
+dist/
 __pycache__/
 *.pyc
 _system/config.json
 _system/cache/
 _system/indexes/
 _system/logs/
+_system/state/
 reports/

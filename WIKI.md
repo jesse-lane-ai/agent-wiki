@@ -1,18 +1,18 @@
 # WIKI.md
 
-Human-readable schema and editorial guide for the Agentics vault.  
-Spec version: v1  
+Human-readable schema and editorial guide for Agent Wiki.
+Spec version: v2
 Last updated: 2026-05-02
 
 ---
 
 ## 1. What this wiki is
 
-This vault is a structured knowledge base designed to be useful for both humans and AI agents.
+This wiki is a structured knowledge base designed to be useful for both humans and AI agents.
 
-This file is the compact runtime schema and editorial guide for ordinary vault operations. User agents should prefer this file for page schemas, status enums, ID formats, evidence rules, and common examples.
+This file is the compact runtime schema and editorial guide for ordinary wiki operations. User agents should prefer this file for page schemas, status enums, ID formats, evidence rules, and common examples.
 
-The full project and development contract lives in [[AGENT-WIKI-SPEC-v1]]. Use the full spec when changing project behavior, scripts, skills, configuration policy, validation behavior, or when this file is insufficient. If this file conflicts with the full spec, the full spec remains canonical until the conflict is resolved.
+The full project and development contract lives in [[AGENT-WIKI-SPEC-v2]]. Use the full spec when changing project behavior, scripts, skills, configuration policy, validation behavior, or when this file is insufficient. If this file conflicts with the full spec, the full spec remains canonical until the conflict is resolved.
 
 It separates:
 - **things** from **ideas**
@@ -30,9 +30,9 @@ It separates:
 |---|---|
 | [[AGENTS]] | Agent behavior contract: preservation, logging, linking, generated files, and editing boundaries |
 | [[WIKI#4.1 Common runtime schemas]] | Compact runtime schema and editorial reference for ordinary vault work |
-| [[INBOX]] | Raw inbox lifecycle |
+| [[INBOX]] | Short pointer to inbox rules and the `process-inbox` skill |
 | [[ONBOARD]] | First-run setup and local environment workflow |
-| [[AGENT-WIKI-SPEC-v1]] | Full project/development contract and detailed implementation reference |
+| [[AGENT-WIKI-SPEC-v2]] | Full project/development contract and detailed implementation reference |
 
 Agents should load the smallest document that answers the task. Routine source import, inbox processing, extraction, overview, and compile work should not require loading the full spec unless there is ambiguity.
 
@@ -45,7 +45,7 @@ Current vault structure:
 ```text
 <vault>/
   AGENTS.md
-  AGENT-WIKI-SPEC-v1.md
+  AGENT-WIKI-SPEC-v2.md
   INBOX.md
   ONBOARD.md
   README.md
@@ -61,6 +61,7 @@ Current vault structure:
   syntheses/
   questions/
   reports/
+  skills/
 
   _inbox/
   raw/
@@ -72,7 +73,6 @@ Current vault structure:
     indexes/
     logs/
     scripts/
-    skills/
 ```
 
 Fresh template checkouts may omit empty content and runtime folders. Initialization, import, and compile workflows create missing folders as needed.
@@ -87,19 +87,26 @@ Fresh template checkouts may omit empty content and runtime folders. Initializat
 | `syntheses/` | Maintained cross-source interpretations: overviews, analyses, comparisons, briefs, timelines |
 | `questions/` | Unresolved uncertainties and research gaps |
 | `reports/` | Generated maintenance views and dashboards |
+| `skills/` | Agent skill definitions and supporting skill files |
 | `_attachments/` | Attachments referenced by source or other pages (created on init, may be empty) |
 | `_archive/` | Archived content no longer actively maintained (created on init, may be empty) |
 | `_system/` | Machine-generated runtime and compile artifacts (do not hand-edit) |
 | `_inbox/` | Raw intake queue for unprocessed items |
 | `raw/` | Retained original raw files after inbox promotion |
 
+Workspace-mode wikis use the same internal structure, but the wiki root is usually `workspace/wiki`. Source candidates can live outside the wiki directory and be discovered by the CLI, while deliberate captures can still land in the wiki's `_inbox/`. They become canonical evidence only after an agent creates `source` pages inside `wiki/sources/`.
+
 `_system/config.json` is optional local operational configuration for tool policy and command preferences. It is not canonical vault knowledge, should not contain secrets, and should not be committed. `_system/config.example.json` is the tracked example shape. Optional `knownVaults` entries may map Obsidian vault names to absolute local paths so agents can resolve `obsidian://` cross-vault references for reading only.
 
-Use `_system/scripts/onboard.py --check` for a read-only local setup probe before first-run configuration or when converter availability is uncertain. Use `_system/scripts/onboard.py --check --questions` when an agent needs compact multiple-choice setup prompts for the user. Use `_system/scripts/onboard.py --write-config` only after the user approves the exact local setup choices to persist.
+Use `agent-wiki onboard --check --wiki-root PATH` for deterministic first-run onboarding and local setup probes. The command emits structured JSON for automation. Use `agent-wiki onboard --check --questions --wiki-root PATH` when an agent needs compact multiple-choice setup prompts for the user. Use `agent-wiki onboard --write-config` only after the user approves the exact local setup choices to persist.
 
-Use `_system/scripts/create-page.py` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
+Use `agent-wiki create-page` to scaffold new canonical pages from caller-supplied metadata and body content. It supports `source`, `entity`, `concept`, `claim`, `question`, and `synthesis` pages, including whole source pages, large-source parent manifests, source part pages, caller-supplied claim evidence records, and synthesis scope. It validates required frontmatter, IDs, filenames, duplicate IDs, target paths, subtype/status enums, required body content, supplied evidence shape, and required synthesis scope. It covers required schema fields, but does not automatically fill every optional recommended field such as `owner`, `summary`, `freshness`, or page-level `confidence`.
 
-This project is scoped to one wiki per checkout. The repository root is the wiki root. Obsidian setup is optional and means opening this repository root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
+Each wiki root remains a single Agent Wiki. In vault mode, the repository or selected root is the wiki root. In workspace mode, the wiki root is usually `workspace/wiki`. The CLI may track multiple local Agent Wiki roots through the machine-local registry at `~/.config/agent-wiki/registry.json`. Registry entries are named Agent Wiki roots and can be selected with `agent-wiki --wiki NAME <command>`. The registry is local operator state, not canonical wiki knowledge, and should not be stored inside a wiki.
+
+Use `agent-wiki list` to list registered wikis and paths. Use `agent-wiki check --all` for a light read-only registry health check across all registered wikis. Use `agent-wiki check --all --full` when compile and index validation should also run. Obsidian setup is optional and means opening the wiki root as an Obsidian vault; it does not change where skills or scripts write content. `knownVaults` does not create alternate write roots.
+
+Use `agent-wiki schedule prompt process-inbox`, `agent-wiki schedule prompt extract-primitives`, and `agent-wiki schedule prompt update-overview` to print scheduled-agent prompts from the registry. These prompts are meant for external scheduled-task harnesses and remain skill-based; the CLI does not execute those workflows. By default they target all registered wikis. Pass wiki names or `--wiki NAME` to target a subset. Scheduled agents should log failures for one wiki and continue to the next.
 
 ---
 
@@ -380,7 +387,7 @@ New `entity`, `concept`, `claim`, `question`, and `synthesis` pages must include
 
 The body should be detailed, human-facing prose that explains what the page represents, why it matters, and how the structured fields should be understood. It should not be a placeholder, a one-line restatement of the title, or only a machine-readable metadata dump.
 
-Agents should use `_system/scripts/create-page.py` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, synthesis judgment, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML. For synthesis pages, pass an explicit `--scope` and any known `--source-page` or `--derived-claim` values.
+Agents should use `agent-wiki create-page` for new page files when a skill creates canonical `source`, `entity`, `concept`, `claim`, `question`, or `synthesis` pages. The script is a scaffolder only; the calling skill or agent remains responsible for the actual source capture, body prose, evidence judgment, relationships, source partitioning decisions, synthesis judgment, and optional fields that require judgment. For claim pages, pass already-selected evidence to the scaffolder so it can render spec-shaped block YAML. For synthesis pages, pass an explicit `--scope` and any known `--source-page` or `--derived-claim` values.
 
 Agents must preserve existing human-authored body prose unless the operator explicitly asks for a rewrite.
 
@@ -490,7 +497,7 @@ Evidence attaches provenance and support semantics to a claim.
 
 ## 8. Relationship predicates
 
-The v1 controlled predicate set:
+The v2 controlled predicate set:
 
 | Predicate | Meaning |
 |---|---|
@@ -517,7 +524,7 @@ Generated structured knowledge should live in frontmatter fields, claim/evidence
 
 Agents should preserve human-authored page prose unless explicitly asked to rewrite it. Page body prose is ordinary markdown.
 
-`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI#1.1 Documentation layers]], [[INBOX]], or [[AGENTS]] instead.
+`index.md` is generated as the root page catalog. Do not place durable manual prose there; use root documentation files such as [[overview]], [[README]], [[WIKI#1.1 Documentation layers]], [[ONBOARD]], or [[AGENTS]] instead.
 
 `overview.md` is durable AI-maintained orientation prose. It should summarize the vault for a human reader, but it is not primary evidence and should not replace canonical source, claim, evidence, or page metadata records.
 
@@ -530,7 +537,7 @@ The compile pipeline reads the vault, emits machine-readable caches to `_system/
 Run with:
 
 ```bash
-python3 _system/skills/compile-wiki/scripts/compile.py
+agent-wiki compile
 ```
 
 Required outputs:
@@ -643,13 +650,13 @@ Extraction should run against source parts, not the parent source page. Evidence
 
 The `_inbox/` folder is the raw item intake queue. New unprocessed material should land here first.
 
-Raw inbox items are promoted into canonical `source` pages by the `process-inbox` skill. See [[INBOX]] for the full intake lifecycle.
+Raw inbox items are promoted into canonical `source` pages by the `process-inbox` skill. This section owns the durable lifecycle rules; the skill owns the exact operational commands.
 
 ### Intake lifecycle
 
 1. Raw item arrives in `_inbox/`
 2. `process-inbox` reads the raw item
-3. If retained: `process-inbox` uses `_system/scripts/create-page.py` to write a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
+3. If retained: `process-inbox` uses `agent-wiki create-page` to write a canonical `source` page under `sources/` with `status: unprocessed`, or a large-source parent plus source parts
 4. The original raw file moves to `raw/`
 5. If discarded: the raw file moves to `_inbox/trash/`
 
@@ -659,6 +666,20 @@ Raw inbox items are promoted into canonical `source` pages by the `process-inbox
 - Files in `raw/` are retained originals, not canonical source records.
 - Agents MUST NOT treat `_inbox/` or `raw/` items as authoritative source records.
 - Agents SHOULD process inbox items by converting them into proper `source` pages.
+
+### Workspace files are not canonical
+
+In workspace mode, files outside the wiki directory are discovery inputs. They may be project notes, docs, datasets, exports, or other artifacts worth promoting.
+
+Agents SHOULD use:
+
+```bash
+agent-wiki workspace pending --json
+```
+
+to get a deterministic worklist of new or changed files. The agent then decides which files deserve canonical source pages.
+
+Original workspace files MUST stay in place. A workspace source page SHOULD point back to the original file with `originPath`, using the workspace-relative path. The `process-workspace-sources` skill owns this workflow.
 
 ---
 

@@ -1,7 +1,56 @@
 {
   "schemaVersion": 1,
+  "wikiType": "vault",
   "pythonCommand": null,
   "knownVaults": {},
+  "workspace": {
+    "root": null,
+    "wikiDir": "wiki",
+    "scan": {
+      "includeExtensions": [
+        ".md",
+        ".markdown",
+        ".txt",
+        ".pdf",
+        ".docx",
+        ".csv",
+        ".json",
+        ".yaml",
+        ".yml"
+      ],
+      "excludeDirs": [
+        ".git",
+        ".hg",
+        ".svn",
+        ".obsidian",
+        ".venv",
+        "venv",
+        "env",
+        "__pycache__",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "node_modules",
+        "dist",
+        "build",
+        ".next",
+        ".turbo",
+        ".cache",
+        "_system",
+        "reports",
+        "target",
+        "vendor"
+      ],
+      "excludeFileGlobs": [
+        "*.lock",
+        "package-lock.json",
+        "pnpm-lock.yaml",
+        "yarn.lock",
+        "uv.lock",
+        "poetry.lock"
+      ]
+    }
+  },
   "conversion": {
     "enabled": false,
     "defaultBackend": "auto",
