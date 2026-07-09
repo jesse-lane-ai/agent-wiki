@@ -29,6 +29,23 @@ test("schedule prompt renders skill-based maintenance prompt for all registered 
   }
 });
 
+test("process-inbox schedule prompt routes workspace wikis to process-workspace-sources", () => {
+  const temp = mkdtempSync(join(tmpdir(), "agent-wiki-schedule-"));
+  const env = { ...process.env, AGENT_WIKI_REGISTRY_PATH: join(temp, "registry.json") };
+  try {
+    registerWiki(env, temp, "Business");
+    registerWorkspaceWiki(env, temp, "Project");
+
+    const out = execFileSync("node", [CLI, "schedule", "prompt", "process-inbox"], { env, encoding: "utf8" });
+    assert.match(out, /Business:/);
+    assert.match(out, /Project: .*workspace wiki; use skills\/process-workspace-sources\/SKILL\.md/);
+    assert.match(out, /process-inbox\/SKILL\.md` instructions for vault wikis/);
+    assert.match(out, /process-workspace-sources\/SKILL\.md` instructions for workspace wikis/);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
 test("schedule prompt can target selected registered wikis by positional name or flag", () => {
   const temp = mkdtempSync(join(tmpdir(), "agent-wiki-schedule-"));
   const env = { ...process.env, AGENT_WIKI_REGISTRY_PATH: join(temp, "registry.json") };
@@ -61,5 +78,15 @@ test("schedule prompt can target selected registered wikis by positional name or
 function registerWiki(env: NodeJS.ProcessEnv, temp: string, name: string): void {
   const wiki = join(temp, name);
   execFileSync("node", [CLI, "init", "--type", "vault", "--root", wiki], { env, encoding: "utf8" });
+  execFileSync("node", [CLI, "registry", "add", name, "--root", wiki], { env, encoding: "utf8" });
+}
+
+function registerWorkspaceWiki(env: NodeJS.ProcessEnv, temp: string, name: string): void {
+  const workspace = join(temp, name);
+  const wiki = join(workspace, "wiki");
+  execFileSync("node", [CLI, "init", "--type", "workspace", "--workspace-root", workspace, "--wiki-dir", "wiki"], {
+    env,
+    encoding: "utf8"
+  });
   execFileSync("node", [CLI, "registry", "add", name, "--root", wiki], { env, encoding: "utf8" });
 }

@@ -32,13 +32,8 @@ function renderPrompt(job: string, entries: WikiRegistryEntry[]): string {
     "extract-primitives": "Scheduled Agent Wiki job: extract knowledge primitives",
     "update-overview": "Scheduled Agent Wiki job: compile and refresh overview"
   }[job];
-  const skill = {
-    "process-inbox": "skills/process-inbox/SKILL.md",
-    "extract-primitives": "skills/extract-knowledge-primitives/SKILL.md",
-    "update-overview": "skills/update-overview/SKILL.md"
-  }[job];
   const task = {
-    "process-inbox": "Run the local process-inbox workflow for raw files in `_inbox/`.",
+    "process-inbox": "Run source intake: use process-inbox for vault wikis and process-workspace-sources for workspace wikis.",
     "extract-primitives": "Run the local extract-knowledge-primitives workflow for source pages with `status: unprocessed`.",
     "update-overview": "Run the local update-overview workflow, which compiles first and then refreshes `overview.md`."
   }[job];
@@ -57,25 +52,54 @@ function renderPrompt(job: string, entries: WikiRegistryEntry[]): string {
     "Do not hand-edit `_system/config.json`, `_system/cache/`, or `_system/indexes/`.",
     "",
     `Task: ${task}`,
-    `Skill: ${skill}`,
+    `Skill: ${skillSummary(job)}`,
     "",
     "Registered wiki targets for this run:"
   ];
   if (entries.length === 0) {
     lines.push("- No registered wikis found. Report that there is nothing to run.");
   } else {
-    for (const entry of entries) lines.push(`- ${entry.name}: ${entry.root}`);
+    for (const entry of entries) lines.push(targetLine(job, entry));
   }
   lines.push(
     "",
     "For each target wiki, in order:",
     "1. Run `agent-wiki --wiki <name> onboard --check` and review the JSON summary.",
     "2. Read that wiki's `AGENTS.md` and `WIKI.md` before editing.",
-    `3. Follow that wiki's local \`${skill}\` instructions exactly.`,
+    `3. Follow ${skillInstruction(job)} exactly.`,
     `4. ${empty}`,
     "5. Report a compact per-wiki result: processed, skipped, failed, and why.",
     "",
     "Act without asking unless the local skill requires an explicit operator decision."
   );
   return `${lines.join("\n")}\n`;
+}
+
+function targetLine(job: string, entry: WikiRegistryEntry): string {
+  if (job === "process-inbox" && entry.type === "workspace") {
+    return `- ${entry.name}: ${entry.root} (workspace wiki; use skills/process-workspace-sources/SKILL.md)`;
+  }
+  return `- ${entry.name}: ${entry.root}`;
+}
+
+function skillInstruction(job: string): string {
+  if (job === "process-inbox") {
+    return "the wiki's local `skills/process-inbox/SKILL.md` instructions for vault wikis and `skills/process-workspace-sources/SKILL.md` instructions for workspace wikis";
+  }
+  const skill = {
+    "extract-primitives": "skills/extract-knowledge-primitives/SKILL.md",
+    "update-overview": "skills/update-overview/SKILL.md"
+  }[job];
+  return `\`${skill}\``;
+}
+
+function skillSummary(job: string): string {
+  if (job === "process-inbox") {
+    return "skills/process-inbox/SKILL.md for vault wikis; skills/process-workspace-sources/SKILL.md for workspace wikis";
+  }
+  const skill = {
+    "extract-primitives": "skills/extract-knowledge-primitives/SKILL.md",
+    "update-overview": "skills/update-overview/SKILL.md"
+  }[job];
+  return String(skill);
 }

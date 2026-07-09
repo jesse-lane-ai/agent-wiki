@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.0 - 2026-07-09
+
+### Changed
+
+- Updated `agent-wiki schedule prompt process-inbox` so workspace wikis route agents to `skills/process-workspace-sources/SKILL.md` while vault wikis continue to use `skills/process-inbox/SKILL.md`.
+
 ## v2.0.0 - 2026-06-28
 
 ### Added
